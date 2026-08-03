@@ -5,6 +5,13 @@ the amount of prose in a template. The skill may use an LLM to draft Markdown
 after the user supplies or authorizes the source, but it is not an automatic
 PDF-ingestion or OCR pipeline.
 
+## Obsidian title rendering
+
+Obsidian displays the Markdown filename as an inline title when that setting is
+enabled. Reference templates therefore do not repeat the filename as a top-
+level `#` heading; content starts with semantic `##` sections. Do not turn off
+or edit `.obsidian` to work around a duplicate title.
+
 ## Two source states
 
 - `not reviewed`: a capture note with only the canonical location, why it was

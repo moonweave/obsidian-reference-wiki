@@ -1,5 +1,3 @@
-# Reference Index
-
 ## Paper-first sources
 
 {source_links}

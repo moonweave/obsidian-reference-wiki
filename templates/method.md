@@ -3,8 +3,6 @@ type: literature-method
 status: {method_status}
 canonical_location: {canonical_location}
 ---
-# Method — {method_name}
-
 ## Purpose
 
 {method_summary}

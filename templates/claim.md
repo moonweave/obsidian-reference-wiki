@@ -2,8 +2,6 @@
 type: literature-claim
 status: {claim_status}
 ---
-# Claim — {claim_name}
-
 {claim_text}
 
 ## Scope and conditions

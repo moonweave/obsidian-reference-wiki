@@ -2,8 +2,6 @@
 type: theory-background
 status: {theory_status}
 ---
-# Theory — {theory_name}
-
 ## Background or mechanism
 
 {theory_summary}

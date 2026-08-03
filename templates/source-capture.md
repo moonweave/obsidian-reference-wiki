@@ -3,8 +3,6 @@ canonical_location: {canonical_location}
 status: not reviewed
 source_text_basis: unknown
 ---
-# Source — {source_name}
-
 ## Capture reason
 
 {capture_reason}

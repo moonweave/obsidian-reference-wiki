@@ -1,5 +1,3 @@
-# Reading Queue
-
 ## Capture
 
 - Item: {source_name}

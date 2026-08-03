@@ -1,5 +1,3 @@
-# Theme — {theme_name}
-
 ## Question
 
 {current_question}

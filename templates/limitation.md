@@ -1,5 +1,3 @@
-# Limitation — {limitation_name}
-
 ## Limitation type
 
 {limitation_type}

@@ -5,8 +5,6 @@ source_text_basis: {source_text_basis}
 reviewed_scope: {reviewed_scope}
 unreviewed_scope: {unreviewed_scope}
 ---
-# Source — {source_name}
-
 ## Paper map
 
 - Problem or research question: {research_problem}

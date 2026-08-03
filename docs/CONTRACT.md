@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 4`
+`contract_version: 5`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -47,8 +47,8 @@ Obsidian title rendering follows `docs/NOTE_QUALITY.md`: a rendered note does
 not repeat its filename as a top-level heading, and the skill does not edit
 `.obsidian` to hide duplicate titles.
 
-The read-only lint is necessary but not sufficient handoff evidence. A pass
-with `sources=0` proves only that no discovered Source violated the checks; it
-does not prove that the correct Vault or expected source set was reviewed.
-Before handoff, compare the reported Source counts with the approved Blueprint
-and treat a mismatch as failure.
+The read-only lint is necessary but not sufficient handoff evidence. Handoff
+must run `scripts/check_notes.py` with `--expect-sources` set to the exact
+Paper/Source count in the approved Blueprint. A mismatch fails the command. A
+bare run without that option is exploratory only and cannot prove that the
+correct Vault or expected reference set was reviewed.

@@ -93,8 +93,13 @@ quality are additionally exercised through the product templates and
 `scripts/check_notes.py`.
 
 The read-only lint is a quality check over discovered notes, not proof that the
-correct Vault was selected. A `sources=0` pass must be rejected when the
-approved Blueprint expected one or more Source notes.
+correct Vault was selected. Handoff runs it with the approved Blueprint count:
+
+```bash
+python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
+```
+
+A count mismatch fails. A run without `--expect-sources` is exploratory only.
 
 ## License
 

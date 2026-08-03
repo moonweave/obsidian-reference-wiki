@@ -87,11 +87,12 @@ when the paper does not support a detail. Do not promote a node until the
 Source dossier has a review trace and the relevant provenance fields.
 
 Before handoff, run the product-local read-only lint with
-`python scripts/check_notes.py <approved-vault>`. It checks Source status,
+`python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>`.
+It checks Paper/Source count, status,
 required dossier sections, page anchors, evidence-type labels, promoted-note
 provenance, and resolving wikilinks; it never edits the Vault.
-Compare its Source counts with the approved Blueprint. A pass with
-`sources=0` is not handoff evidence when the Blueprint expected a Source.
+The expected count comes from the approved Blueprint. A bare lint run without
+`--expect-sources` is exploratory only and is not handoff evidence.
 
 ## Existing Vault and handoff
 

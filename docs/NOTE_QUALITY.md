@@ -19,6 +19,13 @@ other external material. The prefix is part of the stable Markdown basename,
 not a prose heading. Preserve an existing basename even when it predates this
 default; link it through `reference_type` instead of renaming it silently.
 
+## Handoff count gate
+
+Run `python scripts/check_notes.py <approved-vault> --expect-sources
+<approved-count>` before handoff. The approved count includes both `Paper — …`
+and `Source — …` records. A count mismatch is a failed handoff; an exploratory
+run without the option is not completion evidence.
+
 ## Two source states
 
 - `not reviewed`: a capture note with only the canonical location, why it was

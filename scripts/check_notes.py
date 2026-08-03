@@ -55,10 +55,11 @@ def in_domain(path: Path, domain: str) -> bool:
     return any(part == domain or part.endswith(f" {domain}") for part in path.parts)
 
 
-def check(root: Path) -> dict[str, object]:
+def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
     errors: list[str] = []
     notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
     names = {path.stem for path in notes}
+    references = source_notes(root)
 
     for path in notes:
         text = path.read_text(encoding="utf-8")
@@ -69,7 +70,7 @@ def check(root: Path) -> dict[str, object]:
     reviewed = 0
     partial = 0
     captured = 0
-    for path in source_notes(root):
+    for path in references:
         text = path.read_text(encoding="utf-8")
         meta = frontmatter(text)
         status = meta.get("status", "")
@@ -107,10 +108,16 @@ def check(root: Path) -> dict[str, object]:
         if "Source anchor" not in text and not re.search(r"(?:Paper|Source|Reference): \[\[", text):
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
 
+    if expected_sources is not None and len(references) != expected_sources:
+        errors.append(
+            f"source count mismatch: expected {expected_sources}, found {len(references)}"
+        )
+
     return {
         "status": "pass" if not errors else "fail",
         "notes": len(notes),
-        "sources": len(source_notes(root)),
+        "sources": len(references),
+        "expected_sources": expected_sources,
         "reviewed_sources": reviewed,
         "partial_sources": partial,
         "capture_sources": captured,
@@ -122,13 +129,20 @@ def check(root: Path) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("vault", type=Path)
+    parser.add_argument(
+        "--expect-sources",
+        type=int,
+        help="fail unless the discovered Paper/Source note count matches this value",
+    )
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
+    if args.expect_sources is not None and args.expect_sources < 0:
+        parser.error("--expect-sources must be zero or greater")
     root = args.vault.expanduser().resolve()
     if not root.is_dir():
         print(f"Vault does not exist: {root}", file=sys.stderr)
         return 2
-    result = check(root)
+    result = check(root, expected_sources=args.expect_sources)
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

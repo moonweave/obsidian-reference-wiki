@@ -22,3 +22,9 @@ Reference `Method` notes describe a method as reported by a source. Research
 `Method` notes describe the user's own research process; the two meanings must
 not be merged. `Theory` notes capture source-grounded background mechanisms,
 models, or conceptual frameworks and must retain their source and claim links.
+
+The Source note is the paper-first reading record. It may contain the paper's
+abstract or scope, method, theory, evidence, and limitations together. Standalone
+Claim, Method, Theory, Evidence, or Limitation notes are promoted only when
+they are reusable, question-relevant, independently revised, or provenance-
+distinct; promotion must not duplicate the full Source note.

@@ -7,6 +7,11 @@ structure without turning the Vault into a research-log or experiment system.
 It also gives literature methods and source-grounded background theories their
 own notes, distinct from the user's research protocol.
 
+Paper notes remain the primary reading record. Standalone Claim, Method,
+Theory, Evidence, or Limitation notes are optional promotion targets for
+cross-paper reuse, active questions, independent revision, or distinct
+provenance.
+
 ## What it does
 
 - designs or safely onboards a reference-focused Obsidian Vault;

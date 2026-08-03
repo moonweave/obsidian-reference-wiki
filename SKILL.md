@@ -52,6 +52,19 @@ source-grounded background mechanism, model, or conceptual framework that is
 reused across claims. Do not turn a paper's background discussion into a
 scientific fact beyond what the supplied source supports.
 
+## Paper-first capture and selective promotion
+
+Create one Source note per paper as the reading record. Keep the paper-specific
+abstract or scope, method as used by that paper, background theory, reported
+evidence or results, and supplied limitations together in that Source note.
+
+Promote a Claim, Method, Theory, Evidence, or Limitation to its own note only
+when it is reused across sources, answers an active literature question, needs
+independent links or revision, or has a distinct provenance boundary. A
+promoted note is a concise reusable index with a link back to the Source; it is
+not a second copy of the paper's full discussion. If none of those conditions
+hold, keep the detail in the Source note.
+
 ## Existing Vault and handoff
 
 For a mixed Vault, the baseline ledger must use exactly `keep in place`, `link
@@ -61,4 +74,4 @@ outgoing link, confirm canonical locations remain external, report unreviewed
 material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
-Propose `Reference Index`, `Sources`, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Source — …]] -> [[Claim — …]]`. Add `Method — …` and `Theory — …` notes only when the supplied source material supports them. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+Propose `Reference Index`, `Sources`, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Source — …]]`, then adds a Claim or promoted node only when the source supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.

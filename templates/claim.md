@@ -3,5 +3,5 @@
 {claim_text}
 
 - Source: [[Source — {source_name}]]
-- Evidence: [[Evidence — {evidence_name}]]
-- Limitation: [[Limitation — {limitation_name}]]
+- Evidence / context: {evidence_link}
+- Limitation / boundary: {limitation_link}

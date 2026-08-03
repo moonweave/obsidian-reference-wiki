@@ -1,5 +1,9 @@
 # Reference Index
 
-- Source: [[Source — {source_name}]]
-- Claim: [[Claim — {claim_name}]]
-- Theme: [[Theme — {theme_name}]]
+## Paper-first sources
+
+{source_links}
+
+## Promoted reusable nodes
+
+{promoted_links}

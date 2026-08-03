@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 3`
+`contract_version: 4`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -28,6 +28,13 @@ abstract or scope, method, theory, evidence, and limitations together. Standalon
 Claim, Method, Theory, Evidence, or Limitation notes are promoted only when
 they are reusable, question-relevant, independently revised, or provenance-
 distinct; promotion must not duplicate the full Source note.
+
+Academic articles use the filename `Paper — {short title}` by default. Reports,
+web pages, standards, datasets, and other external materials use `Source —
+{name}`. Both are reference records and may live in a `Sources` or `Papers`
+navigation folder. Existing `Source — …` paper notes remain valid and are
+linked in place; adopting `Paper — …` never authorizes an automatic rename.
+Templates use `reference_type` so every wikilink targets the actual basename.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and reviewed scope, include method,

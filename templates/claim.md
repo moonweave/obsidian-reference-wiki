@@ -13,7 +13,7 @@ status: {claim_status}
 - {evidence_link}
 - Provenance anchor: {claim_anchor}
 
-- Source: [[Source — {source_name}]]
+- {reference_type}: [[{reference_type} — {source_name}]]
 
 ## Alternatives or counterevidence
 

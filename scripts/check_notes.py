@@ -41,8 +41,13 @@ def source_notes(root: Path) -> list[Path]:
         path
         for path in root.rglob("*.md")
         if "_templates" not in path.parts
-        and any(part == "Sources" or part.endswith(" Sources") for part in path.parts)
-        and path.stem.startswith("Source — ")
+        and any(
+            part in {"Sources", "Papers"}
+            or part.endswith(" Sources")
+            or part.endswith(" Papers")
+            for part in path.parts
+        )
+        and path.stem.startswith(("Paper — ", "Source — "))
     )
 
 
@@ -99,10 +104,10 @@ def check(root: Path) -> dict[str, object]:
             continue
         promoted += 1
         text = path.read_text(encoding="utf-8")
-        if "Source anchor" not in text and "Source: [[" not in text:
+        if "Source anchor" not in text and not re.search(r"(?:Paper|Source|Reference): \[\[", text):
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
 
-    result = {
+    return {
         "status": "pass" if not errors else "fail",
         "notes": len(notes),
         "sources": len(source_notes(root)),
@@ -112,7 +117,6 @@ def check(root: Path) -> dict[str, object]:
         "promoted_notes": promoted,
         "errors": errors,
     }
-    return result
 
 
 def main() -> int:

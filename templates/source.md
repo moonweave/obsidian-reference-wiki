@@ -1,5 +1,6 @@
 ---
 canonical_location: {canonical_location}
+source_kind: {source_kind}
 status: {source_status}
 source_text_basis: {source_text_basis}
 reviewed_scope: {reviewed_scope}

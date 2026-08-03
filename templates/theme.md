@@ -4,5 +4,5 @@
 
 ## Connected material
 
-- Source: [[Source — {source_name}]]
+- {reference_type}: [[{reference_type} — {source_name}]]
 - Claim: [[Claim — {claim_name}]]

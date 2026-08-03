@@ -14,5 +14,5 @@
 
 {limitation_anchor}
 
-- Source: [[Source — {source_name}]]
+- {reference_type}: [[{reference_type} — {source_name}]]
 - Claim affected: [[Claim — {claim_name}]]

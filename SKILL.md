@@ -36,12 +36,17 @@ PDF library. Do not create a second Vault if the user has an authorized one.
 ## Required first path
 
 The approved first path must be resolvable from `Reference Index` to a real
-Source and then to a Claim, or explicitly stop at Source when no claim was
+Paper or Source and then to a Claim, or explicitly stop at that reference when no claim was
 supplied. Evidence, Method, Theory, and Limitation links are created only when
 supplied. The default domains are `10 Sources`, `20 Claims`, `30 Evidence &
 Methods`, `35 Theories & Background`, `40 Limitations`, `50 Themes`, `60
 Questions`, `90 Reading Queue`, and `_templates`; do not add research-record
 domains.
+
+Use `Paper — {short title}` for academic articles and `Source — {name}` for
+reports, web pages, standards, datasets, or other external material. Preserve
+existing `Source — …` paper basenames and links; do not rename them as part of
+onboarding. Set `reference_type` to the actual prefix when rendering links.
 
 ## Method and theory boundary
 
@@ -97,4 +102,4 @@ outgoing link, confirm canonical locations remain external, report unreviewed
 material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
-Propose `Reference Index`, `Sources`, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Source — …]]`, then adds a Claim or promoted node only when the source supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+Propose `Reference Index`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.

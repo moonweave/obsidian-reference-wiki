@@ -12,6 +12,13 @@ enabled. Reference templates therefore do not repeat the filename as a top-
 level `#` heading; content starts with semantic `##` sections. Do not turn off
 or edit `.obsidian` to work around a duplicate title.
 
+## Filename semantics
+
+Use `Paper — {short title}` for an academic article and `Source — {name}` for
+other external material. The prefix is part of the stable Markdown basename,
+not a prose heading. Preserve an existing basename even when it predates this
+default; link it through `reference_type` instead of renaming it silently.
+
 ## Two source states
 
 - `not reviewed`: a capture note with only the canonical location, why it was

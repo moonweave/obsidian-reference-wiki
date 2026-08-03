@@ -12,6 +12,10 @@ Theory, Evidence, or Limitation notes are optional promotion targets for
 cross-paper reuse, active questions, independent revision, or distinct
 provenance.
 
+Academic articles default to `Paper — {short title}`. Reports, web pages,
+standards, datasets, and other external material use `Source — {name}`. Existing
+`Source — …` paper notes remain valid and are never renamed automatically.
+
 The note-quality workflow in `docs/NOTE_QUALITY.md` keeps text basis, review
 scope, method, measurements, model assumptions, anchored results, and
 limitations visible instead of compressing a paper into an unsupported

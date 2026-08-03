@@ -1,5 +1,6 @@
 ---
 canonical_location: {canonical_location}
+source_kind: {source_kind}
 status: not reviewed
 source_text_basis: unknown
 ---

@@ -50,13 +50,16 @@ or Zotero item remains external and authoritative. A supplied native-text/OCR
 Markdown or text derivative is an immutable reading input. For a private Vault
 that benefits from full-text agent or Obsidian search, `vault-local` may place
 the derivative under the exact approved `05 Source Text/Full Text` path. For a
-shared or published Vault, recommend `external`. `Source Text — …` is a
+shared, published, publicly synchronized, or uncertain Vault, recommend
+`external`. `Source Text — …` is a
 manifest for either mode; it records `source_text_storage`,
 `source_text_location`, `source_text_basis`, `source_text_hash`, and
 `source_text_page_map`, but it is not a summary or a Claim. A vault-local file
 is a regenerable cache, not a copied PDF or an authoritative knowledge note.
 If no derivative was supplied, record `source_text_status: not supplied` and
 `source_text_storage: not supplied`; create no empty placeholder file.
+Artifact verification requires the exact approved `--vault-root`; reject a
+vault-local path whose resolved target, including symlinks, is outside it.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,

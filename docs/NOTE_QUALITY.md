@@ -108,7 +108,7 @@ Claim or Theme that the supplied record does not contain. When a derived text
 manifest is available, verify its external file separately:
 
 ```bash
-python scripts/check_source_text.py <source-text-manifest.md>
+python scripts/check_source_text.py <source-text-manifest.md> --vault-root <approved-vault>
 ```
 
 Graph inspection is a presentation check, not a replacement for the Markdown

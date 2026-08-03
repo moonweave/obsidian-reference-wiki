@@ -25,8 +25,14 @@ def parse_frontmatter(text: str) -> dict[str, str]:
     return values
 
 
-def verify(manifest: Path) -> dict[str, object]:
+def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     errors: list[str] = []
+    vault_root = vault_root.resolve()
+    manifest = manifest.resolve()
+    if not vault_root.is_dir():
+        return {"status": "fail", "manifest": str(manifest), "errors": ["approved Vault root does not exist"]}
+    if not manifest.is_relative_to(vault_root):
+        return {"status": "fail", "manifest": str(manifest), "errors": ["manifest is outside the approved Vault root"]}
     if not manifest.is_file():
         return {"status": "fail", "manifest": str(manifest), "errors": ["manifest does not exist"]}
     metadata = parse_frontmatter(manifest.read_text(encoding="utf-8"))
@@ -49,7 +55,10 @@ def verify(manifest: Path) -> dict[str, object]:
         if not location.is_absolute():
             location = manifest.parent / location
         location = location.resolve()
-        if not location.is_file():
+        if storage == "vault-local" and not location.is_relative_to(vault_root):
+            errors.append("vault-local derived source text is outside the approved Vault root")
+            location = None
+        elif not location.is_file():
             errors.append(f"derived source text does not exist: {location}")
 
     expected_hash = metadata.get("source_text_hash", "")
@@ -89,9 +98,10 @@ def verify(manifest: Path) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
+    parser.add_argument("--vault-root", type=Path, required=True)
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
-    result = verify(args.manifest.expanduser().resolve())
+    result = verify(args.manifest.expanduser(), args.vault_root.expanduser())
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

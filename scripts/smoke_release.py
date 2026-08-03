@@ -90,9 +90,10 @@ def main() -> None:
     assert payload["skill_name"] == "obsidian-research-wiki-reference"
 
     profile_cases = (
-        (("both", "required", "private", "available"), ("balanced", "vault-local")),
-        (("concept", "required", "published", "available"), ("concept-network", "external")),
-        (("paper", "not-required", "private", "none"), ("paper-first", "not supplied")),
+        (("both", "required", "private", "none", "available"), ("balanced", "vault-local")),
+        (("both", "required", "private", "public", "available"), ("balanced", "external")),
+        (("concept", "required", "published", "none", "available"), ("concept-network", "external")),
+        (("paper", "not-required", "private", "none", "none"), ("paper-first", "not supplied")),
     )
     for inputs, expected in profile_cases:
         recommended = subprocess.run(
@@ -102,7 +103,8 @@ def main() -> None:
                 "--retrieval", inputs[0],
                 "--full-text-search", inputs[1],
                 "--sharing", inputs[2],
-                "--derived-text", inputs[3],
+                "--sync-exposure", inputs[3],
+                "--derived-text", inputs[4],
                 "--json",
             ],
             check=False,
@@ -199,6 +201,7 @@ def main() -> None:
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
                 str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
+                "--vault-root", str(vault),
                 "--json",
             ],
             check=False,
@@ -209,6 +212,58 @@ def main() -> None:
         source_text_result = json.loads(source_text_check.stdout)
         assert source_text_result["status"] == "pass"
         assert source_text_result["page_markers"] == 2
+        escaped_text = Path(raw) / "outside-vault.md"
+        escaped_text.write_text("outside\n", encoding="utf-8")
+        escaped_values = source_text_values | {
+            "source_text_location": "../../../outside-vault.md",
+            "source_text_hash": f"sha256:{hashlib.sha256(escaped_text.read_bytes()).hexdigest()}",
+            "source_text_page_map": "not provided",
+        }
+        write(
+            vault,
+            "05 Source Text/Manifests/Source Text — Escape",
+            render(templates / "source-text-manifest.md", escaped_values),
+        )
+        escaped_check = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_source_text.py"),
+                str(vault / "05 Source Text/Manifests/Source Text — Escape.md"),
+                "--vault-root", str(vault),
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert escaped_check.returncode == 1
+        assert "outside the approved Vault root" in escaped_check.stdout
+        assert json.loads(escaped_check.stdout)["byte_count"] == 0
+        linked_text = vault / "05 Source Text/Full Text/Linked outside.md"
+        linked_text.symlink_to(escaped_text)
+        linked_values = escaped_values | {
+            "source_text_location": "../Full Text/Linked outside.md",
+        }
+        write(
+            vault,
+            "05 Source Text/Manifests/Source Text — Symlink Escape",
+            render(templates / "source-text-manifest.md", linked_values),
+        )
+        symlink_check = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_source_text.py"),
+                str(vault / "05 Source Text/Manifests/Source Text — Symlink Escape.md"),
+                "--vault-root", str(vault),
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert symlink_check.returncode == 1
+        assert "outside the approved Vault root" in symlink_check.stdout
+        assert json.loads(symlink_check.stdout)["byte_count"] == 0
         mismatched_source = vault / "20 Papers/Paper — Anchor Review.md"
         mismatched_source.write_text(
             mismatched_source.read_text(encoding="utf-8").replace(
@@ -243,6 +298,7 @@ def main() -> None:
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
                 str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
+                "--vault-root", str(vault),
                 "--json",
             ],
             check=False,

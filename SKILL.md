@@ -28,7 +28,8 @@ the user and do not ask for information that can be established safely later.
 
 1. Diagnose style with four questions: primary retrieval goal (paper, concept,
    or both); need for agent/full-text search; private versus shared/published
-   Vault; and current Zotero/PDF/parsed-Markdown/existing-Vault workflow.
+   Vault plus synchronization exposure; and current
+   Zotero/PDF/parsed-Markdown/existing-Vault workflow.
 2. Recommend two independent choices with reasons: knowledge organization
    (`paper-first`, `balanced`, or `concept-network`) and derived-text storage
    (`vault-local`, `external`, or `not supplied`). Show one recommended
@@ -100,7 +101,8 @@ filename. The manifest is provenance metadata, not a second knowledge dossier.
 
 Use the standard marker `<!-- pdf-page: N -->` in a Markdown derivative when
 page-level anchors are preserved. Run `python scripts/check_source_text.py
-<manifest.md>` only after the exact manifest and derivative path are approved;
+<manifest.md> --vault-root <approved-vault>` only after the exact Vault,
+manifest, and derivative path are approved;
 it reads the named derivative, verifies its hash, and checks the declared page
 markers without modifying either file. A changed hash marks the dossier for
 review; it does not authorize automatic rewriting of claims.
@@ -152,8 +154,8 @@ It checks Paper/Source count, source-text status and manifest metadata,
 text-basis enum, required dossier sections, per-result evidence-ledger anchors
 and labels, promoted-note provenance, unresolved placeholders, duplicate
 basenames, filename-mirroring headings, and resolving wikilinks; it never
-edits the Vault. Run `check_source_text.py` separately when the approved
-derived artifact itself must be hash-verified.
+edits the Vault. Run `check_source_text.py` separately with the approved
+`--vault-root` when the approved derived artifact itself must be hash-verified.
 The expected count comes from the approved Blueprint. A bare lint run without
 `--expect-sources` is exploratory only and is not handoff evidence.
 

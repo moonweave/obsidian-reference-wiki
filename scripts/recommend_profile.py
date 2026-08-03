@@ -10,6 +10,7 @@ def recommend(
     retrieval: str,
     full_text_search: str,
     sharing: str,
+    sync_exposure: str,
     derived_text: str,
 ) -> dict[str, str]:
     organization = {
@@ -21,9 +22,9 @@ def recommend(
     if derived_text == "none":
         storage = "not supplied"
         storage_reason = "No authorized parsed/OCR derivative is available; create no empty cache."
-    elif sharing in {"shared", "published"}:
+    elif sharing in {"shared", "published"} or sync_exposure in {"public", "uncertain"}:
         storage = "external"
-        storage_reason = "A shared or published Vault should keep the full derivative outside its sharing boundary."
+        storage_reason = "A shared, published, publicly synchronized, or uncertain Vault should keep the full derivative outside its sharing boundary."
     elif full_text_search == "required":
         storage = "vault-local"
         storage_reason = "A private Vault with full-text search benefits from a local regenerable Markdown cache."
@@ -54,10 +55,21 @@ def main() -> int:
         required=True,
     )
     parser.add_argument("--sharing", choices=("private", "shared", "published"), required=True)
+    parser.add_argument(
+        "--sync-exposure",
+        choices=("none", "controlled", "public", "uncertain"),
+        required=True,
+    )
     parser.add_argument("--derived-text", choices=("available", "none"), required=True)
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
-    result = recommend(args.retrieval, args.full_text_search, args.sharing, args.derived_text)
+    result = recommend(
+        args.retrieval,
+        args.full_text_search,
+        args.sharing,
+        args.sync_exposure,
+        args.derived_text,
+    )
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

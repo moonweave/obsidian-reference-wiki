@@ -24,8 +24,8 @@ paragraph.
 On first run, the skill asks a short two-stage set of questions. It recommends
 `paper-first`, `balanced`, or `concept-network` organization independently from
 the source-text choice. Private Vaults that need agent/Obsidian full-text
-search can use a vault-local regenerable cache; shared or published Vaults are
-steered to external storage.
+search can use a vault-local regenerable cache; shared, published, publicly
+synchronized, or uncertain Vaults are steered to external storage.
 
 ## What it does
 
@@ -106,7 +106,8 @@ between reference organization and research records, and private-full-text
 versus shared-Vault onboarding. Capture and reviewed-note quality are
 additionally exercised through the product templates,
 `scripts/recommend_profile.py`, `scripts/check_notes.py`, and
-`scripts/check_source_text.py`.
+`scripts/check_source_text.py`. Source-text verification requires the exact
+approved `--vault-root` and rejects relative-path and symlink escapes.
 
 The read-only lint is a quality check over discovered notes, not proof that the
 correct Vault was selected. Handoff runs it with the approved Blueprint count:

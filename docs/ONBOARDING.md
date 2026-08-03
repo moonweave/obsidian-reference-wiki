@@ -14,8 +14,8 @@ only the unresolved decision.
    cross-paper concepts, or both?
 2. Should an agent or Obsidian search and reread the full parsed/OCR text, or
    are reviewed Paper/Source dossiers sufficient?
-3. Is the Vault private, shared with collaborators, published, or synchronized
-   through a repository that may expose files?
+3. Is the Vault private, shared with collaborators, or published, and is its
+   synchronization exposure `none`, `controlled`, `public`, or `uncertain`?
 4. Where are Zotero items, PDFs, parsed/OCR Markdown, and any existing Obsidian
    notes currently kept?
 
@@ -42,6 +42,7 @@ python scripts/recommend_profile.py \
   --retrieval both \
   --full-text-search required \
   --sharing private \
+  --sync-exposure none \
   --derived-text available
 ```
 
@@ -64,6 +65,9 @@ Do not hide the storage consequence. `vault-local` makes full text available
 to Obsidian and local agents but can increase Vault size and accidental sharing
 risk. `external` keeps the knowledge Vault smaller and safer to share but may
 reduce portability and Obsidian-native full-text search.
+Public or uncertain synchronization exposure overrides a private-use label and
+requires `external`; controlled private synchronization does not override the
+other answers but must be named in the Blueprint.
 
 ## Stage 2 — execution approval
 

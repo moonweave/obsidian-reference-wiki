@@ -21,7 +21,9 @@ from a filename. Existing Vault candidates are classified as `keep in place`,
 Reference `Method` notes describe a method as reported by a source. Research
 `Method` notes describe the user's own research process; the two meanings must
 not be merged. `Theory` notes capture source-grounded background mechanisms,
-models, or conceptual frameworks and must retain their source and claim links.
+models, or conceptual frameworks and must retain their source link plus a
+claim link when a claim was supplied. Optional claim/theme relations are
+written explicitly as `not provided`; a graph edge is never invented.
 
 The Source note is the paper-first reading record. It may contain the paper's
 abstract or scope, method, theory, evidence, and limitations together. Standalone
@@ -45,10 +47,14 @@ contains no factual summary.
 
 Obsidian title rendering follows `docs/NOTE_QUALITY.md`: a rendered note does
 not repeat its filename as a top-level heading, and the skill does not edit
-`.obsidian` to hide duplicate titles.
+`.obsidian` to hide duplicate titles. Linked Markdown basenames must also be
+unique so an Obsidian wikilink has one deterministic target.
 
 The read-only lint is necessary but not sufficient handoff evidence. Handoff
 must run `scripts/check_notes.py` with `--expect-sources` set to the exact
-Paper/Source count in the approved Blueprint. A mismatch fails the command. A
-bare run without that option is exploratory only and cannot prove that the
-correct Vault or expected reference set was reviewed.
+Paper/Source count in the approved Blueprint. It also rejects unresolved
+template placeholders, invalid text-basis values, duplicate/ambiguous note
+basenames, filename-mirroring headings, and reviewed evidence-ledger items
+without a type label and page anchor. A mismatch fails the command. A bare
+run without that option is exploratory only and cannot prove that the correct
+Vault or expected reference set was reviewed.

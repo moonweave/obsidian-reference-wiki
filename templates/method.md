@@ -28,4 +28,4 @@ canonical_location: {canonical_location}
 {method_anchor}
 
 - {reference_type}: [[{reference_type} — {source_name}]]
-- Claim: [[Claim — {claim_name}]]
+- {claim_link}

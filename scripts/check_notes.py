@@ -10,6 +10,11 @@ from pathlib import Path
 
 LINK = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")
+TOP_LEVEL_HEADING = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
+EVIDENCE_LABEL = re.compile(r"\[(reported|modelled|calculated|author interpretation|synthesis)\]")
+PAGE_ANCHOR = re.compile(r"\bPDF pp?\.\s*\d+")
+VALID_TEXT_BASES = {"native-text", "OCR", "mixed", "supplied-excerpt"}
 REQUIRED_SOURCE_HEADINGS = (
     "## Paper map",
     "## Abstract and scope",
@@ -55,17 +60,48 @@ def in_domain(path: Path, domain: str) -> bool:
     return any(part == domain or part.endswith(f" {domain}") for part in path.parts)
 
 
+def evidence_bullets(section: str) -> list[str]:
+    bullets: list[str] = []
+    current = ""
+    for line in section.splitlines():
+        if re.match(r"^\s*-\s+", line):
+            if current:
+                bullets.append(current)
+            current = line.strip()
+        elif current and line.strip():
+            current += f" {line.strip()}"
+    if current:
+        bullets.append(current)
+    return bullets
+
+
 def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
     errors: list[str] = []
     notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
-    names = {path.stem for path in notes}
+    name_paths: dict[str, list[Path]] = {}
+    for path in notes:
+        name_paths.setdefault(path.stem, []).append(path)
     references = source_notes(root)
+
+    for name, paths in sorted(name_paths.items()):
+        if len(paths) > 1:
+            locations = ", ".join(str(path.relative_to(root)) for path in paths)
+            errors.append(f"duplicate Markdown basename: {name} ({locations})")
 
     for path in notes:
         text = path.read_text(encoding="utf-8")
+        if PLACEHOLDER.search(path.stem) or PLACEHOLDER.search(text):
+            errors.append(f"unresolved template placeholder: {path.relative_to(root)}")
+        if any(heading.strip() == path.stem for heading in TOP_LEVEL_HEADING.findall(text)):
+            errors.append(f"filename-mirroring top-level heading: {path.relative_to(root)}")
         for target in LINK.findall(text):
-            if target.strip() not in names:
+            target = target.strip()
+            candidates = name_paths.get(target, [])
+            if not candidates:
                 errors.append(f"unresolved wikilink: {path.relative_to(root)} -> {target.strip()}")
+            elif len(candidates) > 1:
+                locations = ", ".join(str(candidate.relative_to(root)) for candidate in candidates)
+                errors.append(f"ambiguous wikilink: {path.relative_to(root)} -> {target} ({locations})")
 
     reviewed = 0
     partial = 0
@@ -93,11 +129,39 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
         for key in ("source_text_basis", "reviewed_scope", "unreviewed_scope"):
             if not meta.get(key):
                 errors.append(f"missing {key}: {path.relative_to(root)}")
+        if meta.get("source_text_basis") not in VALID_TEXT_BASES:
+            errors.append(
+                f"invalid source_text_basis: {path.relative_to(root)} -> "
+                f"{meta.get('source_text_basis', '') or 'missing'}"
+            )
         if status == "reviewed":
-            if not re.search(r"PDF p\.\s*\d+", text):
+            if not PAGE_ANCHOR.search(text):
                 errors.append(f"missing page anchor: {path.relative_to(root)}")
-            if not re.search(r"\[(reported|modelled|calculated|author interpretation|synthesis)\]", text):
+            if not EVIDENCE_LABEL.search(text):
                 errors.append(f"missing evidence type label: {path.relative_to(root)}")
+        ledger_match = re.search(
+            r"^### Evidence ledger\s*\n(.*?)(?=^## |\Z)",
+            text,
+            re.MULTILINE | re.DOTALL,
+        )
+        if status == "reviewed" and ledger_match:
+            bullets = evidence_bullets(ledger_match.group(1))
+            if not bullets:
+                errors.append(f"empty evidence ledger: {path.relative_to(root)}")
+            for index, bullet in enumerate(bullets, start=1):
+                lower = bullet.lower()
+                if "not supplied" in lower or "not reviewed" in lower:
+                    continue
+                if not EVIDENCE_LABEL.search(bullet):
+                    errors.append(
+                        f"evidence ledger item {index} missing evidence type label: "
+                        f"{path.relative_to(root)}"
+                    )
+                if not PAGE_ANCHOR.search(bullet):
+                    errors.append(
+                        f"evidence ledger item {index} missing page anchor: "
+                        f"{path.relative_to(root)}"
+                    )
 
     promoted = 0
     for path in notes:

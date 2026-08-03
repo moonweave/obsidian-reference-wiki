@@ -22,7 +22,7 @@ canonical_location: {canonical_location}
 ## Supports
 
 - {reference_type}: [[{reference_type} — {source_name}]]
-- Claim: [[Claim — {claim_name}]]
+- {claim_link}
 
 ## What remains unconfirmed
 

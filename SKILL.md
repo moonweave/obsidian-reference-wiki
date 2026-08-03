@@ -43,6 +43,10 @@ Methods`, `35 Theories & Background`, `40 Limitations`, `50 Themes`, `60
 Questions`, `90 Reading Queue`, and `_templates`; do not add research-record
 domains.
 
+Relation fields are selective: render `Claim: not provided`, `Claim affected:
+not provided`, or `Theme: not provided` when the user did not supply that node.
+Never manufacture a wikilink merely to make the graph look complete.
+
 Use `Paper — {short title}` for academic articles and `Source — {name}` for
 reports, web pages, standards, datasets, or other external material. Preserve
 existing `Source — …` paper basenames and links; do not rename them as part of
@@ -88,11 +92,19 @@ Source dossier has a review trace and the relevant provenance fields.
 
 Before handoff, run the product-local read-only lint with
 `python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>`.
-It checks Paper/Source count, status,
-required dossier sections, page anchors, evidence-type labels, promoted-note
-provenance, and resolving wikilinks; it never edits the Vault.
+It checks Paper/Source count, status, text-basis enum, required dossier
+sections, per-result evidence-ledger anchors and labels, promoted-note
+provenance, unresolved placeholders, duplicate basenames, filename-mirroring
+headings, and resolving wikilinks; it never edits the Vault.
 The expected count comes from the approved Blueprint. A bare lint run without
 `--expect-sources` is exploratory only and is not handoff evidence.
+
+When visually reviewing an Obsidian Graph, exclude `_templates` with the
+version's graph filter when available (for example, `-path:_templates`). If
+that UI does not expose a filter, use Backlinks/Outgoing links or the file list
+for the factual review. Template Markdown can otherwise appear as
+`{claim_name}`-style graph nodes; those are not research records, and the skill
+does not edit `.obsidian` automatically to hide them.
 
 ## Existing Vault and handoff
 

@@ -40,7 +40,8 @@ run without the option is not completion evidence.
 For a supplied paper, use this order:
 
 1. establish the text basis (`native-text`, `OCR`, `mixed`, or
-   `supplied-excerpt`) and page/section numbering;
+   `supplied-excerpt`) and page/section numbering; use `unknown` only for an
+   unread capture note;
 2. map the problem, contribution, system, conditions, and paper structure;
 3. read the method, measurement/analysis procedure, controls, and
    theory/model assumptions;
@@ -69,3 +70,20 @@ Promote a Claim, Method, Theory, Evidence, or Limitation only after the Source
 dossier passes the relevant completeness checks. Promoted notes are concise
 reusable indexes with source anchors, not copies of the dossier. If a source is
 partial, keep its detail in the Source note and mark the unresolved scope.
+
+## Executable handoff checks
+
+The read-only checker is a structural gate, not a substitute for reading. In
+addition to source count and dossier sections, it rejects unresolved template
+placeholders, invalid text-basis values, duplicate Markdown basenames and
+ambiguous wikilinks, top-level headings that mirror a filename, and reviewed
+Evidence ledger bullets that lack both an evidence-type label and a page
+anchor. A relation field may be `not provided`; the checker must not require a
+Claim or Theme that the supplied record does not contain.
+
+Graph inspection is a presentation check, not a replacement for the Markdown
+lint. Because `_templates` contains Markdown files, an unfiltered Obsidian
+Graph can display template placeholders beside factual nodes. Exclude that
+folder with the graph filter when the installed Obsidian version supports it;
+otherwise review factual edges through Backlinks/Outgoing links. Do not edit
+`.obsidian` automatically for this display preference.

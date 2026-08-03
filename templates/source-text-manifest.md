@@ -3,6 +3,7 @@ type: source-text-manifest
 status: {source_text_status}
 source: [[{reference_type} — {source_name}]]
 canonical_location: {canonical_location}
+source_text_storage: {source_text_storage}
 source_text_location: {source_text_location}
 source_text_basis: {source_text_basis}
 source_text_hash: {source_text_hash}
@@ -16,6 +17,7 @@ It is not the canonical source and it is not a reviewed claim or summary.
 ## Extraction record
 
 - Canonical source: {canonical_location}
+- Storage: {source_text_storage}
 - Derived text: {source_text_location}
 - Basis: {source_text_basis}
 - Integrity hash: {source_text_hash}

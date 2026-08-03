@@ -16,6 +16,7 @@ EVIDENCE_LABEL = re.compile(r"\[(reported|modelled|calculated|author interpretat
 PAGE_ANCHOR = re.compile(r"\bPDF pp?\.\s*\d+")
 VALID_TEXT_BASES = {"native-text", "OCR", "mixed", "supplied-excerpt"}
 VALID_SOURCE_TEXT_STATUSES = {"available", "not supplied", "not reviewed", "stale"}
+VALID_SOURCE_TEXT_STORAGE = {"external", "vault-local", "not supplied", "not reviewed"}
 VALID_PAGE_MAPS = {"pdf-page-comments", "section-only", "not provided"}
 SOURCE_TEXT_HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 SOURCE_TEXT_MANIFEST_TYPE = "source-text-manifest"
@@ -129,6 +130,7 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
             errors.append(f"invalid source-text manifest status: {relative}")
         for key in (
             "canonical_location",
+            "source_text_storage",
             "source_text_location",
             "source_text_basis",
             "source_text_hash",
@@ -138,6 +140,8 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                 errors.append(f"missing {key}: {relative}")
         if meta.get("source_text_basis") not in VALID_TEXT_BASES:
             errors.append(f"invalid source_text_basis: {relative} -> {meta.get('source_text_basis', '')}")
+        if meta.get("source_text_storage") not in {"external", "vault-local"}:
+            errors.append(f"invalid source_text_storage: {relative} -> {meta.get('source_text_storage', '')}")
         if meta.get("source_text_page_map") not in VALID_PAGE_MAPS:
             errors.append(f"invalid source_text_page_map: {relative} -> {meta.get('source_text_page_map', '')}")
         if not SOURCE_TEXT_HASH.fullmatch(meta.get("source_text_hash", "")):
@@ -167,6 +171,8 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                 errors.append(f"invalid capture note: {path.relative_to(root)}")
             if meta.get("source_text_status") not in {"not reviewed", "not supplied"}:
                 errors.append(f"invalid source_text_status: {path.relative_to(root)}")
+            if meta.get("source_text_storage") not in {"not reviewed", "not supplied"}:
+                errors.append(f"invalid source_text_storage: {path.relative_to(root)}")
             continue
         if status == "partial":
             partial += 1
@@ -183,7 +189,7 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
         source_text_status = meta.get("source_text_status", "")
         if source_text_status not in VALID_SOURCE_TEXT_STATUSES:
             errors.append(f"invalid source_text_status: {path.relative_to(root)} -> {source_text_status or 'missing'}")
-        for key in ("source_text_location", "source_text_hash", "source_text_page_map", "source_text_manifest"):
+        for key in ("source_text_storage", "source_text_location", "source_text_hash", "source_text_page_map", "source_text_manifest"):
             if not meta.get(key):
                 errors.append(f"missing {key}: {path.relative_to(root)}")
         manifest_targets = list(
@@ -203,6 +209,7 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                 manifest_meta = manifest_metadata.get(target, {})
                 for key in (
                     "canonical_location",
+                    "source_text_storage",
                     "source_text_location",
                     "source_text_basis",
                     "source_text_hash",
@@ -217,6 +224,8 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                     errors.append(f"source_text_manifest field does not match body link: {path.relative_to(root)}")
             if not SOURCE_TEXT_HASH.fullmatch(meta.get("source_text_hash", "")):
                 errors.append(f"invalid source_text_hash: {path.relative_to(root)}")
+            if meta.get("source_text_storage") not in {"external", "vault-local"}:
+                errors.append(f"invalid available source_text_storage: {path.relative_to(root)}")
             if not_provided(meta.get("source_text_location", "")):
                 errors.append(f"missing available source_text_location: {path.relative_to(root)}")
             if meta.get("source_text_page_map") not in VALID_PAGE_MAPS - {"not provided"}:
@@ -224,6 +233,8 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
         elif source_text_status == "not supplied":
             if manifest_targets:
                 errors.append(f"source_text_status not supplied but a manifest link exists: {path.relative_to(root)}")
+            if meta.get("source_text_storage") != "not supplied":
+                errors.append(f"source_text_status not supplied but storage differs: {path.relative_to(root)}")
             for key in ("source_text_location", "source_text_hash", "source_text_page_map", "source_text_manifest"):
                 if not_provided(meta.get(key, "")) is False:
                     errors.append(f"source_text_status not supplied but {key} is populated: {path.relative_to(root)}")

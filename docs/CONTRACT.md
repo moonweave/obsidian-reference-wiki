@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 6`
+`contract_version: 7`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -12,6 +12,13 @@ an exact Vault path and an approved Blueprint. The default mutation set is
 folders, approved templates, and supplied factual notes. `.obsidian`, plugins,
 bulk moves, renames, deletes, and copies of source material remain out of
 scope.
+
+First run uses the two-stage interview in `docs/ONBOARDING.md`. Stage 1
+diagnoses retrieval style, full-text search need, sharing boundary, and current
+source workflow, then recommends an organization mode and a source-text
+storage mode. Stage 2 confirms the exact Vault path, a bounded first Apply
+scope, and the no-touch list. The skill recommends a configuration; it does
+not make the user design the taxonomy from scratch.
 
 Every factual note must say what was supplied and preserve its canonical
 location. Unread material is labelled `not reviewed`; it is never summarized
@@ -40,12 +47,16 @@ Templates use `reference_type` so every wikilink targets the actual basename.
 
 The source has a separate derived-text boundary. The canonical PDF, web page,
 or Zotero item remains external and authoritative. A supplied native-text/OCR
-Markdown or text derivative is an immutable reading input, stored outside the
-Vault by default. `Source Text — …` is a manifest for that derivative; it
-records `source_text_location`, `source_text_basis`, `source_text_hash`, and
-`source_text_page_map`, but it is not a summary or a Claim. If no derivative
-was supplied, record `source_text_status: not supplied` and do not create an
-empty placeholder file.
+Markdown or text derivative is an immutable reading input. For a private Vault
+that benefits from full-text agent or Obsidian search, `vault-local` may place
+the derivative under the exact approved `05 Source Text/Full Text` path. For a
+shared or published Vault, recommend `external`. `Source Text — …` is a
+manifest for either mode; it records `source_text_storage`,
+`source_text_location`, `source_text_basis`, `source_text_hash`, and
+`source_text_page_map`, but it is not a summary or a Claim. A vault-local file
+is a regenerable cache, not a copied PDF or an authoritative knowledge note.
+If no derivative was supplied, record `source_text_status: not supplied` and
+`source_text_storage: not supplied`; create no empty placeholder file.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,

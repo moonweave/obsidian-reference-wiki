@@ -11,14 +11,22 @@ not an automatic PDF-ingestion or OCR pipeline.
 The full native-text/OCR file is a derived input for reading and retrieval. It
 must not silently become the source of truth: native extraction can omit layout
 and OCR can misread symbols. When supplied, create a `Source Text — …` manifest
-with the external location, `source_text_basis`, SHA-256 hash, and page-map
-convention. Prefer `<!-- pdf-page: N -->` markers in Markdown derivatives so a
-reviewed result can be traced back to the PDF page. The manifest records
-provenance only; the Source dossier contains the interpretation.
+with `source_text_storage`, location, `source_text_basis`, SHA-256 hash, and
+page-map convention. Prefer `<!-- pdf-page: N -->` markers in Markdown
+derivatives so a reviewed result can be traced back to the PDF page. The
+manifest records provenance only; the Source dossier contains the
+interpretation.
 
-When the derivative is absent, use `source_text_status: not supplied`. That is
-an honest lower-evidence state and does not justify creating a blank parse or
-inventing a summary.
+`vault-local` is appropriate for a private Vault when full-text Obsidian or
+agent search is part of the workflow. Render the derivative with
+`templates/full-text.md`; do not add knowledge claims to that file. `external`
+is safer for a shared or published Vault. The Blueprint must make the storage
+choice and sharing consequence visible. The skill does not modify Git ignore,
+sync, Publish, or `.obsidian` settings without separate approval.
+
+When the derivative is absent, use `source_text_status: not supplied` and
+`source_text_storage: not supplied`. That is an honest lower-evidence state and
+does not justify creating a blank parse or inventing a summary.
 
 ## Obsidian title rendering
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify one approved Source Text manifest and its external derivative."""
+"""Verify one approved Source Text manifest and its derived text file."""
 from __future__ import annotations
 
 import argparse
@@ -32,12 +32,20 @@ def verify(manifest: Path) -> dict[str, object]:
     metadata = parse_frontmatter(manifest.read_text(encoding="utf-8"))
     if metadata.get("type") != "source-text-manifest":
         errors.append("manifest type must be source-text-manifest")
+    storage = metadata.get("source_text_storage", "")
+    if storage not in {"external", "vault-local"}:
+        errors.append("source_text_storage must be external or vault-local")
     location_value = metadata.get("source_text_location", "")
     if not location_value or location_value.lower() in {"not provided", "not supplied"}:
         errors.append("source_text_location is not supplied")
         location = None
     else:
-        location = Path(location_value).expanduser()
+        supplied_location = Path(location_value).expanduser()
+        if storage == "external" and not supplied_location.is_absolute():
+            errors.append("external source_text_location must be absolute")
+        if storage == "vault-local" and supplied_location.is_absolute():
+            errors.append("vault-local source_text_location must be relative to the manifest")
+        location = supplied_location
         if not location.is_absolute():
             location = manifest.parent / location
         location = location.resolve()

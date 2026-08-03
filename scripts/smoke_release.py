@@ -21,6 +21,7 @@ VALUES = {
     "source_status": "reviewed",
     "source_text_basis": "native-text",
     "source_text_status": "not supplied",
+    "source_text_storage": "not supplied",
     "source_text_location": "not provided",
     "source_text_hash": "not provided",
     "source_text_page_map": "not provided",
@@ -54,6 +55,7 @@ VALUES = {
     "source_links": "- Paper: [[Paper — Anchor Review]]",
     "capture_reason": "User supplied this source for later review.",
     "next_action": "Read the supplied source before summarizing it.",
+    "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n<!-- pdf-page: 2 -->\nA supplied limitation.",
 }
 
 
@@ -87,19 +89,43 @@ def main() -> None:
     payload = json.loads((ROOT / "evals/evals.json").read_text(encoding="utf-8"))
     assert payload["skill_name"] == "obsidian-research-wiki-reference"
 
+    profile_cases = (
+        (("both", "required", "private", "available"), ("balanced", "vault-local")),
+        (("concept", "required", "published", "available"), ("concept-network", "external")),
+        (("paper", "not-required", "private", "none"), ("paper-first", "not supplied")),
+    )
+    for inputs, expected in profile_cases:
+        recommended = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/recommend_profile.py"),
+                "--retrieval", inputs[0],
+                "--full-text-search", inputs[1],
+                "--sharing", inputs[2],
+                "--derived-text", inputs[3],
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert recommended.returncode == 0, recommended.stdout + recommended.stderr
+        profile = json.loads(recommended.stdout)
+        assert (profile["organization"], profile["source_text_storage"]) == expected
+
     with tempfile.TemporaryDirectory(prefix="reference-release-smoke-") as raw:
         vault = Path(raw) / "vault"
         templates = ROOT / "templates"
-        source_text_file = Path(raw) / "source-text" / "anchor-review.md"
-        source_text_file.parent.mkdir(parents=True, exist_ok=True)
-        source_text_file.write_text(
-            "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n"
-            "<!-- pdf-page: 2 -->\nA supplied limitation.\n",
-            encoding="utf-8",
+        write(
+            vault,
+            "05 Source Text/Full Text/Full Text — Anchor Review",
+            render(templates / "full-text.md", VALUES),
         )
+        source_text_file = vault / "05 Source Text/Full Text/Full Text — Anchor Review.md"
         source_text_values = VALUES | {
             "source_text_status": "available",
-            "source_text_location": str(source_text_file),
+            "source_text_storage": "vault-local",
+            "source_text_location": "../Full Text/Full Text — Anchor Review.md",
             "source_text_hash": f"sha256:{hashlib.sha256(source_text_file.read_bytes()).hexdigest()}",
             "source_text_page_map": "pdf-page-comments",
             "source_text_manifest": "[[Source Text — Anchor Review]]",
@@ -107,6 +133,7 @@ def main() -> None:
         capture_values = VALUES | {
             "source_status": "not reviewed",
             "source_text_status": "not reviewed",
+            "source_text_storage": "not reviewed",
             "source_text_location": "not provided",
             "source_text_hash": "not provided",
             "source_text_page_map": "not provided",
@@ -124,7 +151,7 @@ def main() -> None:
         )
         write(
             vault,
-            "05 Source Text/Source Text — Anchor Review",
+            "05 Source Text/Manifests/Source Text — Anchor Review",
             render(templates / "source-text-manifest.md", source_text_values),
         )
         write(
@@ -171,7 +198,7 @@ def main() -> None:
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Source Text — Anchor Review.md"),
+                str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
                 "--json",
             ],
             check=False,
@@ -215,7 +242,7 @@ def main() -> None:
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Source Text — Anchor Review.md"),
+                str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
                 "--json",
             ],
             check=False,

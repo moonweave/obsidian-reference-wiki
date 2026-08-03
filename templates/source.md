@@ -4,6 +4,7 @@ source_kind: {source_kind}
 status: {source_status}
 source_text_basis: {source_text_basis}
 source_text_status: {source_text_status}
+source_text_storage: {source_text_storage}
 source_text_location: {source_text_location}
 source_text_hash: {source_text_hash}
 source_text_page_map: {source_text_page_map}
@@ -66,6 +67,7 @@ unreviewed_scope: {unreviewed_scope}
 ## Derived source text
 
 - Status: {source_text_status}
+- Storage: {source_text_storage}
 - Manifest: {source_text_manifest}
 - Full text location: {source_text_location}
 - SHA-256: {source_text_hash}

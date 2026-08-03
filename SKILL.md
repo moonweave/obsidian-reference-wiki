@@ -7,8 +7,9 @@ description: Design, safely onboard, or extend an Obsidian reference knowledge s
 
 Onboard into a complete external-knowledge architecture, never a shallow starter. Design mode reads only user-authorized paths. Apply requires exact Vault path and Blueprint approval; it never changes `.obsidian`, installs plugins, copies PDFs/Zotero files, or moves existing notes. A full parsed/OCR text file is a derived reading input, not a replacement for the canonical source or a knowledge note.
 
-Read [the local contract](docs/CONTRACT.md) before acting. Explain the plan in
-the user's language and keep Design and Apply visibly separate.
+Read [the local contract](docs/CONTRACT.md) and
+[the onboarding interview](docs/ONBOARDING.md) before acting. Explain the plan
+in the user's language and keep Design and Apply visibly separate.
 
 ## Installation and Vault location
 
@@ -21,16 +22,33 @@ PDF library. Do not create a second Vault if the user has an authorized one.
 
 ## First-run workflow
 
-1. Ask for the exact Vault path, current question, canonical Zotero or PDF
-   location, and (when available) the authorized full parsed/OCR text location.
-   Do not choose a path or invent a source.
-2. Inspect an existing Vault only after the user names it. Report the baseline
+Use a two-stage onboarding interview before proposing files. The questions are
+decision inputs, not a generic questionnaire; reuse facts already supplied by
+the user and do not ask for information that can be established safely later.
+
+1. Diagnose style with four questions: primary retrieval goal (paper, concept,
+   or both); need for agent/full-text search; private versus shared/published
+   Vault; and current Zotero/PDF/parsed-Markdown/existing-Vault workflow.
+2. Recommend two independent choices with reasons: knowledge organization
+   (`paper-first`, `balanced`, or `concept-network`) and derived-text storage
+   (`vault-local`, `external`, or `not supplied`). Show one recommended
+   configuration and the meaningful alternative; do not make the user design
+   every folder.
+   Use `scripts/recommend_profile.py` after the four answers are known so the
+   same evidence produces a consistent default; add user-specific context to
+   its rationale rather than presenting the helper output as an unexplained
+   verdict.
+3. Only after the recommendation is understood, confirm three execution facts:
+   new or existing exact Vault path; first Apply scope (default pilot: one to
+   three supplied sources); and the exact preservation/no-touch list.
+4. Inspect an existing Vault only after the user names it. Report the baseline
    without treating file names as facts.
-3. Return a Blueprint with the complete map, note meanings, placement rules,
-   labelled link rules, canonical-source boundary, first real source route,
-   and a no-touch list.
-4. Wait for approval of the exact path, Blueprint, and supplied source facts.
-5. Apply only the approved folders, templates, and factual notes. Create an
+5. Return a Blueprint with the style diagnosis, recommendation and rationale,
+   complete map, note meanings, placement rules, labelled link rules,
+   canonical-source boundary, source-text mode, first real source route,
+   approved mutation set, and no-touch list.
+6. Wait for approval of the exact path, Blueprint, and supplied source facts.
+7. Apply only the approved folders, templates, and factual notes. Create an
    unread source as a capture note only when the user supplied its location;
    mark its content `not reviewed`.
 
@@ -64,19 +82,28 @@ Keep four representations distinct:
 4. promoted Claim, Method, Theory, Evidence, Limitation, or Theme notes.
 
 The derived text is not raw truth: OCR can introduce errors and parsing can
-lose layout. Store it outside the Vault by default, unchanged after extraction,
-and record its exact location, extraction basis, SHA-256 hash, and page-marker
-convention in `Source Text — …` using `templates/source-text-manifest.md`.
-Create that manifest only when the derivative is supplied or explicitly
-authorized. If it is unavailable, write `not supplied`; do not create an empty
-text file or summarize from its filename. The manifest is provenance metadata,
-not a second knowledge dossier.
+lose layout. Recommend `vault-local` when a private researcher wants Obsidian
+or an agent to search and reread the full text. Render the cache with
+`templates/full-text.md` under the exact approved `05 Source Text/Full Text`
+path. Recommend `external` when the Vault is shared, published, or subject to
+copyright/synchronization risk. A vault-local cache is a regenerable derivative,
+not permission to copy the PDF, and it must not silently enter Git, Publish, or
+another sharing surface.
+
+For either storage mode, keep the derivative unchanged after extraction and
+record `source_text_storage`, exact location, extraction basis, SHA-256 hash,
+and page-marker convention in `Source Text — …` using
+`templates/source-text-manifest.md`. Create that manifest only when the
+derivative is supplied or explicitly authorized. If it is unavailable, write
+`not supplied`; do not create an empty text file or summarize from its
+filename. The manifest is provenance metadata, not a second knowledge dossier.
 
 Use the standard marker `<!-- pdf-page: N -->` in a Markdown derivative when
 page-level anchors are preserved. Run `python scripts/check_source_text.py
 <manifest.md>` only after the exact manifest and derivative path are approved;
 it reads the named derivative, verifies its hash, and checks the declared page
-markers without modifying either file.
+markers without modifying either file. A changed hash marks the dossier for
+review; it does not authorize automatic rewriting of claims.
 
 ## Method and theory boundary
 

@@ -21,9 +21,17 @@ scope, method, measurements, model assumptions, anchored results, and
 limitations visible instead of compressing a paper into an unsupported
 paragraph.
 
+On first run, the skill asks a short two-stage set of questions. It recommends
+`paper-first`, `balanced`, or `concept-network` organization independently from
+the source-text choice. Private Vaults that need agent/Obsidian full-text
+search can use a vault-local regenerable cache; shared or published Vaults are
+steered to external storage.
+
 ## What it does
 
 - designs or safely onboards a reference-focused Obsidian Vault;
+- diagnoses retrieval style and recommends an architecture with reasons before
+  asking for Apply approval;
 - preserves source provenance and records canonical Zotero or external links;
 - connects sources to claims, evidence methods, literature methods,
   background theories, limitations, themes, and questions with real Obsidian
@@ -65,13 +73,16 @@ reference architecture is in [docs/CONTRACT.md](docs/CONTRACT.md).
 SKILL.md
 docs/CONTRACT.md
 docs/NOTE_QUALITY.md
+docs/ONBOARDING.md
 evals/evals.json
 scripts/check_notes.py
 scripts/check_source_text.py
+scripts/recommend_profile.py
 scripts/smoke_release.py
 templates/
   claim.md
   evidence-method.md
+  full-text.md
   method.md
   limitation.md
   question.md
@@ -90,10 +101,12 @@ installed and evaluated without a sibling repository or a shared skill.
 ## Evaluation
 
 The product evaluation cases are stored in [evals/evals.json](evals/evals.json).
-They cover a new reference Blueprint, an existing mixed Vault, and the boundary
-between reference organization and research records. Capture and reviewed-note
-quality are additionally exercised through the product templates and
-`scripts/check_notes.py` and `scripts/check_source_text.py`.
+They cover a new reference Blueprint, an existing mixed Vault, the boundary
+between reference organization and research records, and private-full-text
+versus shared-Vault onboarding. Capture and reviewed-note quality are
+additionally exercised through the product templates,
+`scripts/recommend_profile.py`, `scripts/check_notes.py`, and
+`scripts/check_source_text.py`.
 
 The read-only lint is a quality check over discovered notes, not proof that the
 correct Vault was selected. Handoff runs it with the approved Blueprint count:
@@ -111,10 +124,11 @@ python scripts/smoke_release.py
 ```
 
 It uses a temporary synthetic Vault to verify the first Reference route,
-reviewed and unread source states, a derived source-text manifest and hash,
-wikilink resolution, expected source count, and the absence of
-experiment/observation records. The full parsed text remains a temporary
-external derivative; it is not bundled into this public repository.
+reviewed and unread source states, onboarding profile recommendations, a
+vault-local derived-text cache and manifest, hash verification, wikilink
+resolution, expected source count, and the absence of experiment/observation
+records. The synthetic full text is temporary and is not bundled into this
+public repository.
 
 ## License
 

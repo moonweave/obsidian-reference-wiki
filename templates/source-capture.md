@@ -4,6 +4,7 @@ source_kind: {source_kind}
 status: not reviewed
 source_text_basis: unknown
 source_text_status: not reviewed
+source_text_storage: not reviewed
 source_text_location: not provided
 source_text_hash: not provided
 source_text_page_map: not provided

@@ -1,6 +1,6 @@
 ---
 name: obsidian-research-wiki-reference
-description: Design, safely onboard, or extend an Obsidian reference knowledge system for papers, Zotero, citations, claims, evidence, methods, limitations, themes, and literature questions. Use for rigorous literature/reference organization, not research records or combined workspaces.
+description: Design, safely onboard, or extend an Obsidian reference knowledge system for papers, Zotero, citations, claims, evidence, literature methods, background theories, limitations, themes, and literature questions. Use for rigorous literature/reference organization, not research records or combined workspaces.
 ---
 
 # Obsidian Research Wiki: Reference
@@ -37,10 +37,20 @@ PDF library. Do not create a second Vault if the user has an authorized one.
 
 The approved first path must be resolvable from `Reference Index` to a real
 Source and then to a Claim, or explicitly stop at Source when no claim was
-supplied. Evidence/Method and Limitation links are created only when supplied.
-The default domains are `10 Sources`, `20 Claims`, `30 Evidence & Methods`,
-`40 Limitations`, `50 Themes`, `60 Questions`, `90 Reading Queue`, and
-`_templates`; do not add research-record domains.
+supplied. Evidence, Method, Theory, and Limitation links are created only when
+supplied. The default domains are `10 Sources`, `20 Claims`, `30 Evidence &
+Methods`, `35 Theories & Background`, `40 Limitations`, `50 Themes`, `60
+Questions`, `90 Reading Queue`, and `_templates`; do not add research-record
+domains.
+
+## Method and theory boundary
+
+`Method` in Reference means a method described or used by a paper: its purpose,
+source-reported procedure, assumptions, and stated boundary. It is not the
+user's own experimental protocol; Research owns that record. `Theory` means a
+source-grounded background mechanism, model, or conceptual framework that is
+reused across claims. Do not turn a paper's background discussion into a
+scientific fact beyond what the supplied source supports.
 
 ## Existing Vault and handoff
 
@@ -51,4 +61,4 @@ outgoing link, confirm canonical locations remain external, report unreviewed
 material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
-Propose `Reference Index`, `Sources`, `Claims`, `Evidence & Methods`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Source — …]] -> [[Claim — …]]`. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+Propose `Reference Index`, `Sources`, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Source — …]] -> [[Claim — …]]`. Add `Method — …` and `Theory — …` notes only when the supplied source material supports them. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.

@@ -4,13 +4,16 @@
 for organizing literature in Obsidian. It gives papers, sources, claims,
 evidence methods, limitations, themes, and literature questions a coherent
 structure without turning the Vault into a research-log or experiment system.
+It also gives literature methods and source-grounded background theories their
+own notes, distinct from the user's research protocol.
 
 ## What it does
 
 - designs or safely onboards a reference-focused Obsidian Vault;
 - preserves source provenance and records canonical Zotero or external links;
-- connects sources to claims, evidence methods, limitations, themes, and
-  questions with real Obsidian wikilinks;
+- connects sources to claims, evidence methods, literature methods,
+  background theories, limitations, themes, and questions with real Obsidian
+  wikilinks;
 - supports an existing Vault through read-only inspection first and staged,
   explicitly approved changes.
 
@@ -51,12 +54,14 @@ evals/evals.json
 templates/
   claim.md
   evidence-method.md
+  method.md
   limitation.md
   question.md
   reading-queue.md
   reference-index.md
   source.md
   theme.md
+  theory-background.md
 ```
 
 The templates are deliberately product-local so this repository can be

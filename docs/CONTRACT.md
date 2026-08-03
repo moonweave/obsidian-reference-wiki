@@ -2,9 +2,10 @@
 
 `contract_version: 1`
 
-Reference owns external knowledge: source provenance, claims, evidence or
-methods, limitations, themes, questions, and reading queue. It does not own
-the user's experiment history, raw data, code, or next research decision.
+Reference owns external knowledge: source provenance, claims, evidence,
+literature methods, background theories, limitations, themes, questions, and
+reading queue. It does not own the user's experiment history, raw data, code,
+or next research decision.
 
 Design mode is read-only and limited to paths the user names. Apply requires
 an exact Vault path and an approved Blueprint. The default mutation set is
@@ -16,3 +17,8 @@ Every factual note must say what was supplied and preserve its canonical
 location. Unread material is labelled `not reviewed`; it is never summarized
 from a filename. Existing Vault candidates are classified as `keep in place`,
 `link from a new note`, or `move later only with separate approval`.
+
+Reference `Method` notes describe a method as reported by a source. Research
+`Method` notes describe the user's own research process; the two meanings must
+not be merged. `Theory` notes capture source-grounded background mechanisms,
+models, or conceptual frameworks and must retain their source and claim links.

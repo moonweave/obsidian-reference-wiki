@@ -60,7 +60,9 @@ reference architecture is in [docs/CONTRACT.md](docs/CONTRACT.md).
 ```text
 SKILL.md
 docs/CONTRACT.md
+docs/NOTE_QUALITY.md
 evals/evals.json
+scripts/check_notes.py
 templates/
   claim.md
   evidence-method.md
@@ -69,6 +71,7 @@ templates/
   question.md
   reading-queue.md
   reference-index.md
+  source-capture.md
   source.md
   theme.md
   theory-background.md
@@ -80,9 +83,14 @@ installed and evaluated without a sibling repository or a shared skill.
 ## Evaluation
 
 The product evaluation cases are stored in [evals/evals.json](evals/evals.json).
-They cover a new reference Vault, an existing mixed Vault, provenance-safe
-source capture, and the boundary between reference organization and research
-records.
+They cover a new reference Blueprint, an existing mixed Vault, and the boundary
+between reference organization and research records. Capture and reviewed-note
+quality are additionally exercised through the product templates and
+`scripts/check_notes.py`.
+
+The read-only lint is a quality check over discovered notes, not proof that the
+correct Vault was selected. A `sources=0` pass must be rejected when the
+approved Blueprint expected one or more Source notes.
 
 ## License
 

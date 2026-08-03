@@ -85,6 +85,8 @@ Before handoff, run the product-local read-only lint with
 `python scripts/check_notes.py <approved-vault>`. It checks Source status,
 required dossier sections, page anchors, evidence-type labels, promoted-note
 provenance, and resolving wikilinks; it never edits the Vault.
+Compare its Source counts with the approved Blueprint. A pass with
+`sources=0` is not handoff evidence when the Blueprint expected a Source.
 
 ## Existing Vault and handoff
 

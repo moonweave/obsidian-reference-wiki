@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 2`
+`contract_version: 3`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -35,3 +35,13 @@ measurement, theory/model assumptions, anchored results, limitations, and a
 review trace. A partial Source must declare its unread scope and must not make
 broad promoted claims. An unread source uses `templates/source-capture.md` and
 contains no factual summary.
+
+Obsidian title rendering follows `docs/NOTE_QUALITY.md`: a rendered note does
+not repeat its filename as a top-level heading, and the skill does not edit
+`.obsidian` to hide duplicate titles.
+
+The read-only lint is necessary but not sufficient handoff evidence. A pass
+with `sources=0` proves only that no discovered Source violated the checks; it
+does not prove that the correct Vault or expected source set was reviewed.
+Before handoff, compare the reported Source counts with the approved Blueprint
+and treat a mismatch as failure.

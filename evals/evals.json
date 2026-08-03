@@ -1,0 +1,8 @@
+{
+  "skill_name": "obsidian-research-wiki-reference",
+  "display_name": "Obsidian Research Wiki: Reference",
+  "evals": [
+    {"id":"reference-blueprint","prompt":"Zotero 논문과 현재 질문을 claim/evidence/limitation까지 추적 가능한 레퍼런스 Vault로 설계해줘.","expected_output":"완전한 Reference Blueprint와 canonical-source 경계, 승인 전에는 파일 없음","assertions":["실험 기록을 만들지 않는다","읽지 않은 자료에서 주장을 만들지 않는다","Reference Index에서 Source로 실제 링크를 제시한다"]},
+    {"id":"reference-mixed-vault","prompt":"기존 문헌 Vault를 옮기지 말고 claim 연결만 안전하게 설계해줘.","expected_output":"read-only baseline과 세 가지 보존 ledger","assertions":[".obsidian과 bulk move를 제외한다","keep in place, link from a new note, move later only with separate approval을 구분한다"]}
+  ]
+}

@@ -67,6 +67,7 @@ docs/CONTRACT.md
 docs/NOTE_QUALITY.md
 evals/evals.json
 scripts/check_notes.py
+scripts/smoke_release.py
 templates/
   claim.md
   evidence-method.md
@@ -100,6 +101,16 @@ python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
 ```
 
 A count mismatch fails. A run without `--expect-sources` is exploratory only.
+
+Run the standalone release smoke before publishing or installing a local copy:
+
+```bash
+python scripts/smoke_release.py
+```
+
+It uses a temporary synthetic Vault to verify the first Reference route,
+reviewed and unread source states, wikilink resolution, expected source count,
+and the absence of experiment/observation records.
 
 ## License
 

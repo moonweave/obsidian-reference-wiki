@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 5`
+`contract_version: 6`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -38,8 +38,17 @@ navigation folder. Existing `Source — …` paper notes remain valid and are
 linked in place; adopting `Paper — …` never authorizes an automatic rename.
 Templates use `reference_type` so every wikilink targets the actual basename.
 
+The source has a separate derived-text boundary. The canonical PDF, web page,
+or Zotero item remains external and authoritative. A supplied native-text/OCR
+Markdown or text derivative is an immutable reading input, stored outside the
+Vault by default. `Source Text — …` is a manifest for that derivative; it
+records `source_text_location`, `source_text_basis`, `source_text_hash`, and
+`source_text_page_map`, but it is not a summary or a Claim. If no derivative
+was supplied, record `source_text_status: not supplied` and do not create an
+empty placeholder file.
+
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
-Source must declare its text basis and reviewed scope, include method,
+Source must declare its text basis and derived-text status, include method,
 measurement, theory/model assumptions, anchored results, limitations, and a
 review trace. A partial Source must declare its unread scope and must not make
 broad promoted claims. An unread source uses `templates/source-capture.md` and
@@ -55,6 +64,7 @@ must run `scripts/check_notes.py` with `--expect-sources` set to the exact
 Paper/Source count in the approved Blueprint. It also rejects unresolved
 template placeholders, invalid text-basis values, duplicate/ambiguous note
 basenames, filename-mirroring headings, and reviewed evidence-ledger items
-without a type label and page anchor. A mismatch fails the command. A bare
-run without that option is exploratory only and cannot prove that the correct
-Vault or expected reference set was reviewed.
+without a type label and page anchor. For an available derivative it requires
+a linked Source Text manifest with a valid hash and page-map declaration. A
+mismatch fails the command. A bare run without that option is exploratory only
+and cannot prove that the correct Vault or expected reference set was reviewed.

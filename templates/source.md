@@ -3,6 +3,11 @@ canonical_location: {canonical_location}
 source_kind: {source_kind}
 status: {source_status}
 source_text_basis: {source_text_basis}
+source_text_status: {source_text_status}
+source_text_location: {source_text_location}
+source_text_hash: {source_text_hash}
+source_text_page_map: {source_text_page_map}
+source_text_manifest: {source_text_manifest}
 reviewed_scope: {reviewed_scope}
 unreviewed_scope: {unreviewed_scope}
 ---
@@ -57,6 +62,14 @@ unreviewed_scope: {unreviewed_scope}
 ## Relation to the current literature question
 
 {question_relation}
+
+## Derived source text
+
+- Status: {source_text_status}
+- Manifest: {source_text_manifest}
+- Full text location: {source_text_location}
+- SHA-256: {source_text_hash}
+- Page map: {source_text_page_map}
 
 ## Promoted links
 

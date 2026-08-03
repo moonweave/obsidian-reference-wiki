@@ -1,9 +1,24 @@
 # Reference note quality contract
 
 Reference note quality depends on the source text and the reading trace, not on
-the amount of prose in a template. The skill may use an LLM to draft Markdown
-after the user supplies or authorizes the source, but it is not an automatic
-PDF-ingestion or OCR pipeline.
+the amount of prose in a template. Keep the canonical source, the full parsed
+text derivative, and the reviewed dossier distinct. The skill may use an LLM
+to draft Markdown after the user supplies or authorizes the source, but it is
+not an automatic PDF-ingestion or OCR pipeline.
+
+## Source-text integrity
+
+The full native-text/OCR file is a derived input for reading and retrieval. It
+must not silently become the source of truth: native extraction can omit layout
+and OCR can misread symbols. When supplied, create a `Source Text — …` manifest
+with the external location, `source_text_basis`, SHA-256 hash, and page-map
+convention. Prefer `<!-- pdf-page: N -->` markers in Markdown derivatives so a
+reviewed result can be traced back to the PDF page. The manifest records
+provenance only; the Source dossier contains the interpretation.
+
+When the derivative is absent, use `source_text_status: not supplied`. That is
+an honest lower-evidence state and does not justify creating a blank parse or
+inventing a summary.
 
 ## Obsidian title rendering
 
@@ -40,7 +55,8 @@ run without the option is not completion evidence.
 For a supplied paper, use this order:
 
 1. establish the text basis (`native-text`, `OCR`, `mixed`, or
-   `supplied-excerpt`) and page/section numbering; use `unknown` only for an
+   `supplied-excerpt`), record whether a full derived text artifact is
+   available, and establish page/section numbering; use `unknown` only for an
    unread capture note;
 2. map the problem, contribution, system, conditions, and paper structure;
 3. read the method, measurement/analysis procedure, controls, and
@@ -53,7 +69,8 @@ For a supplied paper, use this order:
 OCR is an input-recovery method, not a quality guarantee. Prefer a usable
 native text layer; use OCR only when the text layer is missing or when a
 figure/table requires it. Never copy the PDF or an OCR dump into the Vault by
-default. Keep the exact external canonical location and a compact review trace.
+default. Keep the exact external canonical location, derived-text manifest,
+hash, page map, and compact review trace.
 
 ## Provenance rule
 
@@ -79,7 +96,12 @@ placeholders, invalid text-basis values, duplicate Markdown basenames and
 ambiguous wikilinks, top-level headings that mirror a filename, and reviewed
 Evidence ledger bullets that lack both an evidence-type label and a page
 anchor. A relation field may be `not provided`; the checker must not require a
-Claim or Theme that the supplied record does not contain.
+Claim or Theme that the supplied record does not contain. When a derived text
+manifest is available, verify its external file separately:
+
+```bash
+python scripts/check_source_text.py <source-text-manifest.md>
+```
 
 Graph inspection is a presentation check, not a replacement for the Markdown
 lint. Because `_templates` contains Markdown files, an unfiltered Obsidian

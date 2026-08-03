@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import subprocess
 import sys
@@ -19,6 +20,11 @@ VALUES = {
     "source_kind": "paper",
     "source_status": "reviewed",
     "source_text_basis": "native-text",
+    "source_text_status": "not supplied",
+    "source_text_location": "not provided",
+    "source_text_hash": "not provided",
+    "source_text_page_map": "not provided",
+    "source_text_manifest": "not provided",
     "reviewed_scope": "PDF pp. 1-2; abstract and results",
     "unreviewed_scope": "references and supplementary material",
     "canonical_location": "/tmp/reference-release-smoke/supplied.pdf",
@@ -84,6 +90,28 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="reference-release-smoke-") as raw:
         vault = Path(raw) / "vault"
         templates = ROOT / "templates"
+        source_text_file = Path(raw) / "source-text" / "anchor-review.md"
+        source_text_file.parent.mkdir(parents=True, exist_ok=True)
+        source_text_file.write_text(
+            "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n"
+            "<!-- pdf-page: 2 -->\nA supplied limitation.\n",
+            encoding="utf-8",
+        )
+        source_text_values = VALUES | {
+            "source_text_status": "available",
+            "source_text_location": str(source_text_file),
+            "source_text_hash": f"sha256:{hashlib.sha256(source_text_file.read_bytes()).hexdigest()}",
+            "source_text_page_map": "pdf-page-comments",
+            "source_text_manifest": "[[Source Text — Anchor Review]]",
+        }
+        capture_values = VALUES | {
+            "source_status": "not reviewed",
+            "source_text_status": "not reviewed",
+            "source_text_location": "not provided",
+            "source_text_hash": "not provided",
+            "source_text_page_map": "not provided",
+            "source_text_manifest": "not provided",
+        }
         write(
             vault,
             "Reference Index",
@@ -92,7 +120,12 @@ def main() -> None:
         write(
             vault,
             "20 Papers/Paper — Anchor Review",
-            render(templates / "source.md", VALUES),
+            render(templates / "source.md", source_text_values),
+        )
+        write(
+            vault,
+            "05 Source Text/Source Text — Anchor Review",
+            render(templates / "source-text-manifest.md", source_text_values),
         )
         write(
             vault,
@@ -102,7 +135,7 @@ def main() -> None:
         write(
             vault,
             "10 Sources/Source — Unread item",
-            render(templates / "source-capture.md", VALUES),
+            render(templates / "source-capture.md", capture_values),
         )
         write(vault, "Reading Queue", "## Reading Queue\n")
         assert_links_resolve(vault)
@@ -131,6 +164,66 @@ def main() -> None:
         assert result["reviewed_sources"] == 1
         assert result["capture_sources"] == 1
         assert result["promoted_notes"] == 1
+        assert result["source_text_manifests"] == 1
+        assert result["available_source_text"] == 1
+
+        source_text_check = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_source_text.py"),
+                str(vault / "05 Source Text/Source Text — Anchor Review.md"),
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert source_text_check.returncode == 0, source_text_check.stdout + source_text_check.stderr
+        source_text_result = json.loads(source_text_check.stdout)
+        assert source_text_result["status"] == "pass"
+        assert source_text_result["page_markers"] == 2
+        mismatched_source = vault / "20 Papers/Paper — Anchor Review.md"
+        mismatched_source.write_text(
+            mismatched_source.read_text(encoding="utf-8").replace(
+                source_text_values["source_text_hash"], "sha256:" + "0" * 64, 1
+            ),
+            encoding="utf-8",
+        )
+        mismatch_check = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_notes.py"),
+                str(vault),
+                "--expect-sources",
+                "2",
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert mismatch_check.returncode == 1
+        assert "source-text manifest mismatch for source_text_hash" in mismatch_check.stdout
+        mismatched_source.write_text(
+            mismatched_source.read_text(encoding="utf-8").replace(
+                "sha256:" + "0" * 64, source_text_values["source_text_hash"], 1
+            ),
+            encoding="utf-8",
+        )
+        source_text_file.write_text(source_text_file.read_text(encoding="utf-8") + "tampered\n", encoding="utf-8")
+        tampered_source_text = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_source_text.py"),
+                str(vault / "05 Source Text/Source Text — Anchor Review.md"),
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert tampered_source_text.returncode == 1
+        assert "source_text_hash mismatch" in tampered_source_text.stdout
 
     print("PASS: standalone Reference release first-run smoke")
 

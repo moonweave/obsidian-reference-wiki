@@ -67,6 +67,7 @@ docs/CONTRACT.md
 docs/NOTE_QUALITY.md
 evals/evals.json
 scripts/check_notes.py
+scripts/check_source_text.py
 scripts/smoke_release.py
 templates/
   claim.md
@@ -78,6 +79,7 @@ templates/
   reference-index.md
   source-capture.md
   source.md
+  source-text-manifest.md
   theme.md
   theory-background.md
 ```
@@ -91,7 +93,7 @@ The product evaluation cases are stored in [evals/evals.json](evals/evals.json).
 They cover a new reference Blueprint, an existing mixed Vault, and the boundary
 between reference organization and research records. Capture and reviewed-note
 quality are additionally exercised through the product templates and
-`scripts/check_notes.py`.
+`scripts/check_notes.py` and `scripts/check_source_text.py`.
 
 The read-only lint is a quality check over discovered notes, not proof that the
 correct Vault was selected. Handoff runs it with the approved Blueprint count:
@@ -109,8 +111,10 @@ python scripts/smoke_release.py
 ```
 
 It uses a temporary synthetic Vault to verify the first Reference route,
-reviewed and unread source states, wikilink resolution, expected source count,
-and the absence of experiment/observation records.
+reviewed and unread source states, a derived source-text manifest and hash,
+wikilink resolution, expected source count, and the absence of
+experiment/observation records. The full parsed text remains a temporary
+external derivative; it is not bundled into this public repository.
 
 ## License
 

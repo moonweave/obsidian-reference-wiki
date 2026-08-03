@@ -5,7 +5,7 @@ description: Design, safely onboard, or extend an Obsidian reference knowledge s
 
 # Obsidian Research Wiki: Reference
 
-Onboard into a complete external-knowledge architecture, never a shallow starter. Design mode reads only user-authorized paths. Apply requires exact Vault path and Blueprint approval; it never changes `.obsidian`, installs plugins, copies PDFs/Zotero files, or moves existing notes.
+Onboard into a complete external-knowledge architecture, never a shallow starter. Design mode reads only user-authorized paths. Apply requires exact Vault path and Blueprint approval; it never changes `.obsidian`, installs plugins, copies PDFs/Zotero files, or moves existing notes. A full parsed/OCR text file is a derived reading input, not a replacement for the canonical source or a knowledge note.
 
 Read [the local contract](docs/CONTRACT.md) before acting. Explain the plan in
 the user's language and keep Design and Apply visibly separate.
@@ -21,8 +21,9 @@ PDF library. Do not create a second Vault if the user has an authorized one.
 
 ## First-run workflow
 
-1. Ask for the exact Vault path, current question, and the canonical Zotero or
-   PDF location. Do not choose a path or invent a source.
+1. Ask for the exact Vault path, current question, canonical Zotero or PDF
+   location, and (when available) the authorized full parsed/OCR text location.
+   Do not choose a path or invent a source.
 2. Inspect an existing Vault only after the user names it. Report the baseline
    without treating file names as facts.
 3. Return a Blueprint with the complete map, note meanings, placement rules,
@@ -52,6 +53,31 @@ reports, web pages, standards, datasets, or other external material. Preserve
 existing `Source — …` paper basenames and links; do not rename them as part of
 onboarding. Set `reference_type` to the actual prefix when rendering links.
 
+## Source-text layer
+
+Keep four representations distinct:
+
+1. the canonical PDF, web page, or Zotero item outside the Vault;
+2. an optional full native-text/OCR Markdown or text derivative used as the
+   LLM reading input;
+3. the `Paper — …` or `Source — …` dossier that records the reviewed meaning;
+4. promoted Claim, Method, Theory, Evidence, Limitation, or Theme notes.
+
+The derived text is not raw truth: OCR can introduce errors and parsing can
+lose layout. Store it outside the Vault by default, unchanged after extraction,
+and record its exact location, extraction basis, SHA-256 hash, and page-marker
+convention in `Source Text — …` using `templates/source-text-manifest.md`.
+Create that manifest only when the derivative is supplied or explicitly
+authorized. If it is unavailable, write `not supplied`; do not create an empty
+text file or summarize from its filename. The manifest is provenance metadata,
+not a second knowledge dossier.
+
+Use the standard marker `<!-- pdf-page: N -->` in a Markdown derivative when
+page-level anchors are preserved. Run `python scripts/check_source_text.py
+<manifest.md>` only after the exact manifest and derivative path are approved;
+it reads the named derivative, verifies its hash, and checks the declared page
+markers without modifying either file.
+
 ## Method and theory boundary
 
 `Method` in Reference means a method described or used by a paper: its purpose,
@@ -77,9 +103,12 @@ hold, keep the detail in the Source note.
 ## Reading and note-quality workflow
 
 The LLM may draft and populate Markdown only after the user supplies or
-authorizes the source. This skill is not an automatic PDF-ingestion or OCR
-pipeline. Use `source-capture.md` for an unread source; it records only the
-canonical location, capture reason, and next action.
+authorizes the source or derived text. This skill is not an automatic
+PDF-ingestion or OCR pipeline. Use `source-capture.md` for an unread source; it
+records only the canonical location, capture reason, and next action. When a
+derived text artifact exists, read it together with the source's page/section
+map, then write the dossier; never treat the full parse itself as a reviewed
+claim.
 
 For a reviewed source, record the text basis (`native-text`, `OCR`, `mixed`, or
 `supplied-excerpt`) and read in passes: paper map; method, measurements,
@@ -92,10 +121,12 @@ Source dossier has a review trace and the relevant provenance fields.
 
 Before handoff, run the product-local read-only lint with
 `python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>`.
-It checks Paper/Source count, status, text-basis enum, required dossier
-sections, per-result evidence-ledger anchors and labels, promoted-note
-provenance, unresolved placeholders, duplicate basenames, filename-mirroring
-headings, and resolving wikilinks; it never edits the Vault.
+It checks Paper/Source count, source-text status and manifest metadata,
+text-basis enum, required dossier sections, per-result evidence-ledger anchors
+and labels, promoted-note provenance, unresolved placeholders, duplicate
+basenames, filename-mirroring headings, and resolving wikilinks; it never
+edits the Vault. Run `check_source_text.py` separately when the approved
+derived artifact itself must be hash-verified.
 The expected count comes from the approved Blueprint. A bare lint run without
 `--expect-sources` is exploratory only and is not handoff evidence.
 

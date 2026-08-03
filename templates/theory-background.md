@@ -8,6 +8,10 @@ status: {theory_status}
 
 {theory_summary}
 
+## Assumptions or model boundary
+
+{theory_assumptions}
+
 ## Role in the source set
 
 {theory_role}
@@ -15,6 +19,10 @@ status: {theory_status}
 ## Assumptions and boundary
 
 {theory_limits}
+
+## Source anchor
+
+{theory_anchor}
 
 - Source: [[Source — {source_name}]]
 - Claim: [[Claim — {claim_name}]]

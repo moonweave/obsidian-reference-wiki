@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 1`
+`contract_version: 2`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -28,3 +28,10 @@ abstract or scope, method, theory, evidence, and limitations together. Standalon
 Claim, Method, Theory, Evidence, or Limitation notes are promoted only when
 they are reusable, question-relevant, independently revised, or provenance-
 distinct; promotion must not duplicate the full Source note.
+
+The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
+Source must declare its text basis and reviewed scope, include method,
+measurement, theory/model assumptions, anchored results, limitations, and a
+review trace. A partial Source must declare its unread scope and must not make
+broad promoted claims. An unread source uses `templates/source-capture.md` and
+contains no factual summary.

@@ -65,6 +65,27 @@ promoted note is a concise reusable index with a link back to the Source; it is
 not a second copy of the paper's full discussion. If none of those conditions
 hold, keep the detail in the Source note.
 
+## Reading and note-quality workflow
+
+The LLM may draft and populate Markdown only after the user supplies or
+authorizes the source. This skill is not an automatic PDF-ingestion or OCR
+pipeline. Use `source-capture.md` for an unread source; it records only the
+canonical location, capture reason, and next action.
+
+For a reviewed source, record the text basis (`native-text`, `OCR`, `mixed`, or
+`supplied-excerpt`) and read in passes: paper map; method, measurements,
+controls, and theory/model; results with figures/tables; then conclusion and
+limitations. Preserve page/section/figure anchors, units, conditions, and
+comparisons. Label each important item as `reported`, `modelled`, `calculated`,
+`author interpretation`, or `synthesis`. Use `not supplied` or `not reviewed`
+when the paper does not support a detail. Do not promote a node until the
+Source dossier has a review trace and the relevant provenance fields.
+
+Before handoff, run the product-local read-only lint with
+`python scripts/check_notes.py <approved-vault>`. It checks Source status,
+required dossier sections, page anchors, evidence-type labels, promoted-note
+provenance, and resolving wikilinks; it never edits the Vault.
+
 ## Existing Vault and handoff
 
 For a mixed Vault, the baseline ledger must use exactly `keep in place`, `link

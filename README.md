@@ -12,6 +12,11 @@ Theory, Evidence, or Limitation notes are optional promotion targets for
 cross-paper reuse, active questions, independent revision, or distinct
 provenance.
 
+The note-quality workflow in `docs/NOTE_QUALITY.md` keeps text basis, review
+scope, method, measurements, model assumptions, anchored results, and
+limitations visible instead of compressing a paper into an unsupported
+paragraph.
+
 ## What it does
 
 - designs or safely onboards a reference-focused Obsidian Vault;

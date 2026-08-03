@@ -9,6 +9,18 @@ canonical_location: {canonical_location}
 
 {evidence_summary}
 
+## Evidence type
+
+{evidence_kind}
+
+## Conditions and comparison
+
+{evidence_conditions}
+
+## Source anchor
+
+{evidence_anchor}
+
 ## Supports
 
 - Source: [[Source — {source_name}]]

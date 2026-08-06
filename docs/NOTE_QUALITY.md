@@ -48,7 +48,10 @@ off by default because it can be substantially slower on CPU; add
 `--docling-formula on` only when equation recovery justifies that cost. There
 is no silent OCR: OCR is also off by default and requires
 `--docling-ocr auto` for an authorized scan. There is no silent engine
-fallback. The adapter refuses implicit overwrite and fails
+fallback. Prefer `--docling-formula-pages 2,4-6` after identifying the exact
+pages that need equation recovery. Each Docling pass defaults to a 600-second
+timeout and leaves no final derivative or manifest on timeout. The adapter
+refuses implicit overwrite and fails
 on an engine or page-boundary error. Both outputs remain parsed derivatives:
 visually check important equations, symbols, tables, captions, and multi-column
 reading order before promoting claims.
@@ -152,6 +155,18 @@ The checker treats missing, duplicate, or reordered page markers as failures
 for provenance versions 1 and 2. Undecoded formula and image placeholders are
 reported as quality warnings: the hash can be valid while scientific content
 still needs visual review.
+
+Run the deterministic parser corpus before release:
+
+```bash
+python scripts/run_extraction_corpus.py \
+  --corpus evals/corpus/source-text-extraction/corpus.json \
+  --engine pdftotext --json
+```
+
+The optional Docling run may return `quality_status: review-required` for a
+known layout decision. That is a visible review queue, not permission to lower
+the scientific reading gate.
 
 Graph inspection is a presentation check, not a replacement for the Markdown
 lint. Because `_templates` contains Markdown files, an unfiltered Obsidian

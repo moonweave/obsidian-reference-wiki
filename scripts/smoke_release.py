@@ -71,7 +71,6 @@ VALUES = {
     "limitation_link": "not provided",
     "source_links": "- Paper: [[Paper — Anchor Review]]",
     "capture_reason": "User supplied this source for later review.",
-    "next_action": "Read the supplied source before summarizing it.",
     "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n<!-- pdf-page: 2 -->\nA supplied limitation.",
 }
 
@@ -103,7 +102,10 @@ def main() -> None:
     legacy_names = ("Reference-First " + "Starter", "Research Workspace " + "Advanced")
     assert not any(name in skill_text for name in legacy_names)
     assert (ROOT / "scripts/check_notes.py").is_file()
+    assert (ROOT / "scripts/run_extraction_corpus.py").is_file()
     assert (ROOT / "templates/reference-profile.md").is_file()
+    assert (ROOT / "docs/INSTALLATION.md").is_file()
+    assert (ROOT / "docs/BETA_TEST.md").is_file()
     onboarding_text = (ROOT / "docs/ONBOARDING.md").read_text(encoding="utf-8")
     for required in (
         "`notes-only`",
@@ -297,6 +299,7 @@ def main() -> None:
             "source_text_hash": "not provided",
             "source_text_page_map": "not provided",
             "source_text_manifest": "not provided",
+            "next_action": "Read the supplied source before summarizing it.",
         }
         write(
             vault,

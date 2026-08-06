@@ -100,6 +100,8 @@ The Blueprint must state:
 - vault-local cache or external derivative location rule;
 - extraction engine for each pilot source: `pdftotext` compatibility for a
   simple usable text layer, or local `docling` for complex scientific layout;
+- any reviewed formula page range and non-default timeout, without exposing
+  those technical controls as another Stage 1 preset choice;
 - the first real `Reference Index -> Paper/Source` route and any justified
   promoted links;
 - exact Apply scope and expected Paper/Source count;

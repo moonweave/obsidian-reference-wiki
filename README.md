@@ -36,6 +36,8 @@ the canonical PDF external and provides two local adapters: the compatible
 and formula enrichment are separate explicit options. Every new derivative
 records provenance version 2, engine options, hashes, and ordered page markers;
 `scripts/check_source_text.py` also reports undecoded formulas and images.
+High-cost Docling work defaults to a 600-second limit per pass, and reviewed
+formula pages can be selected without enriching the full document.
 
 ## What it does
 
@@ -76,12 +78,16 @@ Codex installation, make this repository available at:
 Then invoke the skill when the task is about rigorous literature or reference
 organization. The full operating contract is in [SKILL.md](SKILL.md), and the
 reference architecture is in [docs/CONTRACT.md](docs/CONTRACT.md).
+See [docs/INSTALLATION.md](docs/INSTALLATION.md) for optional PDF dependencies
+and [docs/BETA_TEST.md](docs/BETA_TEST.md) for the separate human release gate.
 
 ## Included layout
 
 ```text
 SKILL.md
 docs/CONTRACT.md
+docs/BETA_TEST.md
+docs/INSTALLATION.md
 docs/NOTE_QUALITY.md
 docs/ONBOARDING.md
 evals/evals.json
@@ -89,6 +95,7 @@ scripts/check_notes.py
 scripts/check_source_text.py
 scripts/extract_source_text.py
 scripts/recommend_profile.py
+scripts/run_extraction_corpus.py
 scripts/smoke_release.py
 templates/
   claim.md
@@ -146,6 +153,18 @@ vault-local derived-text cache and manifest, hash verification, wikilink
 resolution, expected source count, and the absence of experiment/observation
 records. The synthetic full text is temporary and is not bundled into this
 public repository.
+
+The repository-owned eight-case extraction corpus is a separate parser gate:
+
+```bash
+python scripts/run_extraction_corpus.py \
+  --corpus evals/corpus/source-text-extraction/corpus.json \
+  --engine pdftotext --json
+```
+
+Docling results may deliberately report `quality_status: review-required`;
+automated structure checks never substitute for equation, figure, or first-user
+review.
 
 ## License
 

@@ -118,13 +118,20 @@ scientific PDF where formulas, columns, or reading order matter, prefer
 `--basis mixed --engine docling`. Docling runs locally with remote services and
 external plugins disabled and no silent fallback to `pdftotext`. Formula
 enrichment is an explicit high-cost option, `--docling-formula on`; leave it
-off for the first layout pass. The adapter keeps the canonical PDF external,
-creates ordered
-page markers, records canonical and derivative hashes plus extractor metadata,
+off for the first layout pass. Prefer `--docling-formula-pages 2,4-6` when only
+reviewed pages need equation recovery. Every Docling pass has a default
+600-second limit, adjustable with `--docling-timeout-seconds`; timeout failure
+writes neither final artifact. The adapter keeps the canonical PDF external,
+creates ordered page markers, records canonical and derivative hashes plus extractor metadata,
 and refuses existing outputs unless `--overwrite` is explicitly supplied. If
 the selected engine fails or cannot preserve every page boundary, stop at an
 extraction failure. Treat either derivative as parsed input that still needs
 formula and reading-order review, not as source truth.
+
+Before describing a release as parser-tested, run the repository-owned
+eight-case layout corpus with `scripts/run_extraction_corpus.py`. A green
+structural corpus does not accept equations, figures, or scientific claims.
+Follow `docs/BETA_TEST.md` for the separate first-human gate.
 
 ## Method and theory boundary
 

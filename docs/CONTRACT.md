@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 11`
+`contract_version: 12`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -88,13 +88,21 @@ manifest from explicit input/output paths. `--engine pdftotext --basis
 native-text` remains the compatibility path. `--engine docling --basis mixed`
 is the recommended local path for complex scientific PDFs. It disables remote
 services and external plugins. Formula enrichment is disabled by default and
-requires the explicit high-cost `--docling-formula on` option. Neither path
-falls back silently. The adapter never overwrites without `--overwrite` and
+requires the explicit high-cost `--docling-formula on` option. Selective
+recovery uses `--docling-formula-pages` with one layout pass and one enriched
+page-range pass. Each pass defaults to a 600-second timeout. Neither path falls
+back silently. The adapter never overwrites without `--overwrite` and
 rejects a canonical PDF inside the Vault. Existing provenance version 1
 manifests remain valid. New provenance version 2 records the canonical PDF
 hash/page count, extractor/version/options/mode, extracted-text page count,
 derivative hash, and a complete ordered marker for every PDF page. Any engine
 failure or page-boundary mismatch is an explicit failure.
+
+The public extraction corpus contains eight generated layout cases and stores
+no extracted Markdown. It mechanically checks page boundaries, term coverage,
+and reading order. Engine-specific `review` cases remain visible and never
+become scientific acceptance. The separate first-user gate in
+`docs/BETA_TEST.md` cannot be satisfied by smoke tests or agent simulation.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,

@@ -1,0 +1,57 @@
+{
+  "corpus_id": "source-text-extraction-layout-v1",
+  "fixture_postscript": "../../fixtures/source-text/eight-case.ps",
+  "cases": [
+    {
+      "id": "single-column",
+      "page": 1,
+      "required_terms": ["SINGLE COLUMN START", "SINGLE COLUMN RESULT 12 MILLIAMPERE", "SINGLE COLUMN END"],
+      "ordered_terms": ["SINGLE COLUMN START", "SINGLE COLUMN RESULT 12 MILLIAMPERE", "SINGLE COLUMN END"]
+    },
+    {
+      "id": "two-column",
+      "page": 2,
+      "required_terms": ["TWO COLUMN CASE", "LEFT COLUMN RESULT SAMPLE ALPHA", "RIGHT COLUMN LIMITATION ONE TRIAL", "TWO COLUMN END"],
+      "ordered_terms": ["TWO COLUMN CASE", "LEFT COLUMN RESULT SAMPLE ALPHA", "RIGHT COLUMN LIMITATION ONE TRIAL", "TWO COLUMN END"]
+    },
+    {
+      "id": "equation-text",
+      "page": 3,
+      "required_terms": ["EQUATION TEXT CASE", "CURRENT I EQUALS VOLTAGE V OVER RESISTANCE R", "ENERGY E EQUALS CHARGE Q TIMES VOLTAGE V"],
+      "ordered_terms": ["EQUATION TEXT CASE", "CURRENT I EQUALS VOLTAGE V OVER RESISTANCE R", "ENERGY E EQUALS CHARGE Q TIMES VOLTAGE V", "EQUATION TEXT END"]
+    },
+    {
+      "id": "table",
+      "page": 4,
+      "required_terms": ["TABLE CASE", "SAMPLE ALPHA", "VALUE 12", "SAMPLE BETA", "VALUE 5", "TABLE END"],
+      "ordered_terms": ["TABLE CASE", "SAMPLE ALPHA", "VALUE 12", "SAMPLE BETA", "VALUE 5", "TABLE END"]
+    },
+    {
+      "id": "header-footer",
+      "page": 5,
+      "required_terms": ["REPEATED HEADER JOURNAL TEST", "HEADER FOOTER BODY START", "HEADER FOOTER BODY END", "FOOTER PAGE FIVE"],
+      "ordered_terms": ["REPEATED HEADER JOURNAL TEST", "HEADER FOOTER BODY START", "HEADER FOOTER BODY END", "FOOTER PAGE FIVE"],
+      "docling_optional_terms": ["REPEATED HEADER JOURNAL TEST", "FOOTER PAGE FIVE"],
+      "docling_ordered_terms": ["HEADER FOOTER BODY START", "HEADER FOOTER BODY END"]
+    },
+    {
+      "id": "sparse-page",
+      "page": 6,
+      "required_terms": ["SPARSE PAGE TITLE", "SPARSE CENTRAL NOTE", "SPARSE PAGE END"],
+      "ordered_terms": ["SPARSE PAGE TITLE", "SPARSE CENTRAL NOTE", "SPARSE PAGE END"],
+      "docling_order_policy": "review"
+    },
+    {
+      "id": "rotated-text",
+      "page": 7,
+      "required_terms": ["ROTATED TEXT CASE", "ROTATED RESULT PRESERVED", "ROTATED TEXT END"],
+      "ordered_terms": ["ROTATED TEXT CASE", "ROTATED RESULT PRESERVED", "ROTATED TEXT END"]
+    },
+    {
+      "id": "graphics-caption",
+      "page": 8,
+      "required_terms": ["GRAPHICS CAPTION CASE", "FIGURE ONE RESPONSE CURVE", "GRAPHICS CAPTION RESULT INCREASES", "GRAPHICS CAPTION END"],
+      "ordered_terms": ["GRAPHICS CAPTION CASE", "FIGURE ONE RESPONSE CURVE", "GRAPHICS CAPTION RESULT INCREASES", "GRAPHICS CAPTION END"]
+    }
+  ]
+}

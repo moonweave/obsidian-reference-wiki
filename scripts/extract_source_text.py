@@ -37,8 +37,21 @@ def command_path(name: str) -> str:
     return resolved
 
 
-def run(command: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, check=False, capture_output=True, text=True)
+def run(
+    command: list[str], timeout: float | None = None
+) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"Docling extraction timed out after {timeout:g} seconds"
+        ) from exc
 
 
 def pdf_page_count(pdfinfo: str, source: Path) -> int:
@@ -64,6 +77,42 @@ def normalize_page(text: str) -> str:
     while lines and not lines[-1]:
         lines.pop()
     return "\n".join(lines)
+
+
+def parse_page_selection(value: str, page_count: int) -> list[int]:
+    selected: set[int] = set()
+    for raw_part in value.split(","):
+        part = raw_part.strip()
+        if not part:
+            raise RuntimeError("--docling-formula-pages contains an empty item")
+        match = re.fullmatch(r"(\d+)(?:-(\d+))?", part)
+        if not match:
+            raise RuntimeError(
+                "--docling-formula-pages must use page numbers and ranges such as 2,4-6"
+            )
+        start = int(match.group(1))
+        end = int(match.group(2) or start)
+        if start > end:
+            raise RuntimeError("--docling-formula-pages ranges must be ascending")
+        if start < 1 or end > page_count:
+            raise RuntimeError(
+                f"--docling-formula-pages must stay within PDF pages 1-{page_count}"
+            )
+        selected.update(range(start, end + 1))
+    return sorted(selected)
+
+
+def format_page_selection(pages: list[int]) -> str:
+    ranges: list[str] = []
+    start = previous = pages[0]
+    for page in pages[1:]:
+        if page == previous + 1:
+            previous = page
+            continue
+        ranges.append(str(start) if start == previous else f"{start}-{previous}")
+        start = previous = page
+    ranges.append(str(start) if start == previous else f"{start}-{previous}")
+    return ",".join(ranges)
 
 
 def extract_pages(pdftotext: str, source: Path, page_count: int) -> tuple[str, int]:
@@ -121,10 +170,15 @@ def docling_python() -> str:
     return str(interpreter)
 
 
-def extract_docling(
-    source: Path, page_count: int, ocr_mode: str, formula_mode: str
-) -> tuple[str, int, str, str]:
-    interpreter = docling_python()
+def docling_pass(
+    interpreter: str,
+    source: Path,
+    ocr_mode: str,
+    formula_mode: str,
+    timeout_seconds: float,
+    page_start: int,
+    page_end: int,
+) -> tuple[list[str], str]:
     with tempfile.TemporaryDirectory() as raw:
         temporary = Path(raw)
         markdown_path = temporary / "docling.md"
@@ -139,7 +193,10 @@ def extract_docling(
                 "--metadata", str(metadata_path),
                 "--ocr", ocr_mode,
                 "--formula", formula_mode,
-            ]
+                "--page-start", str(page_start),
+                "--page-end", str(page_end),
+            ],
+            timeout=timeout_seconds,
         )
         if result.returncode != 0:
             detail = (result.stderr or result.stdout).strip()
@@ -149,20 +206,64 @@ def extract_docling(
         markdown = markdown_path.read_text(encoding="utf-8")
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     pages = [normalize_page(part) for part in markdown.split(PAGE_BREAK_TOKEN)]
-    if len(pages) != page_count:
+    expected_pages = page_end - page_start + 1
+    if len(pages) != expected_pages:
         raise RuntimeError(
-            f"Docling page boundary mismatch: expected {page_count}, found {len(pages)}"
+            f"Docling page boundary mismatch: expected {expected_pages}, found {len(pages)}"
         )
+    return pages, str(metadata["version"])
+
+
+def extract_docling(
+    source: Path,
+    page_count: int,
+    ocr_mode: str,
+    formula_mode: str,
+    formula_pages: list[int],
+    timeout_seconds: float,
+) -> tuple[str, int, str, str]:
+    interpreter = docling_python()
+    base_formula_mode = "off" if formula_pages else formula_mode
+    pages, version = docling_pass(
+        interpreter,
+        source,
+        ocr_mode,
+        base_formula_mode,
+        timeout_seconds,
+        1,
+        page_count,
+    )
+    if formula_pages:
+        page_start = formula_pages[0]
+        page_end = formula_pages[-1]
+        enriched, enriched_version = docling_pass(
+            interpreter,
+            source,
+            ocr_mode,
+            "on",
+            timeout_seconds,
+            page_start,
+            page_end,
+        )
+        if enriched_version != version:
+            raise RuntimeError("Docling version changed between extraction passes")
+        for page_number in formula_pages:
+            pages[page_number - 1] = enriched[page_number - page_start]
     text_pages = sum(bool(page) for page in pages)
     if text_pages == 0:
         raise RuntimeError("Docling produced no readable page content")
     rendered = [f"<!-- pdf-page: {index} -->\n{page}".rstrip() for index, page in enumerate(pages, 1)]
-    formula_enabled = str(formula_mode == "on").lower()
-    options = (
-        f"pipeline=standard;ocr={ocr_mode};formula_enrichment={formula_enabled};"
-        "remote_services=false;external_plugins=false;page_breaks=pdf-page-comments"
+    formula_setting = (
+        f"selected:{format_page_selection(formula_pages)}"
+        if formula_pages
+        else str(formula_mode == "on").lower()
     )
-    return "\n\n".join(rendered) + "\n", text_pages, str(metadata["version"]), options
+    options = (
+        f"pipeline=standard;ocr={ocr_mode};formula_enrichment={formula_setting};"
+        f"timeout_seconds_per_pass={timeout_seconds:g};remote_services=false;"
+        "external_plugins=false;page_breaks=pdf-page-comments"
+    )
+    return "\n\n".join(rendered) + "\n", text_pages, version, options
 
 
 def docling_worker(argv: list[str]) -> int:
@@ -172,6 +273,8 @@ def docling_worker(argv: list[str]) -> int:
     parser.add_argument("--metadata", type=Path, required=True)
     parser.add_argument("--ocr", choices=("auto", "off"), required=True)
     parser.add_argument("--formula", choices=("on", "off"), required=True)
+    parser.add_argument("--page-start", type=int, required=True)
+    parser.add_argument("--page-end", type=int, required=True)
     args = parser.parse_args(argv)
     try:
         import docling
@@ -187,7 +290,9 @@ def docling_worker(argv: list[str]) -> int:
         converter = DocumentConverter(
             format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=options)}
         )
-        result = converter.convert(args.source)
+        result = converter.convert(
+            args.source, page_range=(args.page_start, args.page_end)
+        )
         markdown = result.document.export_to_markdown(
             page_break_placeholder=PAGE_BREAK_TOKEN,
             traverse_pictures=True,
@@ -250,11 +355,21 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
 
     pdfinfo = command_path("pdfinfo")
     page_count = pdf_page_count(pdfinfo, source)
+    formula_pages = (
+        parse_page_selection(args.docling_formula_pages, page_count)
+        if args.docling_formula_pages
+        else []
+    )
     if args.engine == "docling":
         if args.basis != "mixed":
             raise RuntimeError("Docling extraction must use --basis mixed")
         extracted_text, text_pages, version, extractor_options = extract_docling(
-            source, page_count, args.docling_ocr, args.docling_formula
+            source,
+            page_count,
+            args.docling_ocr,
+            args.docling_formula,
+            formula_pages,
+            args.docling_timeout_seconds,
         )
         extractor = "docling"
         extraction_mode = "docling-standard-page-marked"
@@ -334,6 +449,8 @@ def main() -> int:
     )
     parser.add_argument("--docling-ocr", choices=("auto", "off"), default="off")
     parser.add_argument("--docling-formula", choices=("on", "off"), default="off")
+    parser.add_argument("--docling-formula-pages", default="")
+    parser.add_argument("--docling-timeout-seconds", type=float, default=600.0)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
@@ -341,6 +458,14 @@ def main() -> int:
         if args.engine not in ("pdftotext", "docling"):
             raise RuntimeError(
                 "REFERENCE_PDF_ENGINE must be either 'pdftotext' or 'docling'"
+            )
+        if args.docling_timeout_seconds <= 0:
+            raise RuntimeError("--docling-timeout-seconds must be positive")
+        if args.docling_formula_pages and args.engine != "docling":
+            raise RuntimeError("--docling-formula-pages requires --engine docling")
+        if args.docling_formula_pages and args.docling_formula == "on":
+            raise RuntimeError(
+                "use either --docling-formula on or --docling-formula-pages, not both"
             )
         result = extract(args)
     except RuntimeError as exc:

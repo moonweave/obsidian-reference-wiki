@@ -5,9 +5,11 @@
 > 출처와의 연결을 유지하면서 논문을 추적 가능한 지식으로 정리합니다.
 
 `Obsidian Research Wiki: Reference`는 Obsidian에 근거 중심 문헌 체계를
-구축하는 독립형 Codex Skill입니다. 검토한 논문 노트, 검색 가능한 전문
-파생본, 재사용 가능한 지식 노트를 서로 구분합니다. 따라서 짧은 요약이
-정본 PDF, 웹페이지 또는 Zotero 항목을 대신하지 않습니다.
+구축하는 독립형 에이전트 스킬(Agent Skill)입니다. 공개된
+[Agent Skills 사양](https://agentskills.io/specification)을 따르며, 검토한
+논문 노트, 검색 가능한 전문 파생본, 재사용 가능한 지식 노트를 서로
+구분합니다. 따라서 짧은 요약이 정본 PDF, 웹페이지 또는 Zotero 항목을
+대신하지 않습니다.
 
 새 Vault와 기존 Vault에서 모두 사용할 수 있으며, 파일을 만들기 전에 전체
 적용 설계안(Blueprint)을 제안합니다. 사용자가 명시적으로 승인하지 않는 한
@@ -16,35 +18,25 @@
 
 ## 빠른 시작
 
-노트만 정리할 때 필요한 것은 Git과 Codex뿐입니다.
-
-macOS 또는 Linux:
+사용 중인 에이전트가 지원하는 스킬 관리자로 설치합니다. 공통 Skills CLI를
+사용할 때는 다음 명령을 실행합니다.
 
 ```bash
-mkdir -p "$HOME/.codex/skills"
-git clone https://github.com/moonweave/obsidian-reference-wiki.git \
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
+npx skills add moonweave/obsidian-reference-wiki
 ```
 
-Windows PowerShell:
-
-```powershell
-New-Item -ItemType Directory -Force "$HOME/.codex/skills" | Out-Null
-git clone https://github.com/moonweave/obsidian-reference-wiki.git `
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
-```
-
-설치한 뒤 새 Codex 세션을 시작하고 다음과 같이 호출합니다.
+설치 프로그램이 호환 에이전트를 감지하며, 설치 대상과 범위를 선택할 수
+있습니다. 설치한 뒤 새 에이전트 세션을 시작하고 다음과 같이 요청합니다.
 
 ```text
-$obsidian-research-wiki-reference 문헌 Vault를 설계해줘. 아직 파일은 만들지 마.
+obsidian-research-wiki-reference로 문헌 Vault를 설계해줘.
 ```
 
 > [!NOTE]
 > 첫 응답은 설계 대화입니다. 정확한 Vault 경로, 적용 설계안, 시험 적용할 자료,
 > 변경 금지 목록을 승인하기 전에는 Vault 파일을 만들지 않습니다.
 
-설치 확인, 업데이트, 안전한 비활성화, Windows 안내와 선택적 PDF 의존성은
+패키지 확인, 수동 설치, 업데이트, 제거와 선택적 PDF 의존성은
 [설치 가이드](docs/INSTALLATION.md)에서 확인할 수 있습니다.
 
 ## 만들어지는 구조

@@ -6,7 +6,7 @@ invited the change in advance.
 
 ## Good issue reports
 
-Include the installed commit or tag, Codex client, operating system, Python
+Include the installed commit or tag, agent client, operating system, Python
 version, selected preset, expected behavior, actual behavior, and the smallest
 synthetic reproduction. For structured onboarding feedback, use the fields in
 [`docs/USABILITY_TEST.md`](docs/USABILITY_TEST.md).

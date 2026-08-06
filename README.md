@@ -4,10 +4,12 @@
 
 > Turn papers into traceable knowledge—without losing the source.
 
-`Obsidian Research Wiki: Reference` is a standalone Codex Skill for building a
-provenance-first literature system in Obsidian. It keeps reviewed paper notes,
-searchable source text, and reusable knowledge notes distinct, so a concise
-summary never replaces the canonical PDF, web page, or Zotero item.
+`Obsidian Research Wiki: Reference` is a standalone Agent Skill for building a
+provenance-first literature system in Obsidian. It follows the open
+[Agent Skills specification](https://agentskills.io/specification) and keeps
+reviewed paper notes, searchable source text, and reusable knowledge notes
+distinct, so a concise summary never replaces the canonical PDF, web page, or
+Zotero item.
 
 It works with a new or existing Vault and proposes a complete Blueprint before
 creating files. Existing notes, `.obsidian` settings, plugins, PDFs, and Zotero
@@ -15,36 +17,26 @@ libraries remain untouched unless the user explicitly approves otherwise.
 
 ## Quick start
 
-Git and Codex are the only requirements for notes-only use.
-
-macOS or Linux:
+Install it with the skill manager supported by your agent. With the portable
+Skills CLI:
 
 ```bash
-mkdir -p "$HOME/.codex/skills"
-git clone https://github.com/moonweave/obsidian-reference-wiki.git \
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
+npx skills add moonweave/obsidian-reference-wiki
 ```
 
-Windows PowerShell:
-
-```powershell
-New-Item -ItemType Directory -Force "$HOME/.codex/skills" | Out-Null
-git clone https://github.com/moonweave/obsidian-reference-wiki.git `
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
-```
-
-Start a new Codex session, then run:
+The installer detects compatible agents and lets you choose the target and
+installation scope. Start a new agent session, then ask:
 
 ```text
-$obsidian-research-wiki-reference Design a literature Vault.
+Use obsidian-research-wiki-reference to design a literature Vault.
 ```
 
 > [!NOTE]
 > The first response is a design conversation. No Vault file is created until
 > the exact path, Blueprint, pilot sources, and no-touch list are approved.
 
-See the [installation guide](docs/INSTALLATION.md) for verification, updates,
-safe disabling, Windows notes, and optional PDF dependencies.
+See the [installation guide](docs/INSTALLATION.md) for package inspection,
+manual installation, updates, removal, and optional PDF dependencies.
 
 ## What you get
 

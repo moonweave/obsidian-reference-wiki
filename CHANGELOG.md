@@ -7,11 +7,13 @@ versioning for public releases.
 
 - Reworked the English and Korean README pages around quick installation,
   visible output structure, preset selection, and provenance boundaries.
+- Clarified that the package is a portable Agent Skill and replaced
+  client-specific installation guidance with the Agent Skills CLI.
 
 ## [0.1.0] — 2026-08-06
 
 - Added a Korean README and language switch links on both README pages.
-- Published the complete standalone Codex Skill installation and workflow
+- Published the complete standalone Agent Skill installation and workflow
   documentation.
 - Validated the one-paper Reference workflow, note-quality checks, source-text
   provenance checks, and independent release layout.
@@ -26,7 +28,7 @@ versioning for public releases.
   manifests, hash verification, and an eight-case extraction corpus.
 - Added standalone release smoke tests and one-paper workflow validation.
 - Adopted the PolyForm Noncommercial License 1.0.0 for current releases.
-- Added reproducible Codex Skill installation, update, and disable guidance.
+- Added reproducible Agent Skill installation, update, and removal guidance.
 
 [Unreleased]: https://github.com/moonweave/obsidian-reference-wiki/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/moonweave/obsidian-reference-wiki/releases/tag/v0.1.0

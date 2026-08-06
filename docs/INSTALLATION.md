@@ -3,33 +3,31 @@
 The skill itself is Markdown, Python, and templates. It does not install
 Obsidian, change `.obsidian`, or install PDF tools automatically.
 
-## Install the Codex skill
+## Install the Agent Skill
 
-Git and Codex are the only requirements for notes-only use. Install the public
-repository directly under the Codex skill directory.
-
-macOS or Linux:
+This repository follows the open
+[Agent Skills specification](https://agentskills.io/specification). Install it
+with the skill manager supported by your agent. With the portable Skills CLI:
 
 ```bash
-mkdir -p "$HOME/.codex/skills"
-git clone https://github.com/moonweave/obsidian-reference-wiki.git \
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
-test -f "$HOME/.codex/skills/obsidian-research-wiki-reference/SKILL.md"
+npx skills add moonweave/obsidian-reference-wiki
 ```
 
-Windows PowerShell:
+The installer detects compatible agents and lets you choose the target and
+project or global scope. To inspect the package without installing it:
 
-```powershell
-New-Item -ItemType Directory -Force "$HOME/.codex/skills" | Out-Null
-git clone https://github.com/moonweave/obsidian-reference-wiki.git `
-  "$HOME/.codex/skills/obsidian-research-wiki-reference"
-Test-Path "$HOME/.codex/skills/obsidian-research-wiki-reference/SKILL.md"
+```bash
+npx skills add moonweave/obsidian-reference-wiki --list
 ```
 
-Start a new Codex session after installation. A direct first invocation is:
+For a manual installation, clone the repository into the skills directory
+documented by your agent. The installed directory must contain `SKILL.md` at
+its root and should retain the basename `obsidian-research-wiki-reference`.
+
+Start a new agent session after installation, then ask:
 
 ```text
-$obsidian-research-wiki-reference Help me design a literature Vault. Do not create files yet.
+Use obsidian-research-wiki-reference to design a literature Vault.
 ```
 
 The first response should offer `notes-only`, `searchable-library`, and
@@ -37,24 +35,23 @@ The first response should offer `notes-only`, `searchable-library`, and
 occupies the target directory, inspect it before replacing it; do not merge two
 skill installations.
 
-## Update or disable
+## Update or remove
 
-Update a Git-based installation:
-
-```bash
-git -C "$HOME/.codex/skills/obsidian-research-wiki-reference" pull --ff-only
-```
-
-To disable the skill without deleting it, close Codex and move it outside the
-active basename:
+Update a Skills CLI installation:
 
 ```bash
-mv "$HOME/.codex/skills/obsidian-research-wiki-reference" \
-  "$HOME/.codex/skills/obsidian-research-wiki-reference.disabled"
+npx skills update obsidian-research-wiki-reference
 ```
 
-On PowerShell, use `Rename-Item` with the same source and `.disabled`
-destination. Move it back to the original basename to re-enable it.
+Remove it from the selected agent and scope:
+
+```bash
+npx skills remove obsidian-research-wiki-reference
+```
+
+For a manual Git installation, run `git pull --ff-only` inside the installed
+skill directory. Use the agent's own skill manager to disable or remove a
+manual installation; skill discovery paths differ by client.
 
 ## Optional PDF extraction dependencies
 

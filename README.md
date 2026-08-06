@@ -35,7 +35,8 @@ the canonical PDF external and provides two local adapters: the compatible
 `pdftotext` path and a Docling path for complex scientific layout. Docling OCR
 and formula enrichment are separate explicit options. Every new derivative
 records provenance version 2, engine options, hashes, and ordered page markers;
-`scripts/check_source_text.py` also reports undecoded formulas and images.
+`scripts/check_source_text.py` also reports undecoded formulas and images with
+per-page counts for targeted recovery and visual review.
 High-cost Docling work defaults to a 600-second limit per pass, and reviewed
 formula pages can be selected without enriching the full document.
 

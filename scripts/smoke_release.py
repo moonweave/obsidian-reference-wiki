@@ -71,7 +71,7 @@ VALUES = {
     "limitation_link": "not provided",
     "source_links": "- Paper: [[Paper — Anchor Review]]",
     "capture_reason": "User supplied this source for later review.",
-    "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n<!-- pdf-page: 2 -->\nA supplied limitation.",
+    "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n<!-- formula-not-decoded -->\n<!-- formula-not-decoded -->\n\n<!-- pdf-page: 2 -->\nA supplied limitation.\n<!-- formula-not-decoded -->\n<!-- image -->",
 }
 
 
@@ -455,6 +455,9 @@ def main() -> None:
         source_text_result = json.loads(source_text_check.stdout)
         assert source_text_result["status"] == "pass"
         assert source_text_result["page_markers"] == 2
+        assert source_text_result["formula_placeholders"] == 3
+        assert source_text_result["formula_placeholder_pages"] == {"1": 2, "2": 1}
+        assert source_text_result["image_placeholder_pages"] == {"2": 1}
         escaped_text = Path(raw) / "outside-vault.md"
         escaped_text.write_text("outside\n", encoding="utf-8")
         escaped_values = source_text_values | {

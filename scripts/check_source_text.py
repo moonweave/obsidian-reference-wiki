@@ -13,6 +13,25 @@ PAGE_MARKER = re.compile(r"<!--\s*pdf-page:\s*(\d+)\s*-->")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
+def placeholder_pages(text: str, token: str) -> dict[int, int]:
+    """Count a review placeholder within each declared PDF page block."""
+    matches = list(PAGE_MARKER.finditer(text))
+    counts: dict[int, int] = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        count = text.count(token, match.end(), end)
+        if count:
+            counts[int(match.group(1))] = count
+    return counts
+
+
+def page_warning_suffix(counts: dict[int, int]) -> str:
+    if not counts:
+        return ""
+    detail = ", ".join(f"{page}={count}" for page, count in sorted(counts.items()))
+    return f" (PDF pages: {detail})"
+
+
 def parse_frontmatter(text: str) -> dict[str, str]:
     match = FRONTMATTER.match(text)
     if not match:
@@ -73,6 +92,8 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     canonical_page_count = 0
     formula_placeholders = 0
     image_placeholders = 0
+    formula_placeholder_pages: dict[int, int] = {}
+    image_placeholder_pages: dict[int, int] = {}
     provenance_version = metadata.get("source_text_provenance_version", "")
     if provenance_version in {"1", "2"}:
         canonical_location = Path(metadata.get("canonical_location", "")).expanduser()
@@ -122,6 +143,10 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
             page_markers = len(marker_numbers)
             formula_placeholders = text.count("<!-- formula-not-decoded -->")
             image_placeholders = text.count("<!-- image -->")
+            formula_placeholder_pages = placeholder_pages(
+                text, "<!-- formula-not-decoded -->"
+            )
+            image_placeholder_pages = placeholder_pages(text, "<!-- image -->")
             if metadata.get("source_text_page_map") == "pdf-page-comments" and page_markers == 0:
                 errors.append("source_text_page_map declares pdf-page-comments but no page markers were found")
             if provenance_version in {"1", "2"} and marker_numbers != list(range(1, canonical_page_count + 1)):
@@ -129,10 +154,12 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
             if formula_placeholders:
                 warnings.append(
                     f"derived text contains {formula_placeholders} undecoded formula placeholders"
+                    f"{page_warning_suffix(formula_placeholder_pages)}"
                 )
             if image_placeholders:
                 warnings.append(
                     f"derived text contains {image_placeholders} image placeholders"
+                    f"{page_warning_suffix(image_placeholder_pages)}"
                 )
 
     return {
@@ -147,6 +174,8 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         "marker_numbers": marker_numbers,
         "formula_placeholders": formula_placeholders,
         "image_placeholders": image_placeholders,
+        "formula_placeholder_pages": formula_placeholder_pages,
+        "image_placeholder_pages": image_placeholder_pages,
         "warnings": warnings,
         "errors": errors,
     }

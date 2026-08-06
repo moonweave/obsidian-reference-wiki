@@ -153,8 +153,9 @@ python scripts/check_source_text.py <source-text-manifest.md> --vault-root <appr
 
 The checker treats missing, duplicate, or reordered page markers as failures
 for provenance versions 1 and 2. Undecoded formula and image placeholders are
-reported as quality warnings: the hash can be valid while scientific content
-still needs visual review.
+reported as quality warnings with per-page counts: the hash can be valid while
+scientific content still needs visual review. Use that page list as the review
+queue for selective formula enrichment and canonical-PDF comparison.
 
 Run the deterministic parser corpus before release:
 

@@ -1,4 +1,7 @@
-## Paper-first sources
+---
+type: reference-index
+---
+## Reference records
 
 {source_links}
 

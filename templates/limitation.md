@@ -1,3 +1,8 @@
+---
+type: reference-limitation
+grounding_status: source-grounded
+canonical_location: {canonical_location}
+---
 ## Limitation type
 
 {limitation_type}

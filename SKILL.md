@@ -61,7 +61,7 @@ The approved first path must be resolvable from `Reference Index` to a real
 Paper or Source and then to a Claim, or explicitly stop at that reference when no claim was
 supplied. Evidence, Method, Theory, and Limitation links are created only when
 supplied. The default domains are `10 Sources`, `20 Claims`, `30 Evidence &
-Methods`, `35 Theories & Background`, `40 Limitations`, `50 Themes`, `60
+Methods`, `35 Theories`, `40 Limitations`, `50 Themes`, `60
 Questions`, `90 Reading Queue`, and `_templates`; do not add research-record
 domains.
 
@@ -73,6 +73,8 @@ Use `Paper — {short title}` for academic articles and `Source — {name}` for
 reports, web pages, standards, datasets, or other external material. Preserve
 existing `Source — …` paper basenames and links; do not rename them as part of
 onboarding. Set `reference_type` to the actual prefix when rendering links.
+Start with the short title; on a basename collision append `— {year}`, then
+append `— {first author}` only if the title and year still collide.
 
 ## Source-text layer
 
@@ -95,7 +97,7 @@ another sharing surface.
 
 For either storage mode, keep the derivative unchanged after extraction and
 record `source_text_storage`, exact location, extraction basis, SHA-256 hash,
-and page-marker convention in `Source Text — …` using
+and page-marker convention in `Source Text Manifest — …` using
 `templates/source-text-manifest.md`. Create that manifest only when the
 derivative is supplied or explicitly authorized. If it is unavailable, write
 `not supplied`; do not create an empty text file or summarize from its
@@ -142,7 +144,7 @@ source-grounded background mechanism, model, or conceptual framework that is
 reused across claims. Do not turn a paper's background discussion into a
 scientific fact beyond what the supplied source supports.
 
-## Paper-first capture and selective promotion
+## Reference-record capture and selective promotion
 
 Create one Source note per paper as the reading record. Keep the paper-specific
 abstract or scope, method as used by that paper, background theory, reported
@@ -174,7 +176,7 @@ comparisons. Label each important item as `reported`, `modelled`, `calculated`,
 when the paper does not support a detail. Do not promote a node until the
 Source dossier has a review trace and the relevant provenance fields.
 
-Before handoff, run the product-local read-only lint with `python
+Before handoff, run the product-local read-only lint with `REFERENCE_SCHEMA_MODE=current python
 scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
 --expect-profile`.
 It checks Paper/Source count, source-text status and manifest metadata,
@@ -203,4 +205,4 @@ outgoing link, confirm canonical locations remain external, report unreviewed
 material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
-Propose `Reference Index`, `Reference Profile`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Reference Profile]]` and `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+Propose `Reference Index`, `Reference Profile`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Reference Profile]]` and `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.

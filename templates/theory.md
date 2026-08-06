@@ -1,6 +1,7 @@
 ---
-type: theory-background
-status: {theory_status}
+type: reference-theory
+grounding_status: source-grounded
+canonical_location: {canonical_location}
 ---
 ## Background or mechanism
 

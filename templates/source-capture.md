@@ -1,10 +1,11 @@
 ---
+type: reference-record
 canonical_location: {canonical_location}
-source_kind: {source_kind}
-status: not reviewed
+reference_kind: {reference_kind}
+review_status: not-reviewed
 source_text_basis: unknown
-source_text_status: not reviewed
-source_text_storage: not reviewed
+source_text_status: not supplied
+source_text_storage: not supplied
 source_text_location: not provided
 source_text_hash: not provided
 source_text_page_map: not provided

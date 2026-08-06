@@ -57,7 +57,7 @@ Return one recommendation before asking for file approval:
 
 ```text
 Selected preset: <notes-only | searchable-library | knowledge-network>
-Recommended configuration: <organization> + <source-text storage>
+Recommended storage: <vault-local | external | not supplied | not-applicable>
 Source-text policy and availability: <policy> + <availability>
 Preset status: <ready | pending-source-text>
 Why: <retrieval and safety rationale>
@@ -92,7 +92,7 @@ approval`.
 The Blueprint must state:
 
 - selected depth preset and evidence;
-- mapped organization and source-text storage modes;
+- source-text storage mode and the preset's internal organization mapping;
 - source-text policy, availability, preset status, and next action;
 - one persisted `Reference Profile` linked from `Reference Index`;
 - exact folders and templates proposed;

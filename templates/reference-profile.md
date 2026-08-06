@@ -1,6 +1,6 @@
 ---
 type: reference-profile
-profile_contract_version: 1
+profile_schema_version: 1
 preset: {preset}
 organization_mode: {organization}
 source_text_policy: {source_text_policy}
@@ -13,7 +13,6 @@ sync_exposure: {sync_exposure}
 ## Selected depth
 
 - Preset: {preset}
-- Organization: {organization}
 - Status: {preset_status}
 
 ## Source-text decision

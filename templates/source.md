@@ -1,7 +1,8 @@
 ---
+type: reference-record
 canonical_location: {canonical_location}
-source_kind: {source_kind}
-status: {source_status}
+reference_kind: {reference_kind}
+review_status: {review_status}
 source_text_basis: {source_text_basis}
 source_text_status: {source_text_status}
 source_text_storage: {source_text_storage}
@@ -12,7 +13,7 @@ source_text_manifest: {source_text_manifest}
 reviewed_scope: {reviewed_scope}
 unreviewed_scope: {unreviewed_scope}
 ---
-## Paper map
+## Reference map
 
 - Problem or research question: {research_problem}
 - Contribution as supplied: {contribution}
@@ -22,7 +23,7 @@ unreviewed_scope: {unreviewed_scope}
 
 {source_summary}
 
-## Method as used in this paper
+## Method described or used by this source
 
 ### Procedure and variables
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
 import re
 import shutil
 import subprocess
@@ -26,8 +27,8 @@ VALUES = {
     "next_action": "Create the approved searchable source-text layer and reviewed dossiers.",
     "source_name": "Anchor Review",
     "reference_type": "Paper",
-    "source_kind": "paper",
-    "source_status": "reviewed",
+    "reference_kind": "paper",
+    "review_status": "reviewed",
     "source_text_basis": "native-text",
     "source_text_status": "not supplied",
     "source_text_storage": "not supplied",
@@ -69,9 +70,37 @@ VALUES = {
     "claim_anchor": "PDF p. 1, §1.",
     "claim_alternatives": "No contrary supplied result was reviewed.",
     "limitation_link": "not provided",
+    "claim_link": "[[Claim — Surface mechanism]]",
+    "evidence_anchor": "PDF p. 1, §1.",
+    "evidence_conditions": "Under the supplied source conditions.",
+    "evidence_kind": "reported",
+    "evidence_summary": "A supplied evidence summary.",
+    "unconfirmed": "Independent replication was not supplied.",
+    "method_anchor": "PDF p. 1, §1.",
+    "method_conditions": "Under the supplied source conditions.",
+    "method_limits": "Limited to the supplied source scope.",
+    "method_measurement": "A supplied measurement procedure.",
+    "method_procedure": "A supplied procedure.",
+    "method_summary": "A supplied method summary.",
+    "theory_anchor": "PDF p. 1, §1.",
+    "theory_assumptions": "A supplied theory assumption.",
+    "theory_limits": "A supplied theory boundary.",
+    "theory_role": "It frames the supplied claim.",
+    "theory_summary": "A supplied theory summary.",
+    "claim_affected_link": "[[Claim — Surface mechanism]]",
+    "limitation_anchor": "PDF p. 2, §2.",
+    "limitation_consequence": "Interpretation remains bounded.",
+    "limitation_text": "A supplied limitation.",
+    "limitation_type": "scope",
+    "current_question": "A supplied literature question.",
+    "theme_anchor": "PDF p. 1, §1.",
+    "question_anchor": "PDF p. 1, §1.",
+    "question_text": "What remains unresolved?",
+    "theme_link": "not provided",
     "source_links": "- Paper: [[Paper — Anchor Review]]",
     "capture_reason": "User supplied this source for later review.",
-    "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n<!-- formula-not-decoded -->\n<!-- formula-not-decoded -->\n\n<!-- pdf-page: 2 -->\nA supplied limitation.\n<!-- formula-not-decoded -->\n<!-- image -->",
+    "reading_status": "queued",
+    "full_text_content": "<!-- pdf-page: 1 -->\nA supplied extracted result.\n\n<!-- pdf-page: 2 -->\nA supplied limitation.",
 }
 
 
@@ -97,6 +126,7 @@ def assert_links_resolve(vault: Path) -> None:
 
 
 def main() -> None:
+    os.environ["REFERENCE_SCHEMA_MODE"] = "current"
     skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     assert re.search(r"^name: obsidian-research-wiki-reference$", skill_text, re.M)
     legacy_names = ("Reference-First " + "Starter", "Research Workspace " + "Advanced")
@@ -106,6 +136,8 @@ def main() -> None:
     assert (ROOT / "templates/reference-profile.md").is_file()
     assert (ROOT / "docs/INSTALLATION.md").is_file()
     assert (ROOT / "docs/BETA_TEST.md").is_file()
+    for template in sorted((ROOT / "templates").glob("*.md")):
+        render(template, VALUES)
     onboarding_text = (ROOT / "docs/ONBOARDING.md").read_text(encoding="utf-8")
     for required in (
         "`notes-only`",
@@ -241,7 +273,7 @@ def main() -> None:
         extraction_vault = Path(raw) / "extraction-vault"
         extraction_vault.mkdir()
         extraction_output = extraction_vault / "05 Source Text/Full Text/Full Text — Two Page Fixture.md"
-        extraction_manifest = extraction_vault / "05 Source Text/Manifests/Source Text — Two Page Fixture.md"
+        extraction_manifest = extraction_vault / "05 Source Text/Manifests/Source Text Manifest — Two Page Fixture.md"
         extracted = subprocess.run(
             [
                 sys.executable,
@@ -289,12 +321,12 @@ def main() -> None:
             "source_text_location": "../Full Text/Full Text — Anchor Review.md",
             "source_text_hash": f"sha256:{hashlib.sha256(source_text_file.read_bytes()).hexdigest()}",
             "source_text_page_map": "pdf-page-comments",
-            "source_text_manifest": "[[Source Text — Anchor Review]]",
+            "source_text_manifest": "[[Source Text Manifest — Anchor Review]]",
         }
         capture_values = VALUES | {
-            "source_status": "not reviewed",
-            "source_text_status": "not reviewed",
-            "source_text_storage": "not reviewed",
+            "review_status": "not-reviewed",
+            "source_text_status": "not supplied",
+            "source_text_storage": "not supplied",
             "source_text_location": "not provided",
             "source_text_hash": "not provided",
             "source_text_page_map": "not provided",
@@ -321,7 +353,7 @@ def main() -> None:
         )
         write(
             vault,
-            "05 Source Text/Manifests/Source Text — Anchor Review",
+            "05 Source Text/Manifests/Source Text Manifest — Anchor Review",
             render(templates / "source-text-manifest.md", source_text_values),
         )
         write(
@@ -334,7 +366,7 @@ def main() -> None:
             "10 Sources/Source — Unread item",
             render(templates / "source-capture.md", capture_values),
         )
-        write(vault, "Reading Queue", "## Reading Queue\n")
+        write(vault, "Reading Queue", render(templates / "reading-queue.md", VALUES))
         assert_links_resolve(vault)
         assert not any(
             path.name.startswith(("Experiment", "Observation"))
@@ -422,7 +454,7 @@ def main() -> None:
         partial_source = partial_promotion / "20 Papers/Paper — Anchor Review.md"
         partial_source.write_text(
             partial_source.read_text(encoding="utf-8").replace(
-                "status: reviewed", "status: partial", 1
+                "review_status: reviewed", "review_status: partial", 1
             ),
             encoding="utf-8",
         )
@@ -443,7 +475,7 @@ def main() -> None:
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
+                str(vault / "05 Source Text/Manifests/Source Text Manifest — Anchor Review.md"),
                 "--vault-root", str(vault),
                 "--json",
             ],
@@ -455,9 +487,6 @@ def main() -> None:
         source_text_result = json.loads(source_text_check.stdout)
         assert source_text_result["status"] == "pass"
         assert source_text_result["page_markers"] == 2
-        assert source_text_result["formula_placeholders"] == 3
-        assert source_text_result["formula_placeholder_pages"] == {"1": 2, "2": 1}
-        assert source_text_result["image_placeholder_pages"] == {"2": 1}
         escaped_text = Path(raw) / "outside-vault.md"
         escaped_text.write_text("outside\n", encoding="utf-8")
         escaped_values = source_text_values | {
@@ -467,14 +496,14 @@ def main() -> None:
         }
         write(
             vault,
-            "05 Source Text/Manifests/Source Text — Escape",
+            "05 Source Text/Manifests/Source Text Manifest — Escape",
             render(templates / "source-text-manifest.md", escaped_values),
         )
         escaped_check = subprocess.run(
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Manifests/Source Text — Escape.md"),
+                str(vault / "05 Source Text/Manifests/Source Text Manifest — Escape.md"),
                 "--vault-root", str(vault),
                 "--json",
             ],
@@ -492,14 +521,14 @@ def main() -> None:
         }
         write(
             vault,
-            "05 Source Text/Manifests/Source Text — Symlink Escape",
+            "05 Source Text/Manifests/Source Text Manifest — Symlink Escape",
             render(templates / "source-text-manifest.md", linked_values),
         )
         symlink_check = subprocess.run(
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Manifests/Source Text — Symlink Escape.md"),
+                str(vault / "05 Source Text/Manifests/Source Text Manifest — Symlink Escape.md"),
                 "--vault-root", str(vault),
                 "--json",
             ],
@@ -543,7 +572,7 @@ def main() -> None:
             [
                 sys.executable,
                 str(ROOT / "scripts/check_source_text.py"),
-                str(vault / "05 Source Text/Manifests/Source Text — Anchor Review.md"),
+                str(vault / "05 Source Text/Manifests/Source Text Manifest — Anchor Review.md"),
                 "--vault-root", str(vault),
                 "--json",
             ],

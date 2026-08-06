@@ -1,6 +1,6 @@
 ---
-type: literature-method
-status: {method_status}
+type: reference-method
+grounding_status: source-grounded
 canonical_location: {canonical_location}
 ---
 ## Purpose

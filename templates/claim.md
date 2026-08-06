@@ -1,6 +1,6 @@
 ---
-type: literature-claim
-status: {claim_status}
+type: reference-claim
+grounding_status: source-grounded
 ---
 {claim_text}
 

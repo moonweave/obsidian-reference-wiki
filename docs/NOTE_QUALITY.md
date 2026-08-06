@@ -12,7 +12,7 @@ PDF-to-Markdown adapter described below.
 
 The full native-text/OCR file is a derived input for reading and retrieval. It
 must not silently become the source of truth: native extraction can omit layout
-and OCR can misread symbols. When supplied, create a `Source Text — …` manifest
+and OCR can misread symbols. When supplied, create a `Source Text Manifest — …` manifest
 with `source_text_storage`, location, `source_text_basis`, SHA-256 hash, and
 page-map convention. Prefer `<!-- pdf-page: N -->` markers in Markdown
 derivatives so a reviewed result can be traced back to the PDF page. The
@@ -80,18 +80,20 @@ Use `Paper — {short title}` for an academic article and `Source — {name}` fo
 other external material. The prefix is part of the stable Markdown basename,
 not a prose heading. Preserve an existing basename even when it predates this
 default; link it through `reference_type` instead of renaming it silently.
+Use the short title first. If that basename already exists, append `— {year}`;
+if it still collides, append `— {first author}`.
 
 ## Handoff count gate
 
-Run `python scripts/check_notes.py <approved-vault> --expect-sources
+Run `REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <approved-vault> --expect-sources
 <approved-count> --expect-profile` before a preset-aware handoff. The approved
 count includes both `Paper — …` and `Source — …` records. A count or profile
 mismatch is a failed handoff; an exploratory run without the expectations is
 not completion evidence.
 
-## Two source states
+## Three review states
 
-- `not reviewed`: a capture note with only the canonical location, why it was
+- `not-reviewed`: a capture note with only the canonical location, why it was
   queued, and the next reading action. It contains no paper summary or claim.
 - `partial`: the source was read only in the named sections or excerpt. Every
   detail is labelled with its scope, and no broad claim is promoted.
@@ -153,9 +155,8 @@ python scripts/check_source_text.py <source-text-manifest.md> --vault-root <appr
 
 The checker treats missing, duplicate, or reordered page markers as failures
 for provenance versions 1 and 2. Undecoded formula and image placeholders are
-reported as quality warnings with per-page counts: the hash can be valid while
-scientific content still needs visual review. Use that page list as the review
-queue for selective formula enrichment and canonical-PDF comparison.
+reported as quality warnings: the hash can be valid while scientific content
+still needs visual review.
 
 Run the deterministic parser corpus before release:
 

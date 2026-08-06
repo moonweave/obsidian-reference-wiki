@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 12`
+`contract_version: 13`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -33,7 +33,8 @@ shallower preset is chosen. Shared/published use or public/uncertain
 synchronization forces `external` only when `source_text_policy: searchable`
 and an authorized derivative is available.
 
-The profile separates intent from artifact state. It records `preset`,
+The profile separates intent from artifact state. Its current schema records
+`profile_schema_version: 1`, `preset`,
 `organization_mode`, `source_text_policy`, `source_text_availability`,
 `source_text_storage`, `preset_status`, `sharing`, and `sync_exposure`.
 `notes-only` is `omit + not-applicable + ready`, even when an existing
@@ -65,6 +66,20 @@ web pages, standards, datasets, and other external materials use `Source —
 navigation folder. Existing `Source — …` paper notes remain valid and are
 linked in place; adopting `Paper — …` never authorizes an automatic rename.
 Templates use `reference_type` so every wikilink targets the actual basename.
+Resolve basename collisions deterministically: use the short title first,
+append `— {year}` when that basename already exists, and append `— {first
+author}` only if the title-and-year form also exists.
+
+The current note schema uses `type: reference-record` with `reference_kind`
+and `review_status` on Paper/Source dossiers. Promoted notes use the explicit
+types `reference-claim`, `reference-evidence`, `reference-method`,
+`reference-theory`, `reference-limitation`, `reference-theme`, and
+`reference-question`; source-grounded promoted notes also use
+`grounding_status: source-grounded`. `Reference Index` and Reading Queue use
+`reference-index` and `reference-reading-queue`. Existing Vaults with the
+legacy generic `status`, `source_kind`, profile version key, headings, or `35
+Theories & Background` folder remain readable in the default compatibility
+mode. A new or release-ready Vault must pass with `REFERENCE_SCHEMA_MODE=current`.
 
 The source has a separate derived-text boundary. The canonical PDF, web page,
 or Zotero item remains external and authoritative. A supplied native-text/OCR
@@ -72,7 +87,7 @@ Markdown or text derivative is an immutable reading input. For a private Vault
 that benefits from full-text agent or Obsidian search, `vault-local` may place
 the derivative under the exact approved `05 Source Text/Full Text` path. For a
 shared, published, publicly synchronized, or uncertain Vault, recommend
-`external`. `Source Text — …` is a
+`external`. `Source Text Manifest — …` is a
 manifest for either mode; it records `source_text_storage`,
 `source_text_location`, `source_text_basis`, `source_text_hash`, and
 `source_text_page_map`, but it is not a summary or a Claim. A vault-local file

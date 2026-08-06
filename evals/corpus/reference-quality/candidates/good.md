@@ -3,7 +3,7 @@
 This fixture reports one response and baseline comparison, then states the
 repeatability boundary and next required action.
 
-## Method as used in this paper
+## Method described or used by this source
 
 The supplied fixture compares a response under condition A with a baseline.
 

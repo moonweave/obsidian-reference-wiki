@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -18,6 +19,7 @@ VALID_TEXT_BASES = {"native-text", "OCR", "mixed", "supplied-excerpt"}
 VALID_SOURCE_TEXT_STATUSES = {"available", "not supplied", "not reviewed", "stale"}
 VALID_SOURCE_TEXT_STORAGE = {"external", "vault-local", "not supplied", "not reviewed"}
 VALID_PAGE_MAPS = {"pdf-page-comments", "section-only", "not provided"}
+VALID_REFERENCE_KINDS = {"paper", "report", "web-page", "standard", "dataset", "other"}
 SOURCE_TEXT_HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 SOURCE_TEXT_MANIFEST_TYPE = "source-text-manifest"
 REFERENCE_PROFILE_TYPE = "reference-profile"
@@ -26,18 +28,28 @@ PRESET_ORGANIZATIONS = {
     "searchable-library": "balanced",
     "knowledge-network": "concept-network",
 }
-REQUIRED_SOURCE_HEADINGS = (
-    "## Paper map",
-    "## Abstract and scope",
-    "## Method as used in this paper",
-    "### Measurement and analysis",
-    "## Background theory and model",
-    "## Reported evidence or results",
-    "### Evidence ledger",
-    "## Limitations as supplied",
-    "## Derived source text",
-    "## Extraction and review trace",
+REQUIRED_SOURCE_HEADING_GROUPS = (
+    ("## Reference map", "## Paper map"),
+    ("## Abstract and scope",),
+    ("## Method described or used by this source", "## Method as used in this paper"),
+    ("### Measurement and analysis",),
+    ("## Background theory and model",),
+    ("## Reported evidence or results",),
+    ("### Evidence ledger",),
+    ("## Limitations as supplied",),
+    ("## Derived source text",),
+    ("## Extraction and review trace",),
 )
+CURRENT_PROMOTED_TYPES = {
+    "Claim — ": "reference-claim",
+    "Evidence — ": "reference-evidence",
+    "Method — ": "reference-method",
+    "Theory — ": "reference-theory",
+    "Limitation — ": "reference-limitation",
+    "Theme — ": "reference-theme",
+    "Question — ": "reference-question",
+}
+GROUNDED_PREFIXES = {"Claim — ", "Evidence — ", "Method — ", "Theory — ", "Limitation — "}
 
 
 def frontmatter(text: str) -> dict[str, str]:
@@ -55,6 +67,14 @@ def frontmatter(text: str) -> dict[str, str]:
 
 def not_provided(value: str) -> bool:
     return value.strip().lower() in {"", "not provided", "not supplied", "unknown"}
+
+
+def review_status(meta: dict[str, str]) -> str:
+    return meta.get("review_status", meta.get("status", "")).replace(" ", "-")
+
+
+def first_heading(text: str, headings: tuple[str, ...]) -> str | None:
+    return next((heading for heading in headings if heading in text), None)
 
 
 def source_notes(root: Path) -> list[Path]:
@@ -111,6 +131,14 @@ def check(
     expect_profile: bool = False,
 ) -> dict[str, object]:
     errors: list[str] = []
+    schema_mode = os.environ.get("REFERENCE_SCHEMA_MODE", "compat")
+    if schema_mode not in {"compat", "current"}:
+        return {
+            "status": "fail",
+            "schema_mode": schema_mode,
+            "errors": ["REFERENCE_SCHEMA_MODE must be compat or current"],
+        }
+    current_schema = schema_mode == "current"
     notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
     name_paths: dict[str, list[Path]] = {}
     for path in notes:
@@ -150,8 +178,13 @@ def check(
     for path in profiles:
         meta = frontmatter(path.read_text(encoding="utf-8"))
         relative = path.relative_to(root)
+        if current_schema and "profile_contract_version" in meta:
+            errors.append(f"legacy profile_contract_version is not allowed in current schema: {relative}")
+        version_key = "profile_schema_version" if current_schema else (
+            "profile_schema_version" if meta.get("profile_schema_version") else "profile_contract_version"
+        )
         for key in (
-            "profile_contract_version",
+            version_key,
             "preset",
             "organization_mode",
             "source_text_policy",
@@ -171,8 +204,8 @@ def check(
         status = meta.get("preset_status", "")
         sharing = meta.get("sharing", "")
         exposure = meta.get("sync_exposure", "")
-        if meta.get("profile_contract_version") != "1":
-            errors.append(f"invalid profile_contract_version: {relative}")
+        if meta.get(version_key) != "1":
+            errors.append(f"invalid {version_key}: {relative}")
         if preset not in PRESET_ORGANIZATIONS:
             errors.append(f"invalid preset: {relative} -> {preset or 'missing'}")
         elif organization != PRESET_ORGANIZATIONS[preset]:
@@ -208,6 +241,13 @@ def check(
         indexes = [path for path in notes if path.stem == "Reference Index"]
         if len(indexes) != 1 or "[[Reference Profile]]" not in indexes[0].read_text(encoding="utf-8"):
             errors.append("Reference Index must link exactly one Reference Profile")
+        elif current_schema and frontmatter(indexes[0].read_text(encoding="utf-8")).get("type") != "reference-index":
+            errors.append("Reference Index must use type reference-index in current schema")
+
+    if current_schema:
+        for path in notes:
+            if path.stem.startswith("Reading Queue") and frontmatter(path.read_text(encoding="utf-8")).get("type") != "reference-reading-queue":
+                errors.append(f"Reading Queue must use type reference-reading-queue: {path.relative_to(root)}")
 
     manifests = [
         path
@@ -222,6 +262,8 @@ def check(
         meta = frontmatter(text)
         manifest_metadata[path.stem] = meta
         relative = path.relative_to(root)
+        if current_schema and not path.stem.startswith("Source Text Manifest — "):
+            errors.append(f"legacy source-text manifest name is not allowed in current schema: {relative}")
         if meta.get("status") not in {"available", "stale"}:
             errors.append(f"invalid source-text manifest status: {relative}")
         for key in (
@@ -258,16 +300,23 @@ def check(
     for path in references:
         text = path.read_text(encoding="utf-8")
         meta = frontmatter(text)
-        status = meta.get("status", "")
+        status = review_status(meta)
+        if current_schema:
+            if meta.get("type") != "reference-record":
+                errors.append(f"invalid reference record type: {path.relative_to(root)}")
+            if meta.get("reference_kind") not in VALID_REFERENCE_KINDS:
+                errors.append(f"invalid reference_kind: {path.relative_to(root)}")
+            if "status" in meta:
+                errors.append(f"legacy status field is not allowed in current schema: {path.relative_to(root)}")
         if not meta.get("canonical_location"):
             errors.append(f"missing canonical_location: {path.relative_to(root)}")
-        if status == "not reviewed":
+        if status == "not-reviewed":
             captured += 1
             if "Not reviewed" not in text or "## Capture reason" not in text:
                 errors.append(f"invalid capture note: {path.relative_to(root)}")
-            if meta.get("source_text_status") not in {"not reviewed", "not supplied"}:
+            if meta.get("source_text_status") != "not supplied":
                 errors.append(f"invalid source_text_status: {path.relative_to(root)}")
-            if meta.get("source_text_storage") not in {"not reviewed", "not supplied"}:
+            if meta.get("source_text_storage") != "not supplied":
                 errors.append(f"invalid source_text_storage: {path.relative_to(root)}")
             continue
         if status == "partial":
@@ -276,9 +325,11 @@ def check(
             reviewed += 1
         else:
             errors.append(f"invalid source status: {path.relative_to(root)}")
-        for heading in REQUIRED_SOURCE_HEADINGS:
-            if heading not in text:
-                errors.append(f"missing {heading}: {path.relative_to(root)}")
+        for headings in REQUIRED_SOURCE_HEADING_GROUPS:
+            if current_schema and headings[0] not in text:
+                errors.append(f"missing {headings[0]}: {path.relative_to(root)}")
+            elif not current_schema and not first_heading(text, headings):
+                errors.append(f"missing {headings[0]}: {path.relative_to(root)}")
         for key in ("source_text_basis", "reviewed_scope", "unreviewed_scope"):
             if not meta.get(key):
                 errors.append(f"missing {key}: {path.relative_to(root)}")
@@ -340,8 +391,8 @@ def check(
                 f"{meta.get('source_text_basis', '') or 'missing'}"
             )
         if status == "reviewed":
-            for heading, label in (
-                ("## Paper map", "source paper map"),
+            for headings, label in (
+                (("## Reference map", "## Paper map"), "source reference map"),
                 ("## Abstract and scope", "source abstract and scope"),
                 ("### Procedure and variables", "source method"),
                 ("### Measurement and analysis", "source measurement and analysis"),
@@ -351,6 +402,10 @@ def check(
                 ("## Limitations as supplied", "source limitations"),
                 ("## Extraction and review trace", "source review trace"),
             ):
+                if isinstance(headings, str):
+                    heading = headings
+                else:
+                    heading = first_heading(text, headings) or headings[0]
                 if not substantive(section_preamble(text, heading)):
                     verb = "are" if label == "source limitations" else "is"
                     errors.append(f"{label} {verb} not supplied: {path.relative_to(root)}")
@@ -384,14 +439,23 @@ def check(
 
     promoted = 0
     source_statuses = {
-        path.stem: frontmatter(path.read_text(encoding="utf-8")).get("status", "")
+        path.stem: review_status(frontmatter(path.read_text(encoding="utf-8")))
         for path in references
     }
     for path in notes:
-        if not any(in_domain(path, folder) for folder in ("Claims", "Evidence & Methods", "Theories & Background", "Limitations")):
+        if not any(in_domain(path, folder) for folder in ("Claims", "Evidence & Methods", "Theories", "Theories & Background", "Limitations", "Themes", "Questions")):
             continue
         promoted += 1
         text = path.read_text(encoding="utf-8")
+        meta = frontmatter(text)
+        prefix = next((prefix for prefix in CURRENT_PROMOTED_TYPES if path.stem.startswith(prefix)), None)
+        if current_schema:
+            if prefix is None or meta.get("type") != CURRENT_PROMOTED_TYPES[prefix]:
+                errors.append(f"invalid promoted note type: {path.relative_to(root)}")
+            if prefix in GROUNDED_PREFIXES and meta.get("grounding_status") != "source-grounded":
+                errors.append(f"invalid promoted grounding_status: {path.relative_to(root)}")
+            if "status" in meta:
+                errors.append(f"legacy status field is not allowed in current schema: {path.relative_to(root)}")
         if "Source anchor" not in text and not re.search(r"(?:Paper|Source|Reference): \[\[", text):
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
         source_targets = [
@@ -415,6 +479,7 @@ def check(
 
     return {
         "status": "pass" if not errors else "fail",
+        "schema_mode": schema_mode,
         "notes": len(notes),
         "sources": len(references),
         "expected_sources": expected_sources,

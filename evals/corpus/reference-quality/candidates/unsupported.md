@@ -2,7 +2,7 @@
 
 This fixture is described as a repeatable response study.
 
-## Method as used in this paper
+## Method described or used by this source
 
 The response is compared with a baseline.
 

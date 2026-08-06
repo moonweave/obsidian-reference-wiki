@@ -1,6 +1,6 @@
 ---
-type: evidence-method
-status: {evidence_status}
+type: reference-evidence
+grounding_status: source-grounded
 canonical_location: {canonical_location}
 ---
 ## Supplied evidence or method

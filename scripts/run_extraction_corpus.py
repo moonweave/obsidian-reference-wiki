@@ -81,7 +81,7 @@ def main() -> int:
         vault = work / "vault"
         vault.mkdir()
         output = vault / "05 Source Text/Full Text/Full Text — Layout Corpus.md"
-        manifest = vault / "05 Source Text/Source Text — Layout Corpus.md"
+        manifest = vault / "05 Source Text/Source Text Manifest — Layout Corpus.md"
         command = [
             sys.executable,
             str(ROOT / "scripts/extract_source_text.py"),

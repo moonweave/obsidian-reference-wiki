@@ -1,3 +1,6 @@
+---
+type: reference-reading-queue
+---
 ## Capture
 
 - Item: {source_name}

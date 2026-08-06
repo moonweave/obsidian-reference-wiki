@@ -2,7 +2,7 @@
 
 `Obsidian Research Wiki: Reference` is a standalone, provenance-first skill
 for organizing literature in Obsidian. It gives papers, sources, claims,
-evidence methods, limitations, themes, and literature questions a coherent
+evidence, methods, theories, limitations, themes, and literature questions a coherent
 structure without turning the Vault into a research-log or experiment system.
 It also gives literature methods and source-grounded background theories their
 own notes, distinct from the user's research protocol.
@@ -15,6 +15,7 @@ provenance.
 Academic articles default to `Paper — {short title}`. Reports, web pages,
 standards, datasets, and other external material use `Source — {name}`. Existing
 `Source — …` paper notes remain valid and are never renamed automatically.
+When a basename collides, the stable suffix order is year, then first author.
 
 The note-quality workflow in `docs/NOTE_QUALITY.md` keeps text basis, review
 scope, method, measurements, model assumptions, anchored results, and
@@ -100,7 +101,7 @@ scripts/run_extraction_corpus.py
 scripts/smoke_release.py
 templates/
   claim.md
-  evidence-method.md
+  evidence.md
   full-text.md
   method.md
   limitation.md
@@ -112,7 +113,7 @@ templates/
   source.md
   source-text-manifest.md
   theme.md
-  theory-background.md
+  theory.md
 ```
 
 The templates are deliberately product-local so this repository can be
@@ -133,7 +134,7 @@ The read-only lint is a quality check over discovered notes, not proof that the
 correct Vault was selected. Handoff runs it with the approved Blueprint count:
 
 ```bash
-python scripts/check_notes.py <approved-vault> \
+REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <approved-vault> \
   --expect-sources <approved-count> \
   --expect-profile
 ```

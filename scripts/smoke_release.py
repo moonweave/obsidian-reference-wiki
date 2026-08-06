@@ -135,7 +135,7 @@ def main() -> None:
     assert (ROOT / "scripts/run_extraction_corpus.py").is_file()
     assert (ROOT / "templates/reference-profile.md").is_file()
     assert (ROOT / "docs/INSTALLATION.md").is_file()
-    assert (ROOT / "docs/BETA_TEST.md").is_file()
+    assert (ROOT / "docs/USABILITY_TEST.md").is_file()
     for template in sorted((ROOT / "templates").glob("*.md")):
         render(template, VALUES)
     onboarding_text = (ROOT / "docs/ONBOARDING.md").read_text(encoding="utf-8")

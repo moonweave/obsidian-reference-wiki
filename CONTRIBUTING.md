@@ -1,15 +1,15 @@
 # Contributing
 
-The project is in technical beta. Reproducible issue reports and first-user
-feedback are welcome. External code and documentation pull requests are not
-accepted unless a maintainer has invited the change in advance.
+Reproducible issue reports and workflow feedback are welcome. External code
+and documentation pull requests are not accepted unless a maintainer has
+invited the change in advance.
 
 ## Good issue reports
 
 Include the installed commit or tag, Codex client, operating system, Python
 version, selected preset, expected behavior, actual behavior, and the smallest
-synthetic reproduction. For onboarding feedback, use the fields in
-[`docs/BETA_TEST.md`](docs/BETA_TEST.md).
+synthetic reproduction. For structured onboarding feedback, use the fields in
+[`docs/USABILITY_TEST.md`](docs/USABILITY_TEST.md).
 
 Do not upload copyrighted PDFs, extracted full text, private Zotero exports,
 personal Vault paths, secrets, or unpublished research material. Replace them

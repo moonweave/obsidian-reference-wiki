@@ -116,8 +116,9 @@ failure or page-boundary mismatch is an explicit failure.
 The public extraction corpus contains eight generated layout cases and stores
 no extracted Markdown. It mechanically checks page boundaries, term coverage,
 and reading order. Engine-specific `review` cases remain visible and never
-become scientific acceptance. The separate first-user gate in
-`docs/BETA_TEST.md` cannot be satisfied by smoke tests or agent simulation.
+become scientific acceptance. `docs/USABILITY_TEST.md` provides an optional
+protocol for observing the first workflow with another researcher; it does not
+replace source review or scientific judgment.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,

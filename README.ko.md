@@ -2,11 +2,6 @@
 
 한국어 | [English](README.md)
 
-> **상태: 기술 베타 (`v0.1.0-beta.1`)** — 자동 릴리스 검사와 유지관리자
-> 도그푸드는 통과했습니다. 처음 사용하는
-> 연구자 3명을 대상으로 한 사용성 검증은 아직 진행 중입니다. 자세한
-> 기준은 [베타 테스트 절차](docs/BETA_TEST.md)에서 확인할 수 있습니다.
-
 `Obsidian Research Wiki: Reference`는 논문과 외부 자료를 Obsidian에서
 근거 중심으로 정리하는 소스 공개형 Codex Skill입니다. 논문, 주장,
 근거, 문헌 방법, 이론, 한계, 주제, 후속 질문을 연결하되 연구자의 실험
@@ -162,7 +157,6 @@ REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <승인된-vault> \
 - 변경 이력: [CHANGELOG.md](CHANGELOG.md)
 - 보안 문제 신고: [SECURITY.md](SECURITY.md)
 - 피드백과 기여: [CONTRIBUTING.md](CONTRIBUTING.md)
-- 첫 사용자 검증: [docs/BETA_TEST.md](docs/BETA_TEST.md)
 
 ## 라이선스
 

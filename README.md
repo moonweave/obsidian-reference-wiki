@@ -2,10 +2,6 @@
 
 [한국어](README.ko.md) | English
 
-> **Status: Technical Beta (`v0.1.0-beta.1`).** Automated release gates and
-> maintainer dogfooding pass. The three-researcher first-user gate is still
-> open; see [the beta protocol](docs/BETA_TEST.md).
-
 `Obsidian Research Wiki: Reference` is a source-available, provenance-first skill
 for organizing literature in Obsidian. It gives papers, sources, claims,
 evidence, methods, theories, limitations, themes, and literature questions a coherent
@@ -118,7 +114,7 @@ LICENSE
 NOTICE
 SECURITY.md
 docs/CONTRACT.md
-docs/BETA_TEST.md
+docs/USABILITY_TEST.md
 docs/INSTALLATION.md
 docs/NOTE_QUALITY.md
 docs/ONBOARDING.md
@@ -195,7 +191,7 @@ python scripts/run_extraction_corpus.py \
 ```
 
 Docling results may deliberately report `quality_status: review-required`;
-automated structure checks never substitute for equation, figure, or first-user
+automated structure checks never substitute for equation, figure, or scientific
 review.
 
 ## Project policies

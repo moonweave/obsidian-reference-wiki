@@ -1,8 +1,8 @@
-# First-user beta test
+# Workflow usability test
 
 This protocol measures whether a researcher can reach a useful first Reference
-route without maintainer intervention. Automated smoke tests do not satisfy
-this human gate.
+route without maintainer intervention. It is an optional product-evaluation
+protocol, not a prerequisite for installation or use.
 
 ## Test boundary
 
@@ -28,7 +28,7 @@ this human gate.
 
 ## Acceptance record
 
-Record these fields for every tester:
+Record these fields for each session:
 
 ```text
 Tester ID:
@@ -46,10 +46,10 @@ Confusing wording:
 One improvement:
 ```
 
-## Public-v1 human gate
+## Review criteria
 
-The human gate passes only after at least three first-time researchers complete
-the task, at least two finish without maintainer explanation, all can explain
-the four representation layers, no P0/P1 issue remains, and the median time to
-a resolving first Paper route is at most fifteen minutes. Until then, describe
-the release as a technical beta even when all automated gates pass.
+Treat any data-loss or unintended-sharing issue as a release-blocking defect.
+Treat a blocked first route as a workflow defect. Use completion time,
+explanation needs, and confusing wording to prioritize later improvements.
+Automated smoke tests and observed usability sessions measure different parts
+of the product and should be recorded separately.

@@ -133,7 +133,8 @@ formula and reading-order review, not as source truth.
 Before describing a release as parser-tested, run the repository-owned
 eight-case layout corpus with `scripts/run_extraction_corpus.py`. A green
 structural corpus does not accept equations, figures, or scientific claims.
-Follow `docs/BETA_TEST.md` for the separate first-human gate.
+Use `docs/USABILITY_TEST.md` when evaluating the workflow with another
+researcher.
 
 ## Method and theory boundary
 

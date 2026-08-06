@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security fixes are made on the latest tagged beta and the current `main`
+Security fixes are made on the latest tagged release and the current `main`
 branch. Older prereleases and versions previously released under MIT are not
 maintained.
 

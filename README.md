@@ -1,6 +1,6 @@
 # Obsidian Research Wiki: Reference
 
-`Obsidian Research Wiki: Reference` is a standalone, provenance-first skill
+`Obsidian Research Wiki: Reference` is a source-available, provenance-first skill
 for organizing literature in Obsidian. It gives papers, sources, claims,
 evidence, methods, theories, limitations, themes, and literature questions a coherent
 structure without turning the Vault into a research-log or experiment system.
@@ -170,4 +170,14 @@ review.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The current release is licensed under the
+[PolyForm Noncommercial License 1.0.0](LICENSE), SPDX identifier
+`PolyForm-Noncommercial-1.0.0`.
+
+Personal research, study, experimentation, educational-institution use, and
+public-research-organization use are permitted under its terms. Commercial use
+requires a separate license from Moonweave. This is a source-available license,
+not an OSI-approved open-source license.
+
+The license change is prospective. Versions released at or before commit
+`8a43fd2` remain available under the MIT License that applied to those versions.

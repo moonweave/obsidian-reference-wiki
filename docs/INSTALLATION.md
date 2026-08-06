@@ -3,11 +3,63 @@
 The skill itself is Markdown, Python, and templates. It does not install
 Obsidian, change `.obsidian`, or install PDF tools automatically.
 
-## Minimum installation
+## Install the Codex skill
 
-Install the repository as `obsidian-research-wiki-reference` in the skill
-directory used by the agent client. Notes-only onboarding does not require
-Docling. PDF source-text extraction requires Poppler commands:
+Git and Codex are the only requirements for notes-only use. Install the public
+repository directly under the Codex skill directory.
+
+macOS or Linux:
+
+```bash
+mkdir -p "$HOME/.codex/skills"
+git clone https://github.com/moonweave/obsidian-reference-wiki.git \
+  "$HOME/.codex/skills/obsidian-research-wiki-reference"
+test -f "$HOME/.codex/skills/obsidian-research-wiki-reference/SKILL.md"
+```
+
+Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME/.codex/skills" | Out-Null
+git clone https://github.com/moonweave/obsidian-reference-wiki.git `
+  "$HOME/.codex/skills/obsidian-research-wiki-reference"
+Test-Path "$HOME/.codex/skills/obsidian-research-wiki-reference/SKILL.md"
+```
+
+Start a new Codex session after installation. A direct first invocation is:
+
+```text
+$obsidian-research-wiki-reference Help me design a literature Vault. Do not create files yet.
+```
+
+The first response should offer `notes-only`, `searchable-library`, and
+`knowledge-network` before asking for an Apply path. If another copy already
+occupies the target directory, inspect it before replacing it; do not merge two
+skill installations.
+
+## Update or disable
+
+Update a Git-based installation:
+
+```bash
+git -C "$HOME/.codex/skills/obsidian-research-wiki-reference" pull --ff-only
+```
+
+To disable the skill without deleting it, close Codex and move it outside the
+active basename:
+
+```bash
+mv "$HOME/.codex/skills/obsidian-research-wiki-reference" \
+  "$HOME/.codex/skills/obsidian-research-wiki-reference.disabled"
+```
+
+On PowerShell, use `Rename-Item` with the same source and `.disabled`
+destination. Move it back to the original basename to re-enable it.
+
+## Optional PDF extraction dependencies
+
+Notes-only onboarding does not require Poppler or Docling. The compatible PDF
+source-text extraction path requires Poppler commands:
 
 ```bash
 # macOS

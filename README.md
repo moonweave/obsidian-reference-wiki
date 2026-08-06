@@ -1,5 +1,9 @@
 # Obsidian Research Wiki: Reference
 
+> **Status: Technical Beta (`v0.1.0-beta.1`).** Automated release gates and
+> maintainer dogfooding pass. The three-researcher first-user gate is still
+> open; see [the beta protocol](docs/BETA_TEST.md).
+
 `Obsidian Research Wiki: Reference` is a source-available, provenance-first skill
 for organizing literature in Obsidian. It gives papers, sources, claims,
 evidence, methods, theories, limitations, themes, and literature questions a coherent
@@ -70,23 +74,46 @@ note is the default migration path.
 
 ## Install
 
-The technical skill identifier is `obsidian-research-wiki-reference`. For a
-Codex installation, make this repository available at:
+The technical skill identifier is `obsidian-research-wiki-reference`. Install
+the repository directly into the Codex skill directory.
 
-```text
-~/.codex/skills/obsidian-research-wiki-reference
+macOS or Linux:
+
+```bash
+mkdir -p "$HOME/.codex/skills"
+git clone https://github.com/moonweave/obsidian-reference-wiki.git \
+  "$HOME/.codex/skills/obsidian-research-wiki-reference"
 ```
 
-Then invoke the skill when the task is about rigorous literature or reference
-organization. The full operating contract is in [SKILL.md](SKILL.md), and the
-reference architecture is in [docs/CONTRACT.md](docs/CONTRACT.md).
-See [docs/INSTALLATION.md](docs/INSTALLATION.md) for optional PDF dependencies
-and [docs/BETA_TEST.md](docs/BETA_TEST.md) for the separate human release gate.
+Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME/.codex/skills" | Out-Null
+git clone https://github.com/moonweave/obsidian-reference-wiki.git `
+  "$HOME/.codex/skills/obsidian-research-wiki-reference"
+```
+
+Start a new Codex session, then try:
+
+```text
+$obsidian-research-wiki-reference Help me design a literature Vault. Do not create files yet.
+```
+
+The full [installation guide](docs/INSTALLATION.md) includes verification,
+updating, safe disabling, Windows notes, and optional PDF dependencies. The
+operating contract is in [SKILL.md](SKILL.md), and the reference architecture
+is in [docs/CONTRACT.md](docs/CONTRACT.md).
 
 ## Included layout
 
 ```text
+README.md
 SKILL.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+NOTICE
+SECURITY.md
 docs/CONTRACT.md
 docs/BETA_TEST.md
 docs/INSTALLATION.md
@@ -167,6 +194,12 @@ python scripts/run_extraction_corpus.py \
 Docling results may deliberately report `quality_status: review-required`;
 automated structure checks never substitute for equation, figure, or first-user
 review.
+
+## Project policies
+
+- Release history: [CHANGELOG.md](CHANGELOG.md)
+- Security reports: [SECURITY.md](SECURITY.md)
+- Feedback and contributions: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 

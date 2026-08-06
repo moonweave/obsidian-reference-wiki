@@ -26,32 +26,34 @@ Use a two-stage onboarding interview before proposing files. The questions are
 decision inputs, not a generic questionnaire; reuse facts already supplied by
 the user and do not ask for information that can be established safely later.
 
-1. Diagnose style with four questions: primary retrieval goal (paper, concept,
-   or both); need for agent/full-text search; private versus shared/published
-   Vault plus synchronization exposure; and current
-   Zotero/PDF/parsed-Markdown/existing-Vault workflow.
-2. Recommend two independent choices with reasons: knowledge organization
-   (`paper-first`, `balanced`, or `concept-network`) and derived-text storage
-   (`vault-local`, `external`, or `not supplied`). Show one recommended
-   configuration and the meaningful alternative; do not make the user design
-   every folder.
-   Use `scripts/recommend_profile.py` after the four answers are known so the
-   same evidence produces a consistent default; add user-specific context to
-   its rationale rather than presenting the helper output as an unexplained
-   verdict.
+1. Start with one plain-language depth choice: `notes-only`,
+   `searchable-library` (recommended), or `knowledge-network`. Explain these as
+   Paper/Source dossiers; dossiers plus searchable full text; or searchable
+   full text plus selectively promoted cross-paper knowledge. Do not call the
+   derivative raw truth.
+2. Confirm the safety context needed to realize that preset: private versus
+   shared/published Vault, synchronization exposure, and the current
+   Zotero/PDF/parsed-Markdown/existing-Vault workflow. The preset maps to
+   `paper-first`, `balanced`, or `concept-network`; storage remains an
+   independent safety outcome of `vault-local`, `external`, or `not supplied`.
+   Use `scripts/recommend_profile.py --preset ...` so the same choice and
+   safety facts produce a consistent default. Preserve the legacy
+   retrieval/full-text arguments for existing callers, but do not lead a new
+   user through those technical axes.
 3. Only after the recommendation is understood, confirm three execution facts:
    new or existing exact Vault path; first Apply scope (default pilot: one to
    three supplied sources); and the exact preservation/no-touch list.
 4. Inspect an existing Vault only after the user names it. Report the baseline
    without treating file names as facts.
-5. Return a Blueprint with the style diagnosis, recommendation and rationale,
-   complete map, note meanings, placement rules, labelled link rules,
+5. Return a Blueprint with the selected preset, mapped configuration and
+   rationale, a persisted `Reference Profile`, complete map, note meanings,
+   placement rules, labelled link rules,
    canonical-source boundary, source-text mode, first real source route,
    approved mutation set, and no-touch list.
 6. Wait for approval of the exact path, Blueprint, and supplied source facts.
-7. Apply only the approved folders, templates, and factual notes. Create an
-   unread source as a capture note only when the user supplied its location;
-   mark its content `not reviewed`.
+7. Apply only the approved folders, templates, persisted profile, and factual
+   notes. Create an unread source as a capture note only when the user supplied
+   its location; mark its content `not reviewed`.
 
 ## Required first path
 
@@ -107,6 +109,15 @@ it reads the named derivative, verifies its hash, and checks the declared page
 markers without modifying either file. A changed hash marks the dossier for
 review; it does not authorize automatic rewriting of claims.
 
+When the user explicitly authorizes extracting one native-text PDF, use
+`python scripts/extract_source_text.py <canonical.pdf> --output <derived.md>
+--manifest <manifest.md> --vault-root <approved-vault> --source-name <name>
+--reference-type <Paper|Source> --storage <vault-local|external> --basis
+native-text`. The adapter keeps the canonical PDF external, creates ordered
+page markers, records canonical and derivative hashes plus extractor metadata,
+and refuses existing outputs unless `--overwrite` is explicitly supplied. If
+the PDF has no text layer, stop at an extraction failure; do not silently OCR.
+
 ## Method and theory boundary
 
 `Method` in Reference means a method described or used by a paper: its purpose,
@@ -148,11 +159,13 @@ comparisons. Label each important item as `reported`, `modelled`, `calculated`,
 when the paper does not support a detail. Do not promote a node until the
 Source dossier has a review trace and the relevant provenance fields.
 
-Before handoff, run the product-local read-only lint with
-`python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>`.
+Before handoff, run the product-local read-only lint with `python
+scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
+--expect-profile`.
 It checks Paper/Source count, source-text status and manifest metadata,
-text-basis enum, required dossier sections, per-result evidence-ledger anchors
-and labels, promoted-note provenance, unresolved placeholders, duplicate
+text-basis enum, substantive required dossier sections, per-result
+evidence-ledger anchors and labels, promoted-note provenance and reviewed-source
+status, unresolved placeholders, duplicate
 basenames, filename-mirroring headings, and resolving wikilinks; it never
 edits the Vault. Run `check_source_text.py` separately with the approved
 `--vault-root` when the approved derived artifact itself must be hash-verified.
@@ -175,4 +188,4 @@ outgoing link, confirm canonical locations remain external, report unreviewed
 material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
-Propose `Reference Index`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+Propose `Reference Index`, `Reference Profile`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories & Background`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Reference Profile]]` and `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.

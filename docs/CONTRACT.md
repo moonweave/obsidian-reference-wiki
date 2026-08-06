@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 7`
+`contract_version: 10`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -13,12 +13,33 @@ folders, approved templates, and supplied factual notes. `.obsidian`, plugins,
 bulk moves, renames, deletes, and copies of source material remain out of
 scope.
 
-First run uses the two-stage interview in `docs/ONBOARDING.md`. Stage 1
-diagnoses retrieval style, full-text search need, sharing boundary, and current
-source workflow, then recommends an organization mode and a source-text
-storage mode. Stage 2 confirms the exact Vault path, a bounded first Apply
-scope, and the no-touch list. The skill recommends a configuration; it does
-not make the user design the taxonomy from scratch.
+First run uses the two-stage interview in `docs/ONBOARDING.md`. Stage 1 starts
+with one depth preset: `notes-only`, `searchable-library` (the default), or
+`knowledge-network`. It then checks the sharing boundary, synchronization
+exposure, and current source workflow before mapping the preset to an
+organization mode and a safe source-text storage mode. Stage 2 confirms the
+exact Vault path, a bounded first Apply scope, and the no-touch list. The skill
+recommends a configuration; it does not make the user design the taxonomy from
+scratch.
+
+The preset is an onboarding layer over the existing note schema. Persist the
+approved choice in exactly one `Reference Profile` linked from `Reference
+Index`; do not rely on chat history. `notes-only` maps to `paper-first` and
+does not create or import a full-text derivative;
+`searchable-library` maps to `balanced` and requests searchable full text;
+`knowledge-network` maps to `concept-network` and lowers the selective
+promotion threshold. Existing derivatives and notes are preserved when a
+shallower preset is chosen. Shared/published use or public/uncertain
+synchronization forces `external` only when `source_text_policy: searchable`
+and an authorized derivative is available.
+
+The profile separates intent from artifact state. It records `preset`,
+`organization_mode`, `source_text_policy`, `source_text_availability`,
+`source_text_storage`, `preset_status`, `sharing`, and `sync_exposure`.
+`notes-only` is `omit + not-applicable + ready`, even when an existing
+derivative is known and preserved externally. A searchable preset without an
+authorized derivative is `unavailable + not supplied + pending-source-text`;
+it must not be described as search-ready.
 
 Every factual note must say what was supplied and preserve its canonical
 location. Unread material is labelled `not reviewed`; it is never summarized
@@ -61,6 +82,15 @@ If no derivative was supplied, record `source_text_status: not supplied` and
 Artifact verification requires the exact approved `--vault-root`; reject a
 vault-local path whose resolved target, including symlinks, is outside it.
 
+When the user authorizes native PDF text extraction,
+`scripts/extract_source_text.py` creates the page-marked derivative and its
+manifest from explicit input/output paths. It uses Poppler `pdfinfo` and
+`pdftotext`, never overwrites without `--overwrite`, and rejects a canonical
+PDF inside the Vault. Provenance version 1 records the canonical PDF hash/page
+count, extractor/version/mode, extracted-text page count, derivative hash, and
+a complete ordered marker for every PDF page. A PDF with no extractable text
+fails and requires a separately authorized OCR input.
+
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,
 measurement, theory/model assumptions, anchored results, limitations, and a
@@ -75,10 +105,15 @@ unique so an Obsidian wikilink has one deterministic target.
 
 The read-only lint is necessary but not sufficient handoff evidence. Handoff
 must run `scripts/check_notes.py` with `--expect-sources` set to the exact
-Paper/Source count in the approved Blueprint. It also rejects unresolved
+Paper/Source count in the approved Blueprint and `--expect-profile` for a new
+or upgraded preset-aware Apply. It also rejects unresolved
 template placeholders, invalid text-basis values, duplicate/ambiguous note
 basenames, filename-mirroring headings, and reviewed evidence-ledger items
 without a type label and page anchor. For an available derivative it requires
 a linked Source Text manifest with a valid hash and page-map declaration. A
 mismatch fails the command. A bare run without that option is exploratory only
 and cannot prove that the correct Vault or expected reference set was reviewed.
+For `reviewed` sources, required dossier sections must contain substantive
+content rather than `not supplied`. A promoted note must carry a PDF page
+anchor and may link only to a Source dossier whose status is `reviewed`;
+promotion from a partial or unread source fails.

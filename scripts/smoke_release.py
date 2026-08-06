@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import hashlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,14 @@ LINK = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
 PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")
 
 VALUES = {
+    "preset": "searchable-library",
+    "organization": "balanced",
+    "source_text_policy": "searchable",
+    "source_text_availability": "available",
+    "preset_status": "ready",
+    "sharing": "private",
+    "sync_exposure": "none",
+    "next_action": "Create the approved searchable source-text layer and reviewed dossiers.",
     "source_name": "Anchor Review",
     "reference_type": "Paper",
     "source_kind": "paper",
@@ -26,6 +35,13 @@ VALUES = {
     "source_text_hash": "not provided",
     "source_text_page_map": "not provided",
     "source_text_manifest": "not provided",
+    "source_text_provenance_version": "not provided",
+    "canonical_source_hash": "not provided",
+    "canonical_page_count": "not provided",
+    "source_text_extractor": "not provided",
+    "source_text_extractor_version": "not provided",
+    "source_text_extraction_mode": "not provided",
+    "source_text_extracted_pages": "not provided",
     "reviewed_scope": "PDF pp. 1-2; abstract and results",
     "unreviewed_scope": "references and supplementary material",
     "canonical_location": "/tmp/reference-release-smoke/supplied.pdf",
@@ -86,16 +102,89 @@ def main() -> None:
     legacy_names = ("Reference-First " + "Starter", "Research Workspace " + "Advanced")
     assert not any(name in skill_text for name in legacy_names)
     assert (ROOT / "scripts/check_notes.py").is_file()
+    assert (ROOT / "templates/reference-profile.md").is_file()
+    onboarding_text = (ROOT / "docs/ONBOARDING.md").read_text(encoding="utf-8")
+    for required in (
+        "`notes-only`",
+        "`searchable-library`",
+        "`knowledge-network`",
+        "Reference Profile",
+        "pending-source-text",
+    ):
+        assert required in onboarding_text
+    assert onboarding_text.index("Start with one plain-language choice") < onboarding_text.index(
+        "After the preset choice"
+    )
+    assert "persisted `Reference Profile`" in skill_text
     payload = json.loads((ROOT / "evals/evals.json").read_text(encoding="utf-8"))
     assert payload["skill_name"] == "obsidian-research-wiki-reference"
 
-    profile_cases = (
+    corpus = ROOT / "evals/corpus/reference-quality/corpus.json"
+    scorer = ROOT / "scripts/score_dossier.py"
+    good_score = subprocess.run(
+        [
+            sys.executable, str(scorer),
+            "--corpus", str(corpus),
+            "--dossier", str(ROOT / "evals/corpus/reference-quality/candidates/good.md"),
+            "--json",
+        ],
+        check=False, capture_output=True, text=True,
+    )
+    assert good_score.returncode == 0, good_score.stdout + good_score.stderr
+    bad_score = subprocess.run(
+        [
+            sys.executable, str(scorer),
+            "--corpus", str(corpus),
+            "--dossier", str(ROOT / "evals/corpus/reference-quality/candidates/unsupported.md"),
+            "--json",
+        ],
+        check=False, capture_output=True, text=True,
+    )
+    assert bad_score.returncode == 1, bad_score.stdout + bad_score.stderr
+    assert json.loads(bad_score.stdout)["unsupported_claims"] >= 1
+
+    preset_cases = (
+        (("notes-only", "private", "none", "available"), ("paper-first", "not-applicable", "omit", "available", "ready")),
+        (("searchable-library", "private", "none", "available"), ("balanced", "vault-local", "searchable", "available", "ready")),
+        (("searchable-library", "private", "public", "available"), ("balanced", "external", "searchable", "available", "ready")),
+        (("knowledge-network", "published", "none", "available"), ("concept-network", "external", "searchable", "available", "ready")),
+        (("knowledge-network", "private", "none", "none"), ("concept-network", "not supplied", "searchable", "unavailable", "pending-source-text")),
+    )
+    profile_results: list[dict[str, str]] = []
+    for inputs, expected in preset_cases:
+        recommended = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/recommend_profile.py"),
+                "--preset", inputs[0],
+                "--sharing", inputs[1],
+                "--sync-exposure", inputs[2],
+                "--derived-text", inputs[3],
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert recommended.returncode == 0, recommended.stdout + recommended.stderr
+        profile = json.loads(recommended.stdout)
+        profile_results.append(profile)
+        assert profile["preset"] == inputs[0]
+        assert (
+            profile["organization"],
+            profile["source_text_storage"],
+            profile["source_text_policy"],
+            profile["source_text_availability"],
+            profile["preset_status"],
+        ) == expected
+
+    legacy_profile_cases = (
         (("both", "required", "private", "none", "available"), ("balanced", "vault-local")),
         (("both", "required", "private", "public", "available"), ("balanced", "external")),
         (("concept", "required", "published", "none", "available"), ("concept-network", "external")),
         (("paper", "not-required", "private", "none", "none"), ("paper-first", "not supplied")),
     )
-    for inputs, expected in profile_cases:
+    for inputs, expected in legacy_profile_cases:
         recommended = subprocess.run(
             [
                 sys.executable,
@@ -116,6 +205,73 @@ def main() -> None:
         assert (profile["organization"], profile["source_text_storage"]) == expected
 
     with tempfile.TemporaryDirectory(prefix="reference-release-smoke-") as raw:
+        for index, profile in enumerate(profile_results):
+            profile_vault = Path(raw) / f"profile-{index}"
+            write(
+                profile_vault,
+                "Reference Index",
+                render(
+                    ROOT / "templates/reference-index.md",
+                    VALUES | {"source_links": "- not provided", "promoted_links": "- not provided"},
+                ),
+            )
+            write(
+                profile_vault,
+                "Reference Profile",
+                render(ROOT / "templates/reference-profile.md", profile),
+            )
+            profile_checked = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts/check_notes.py"),
+                    str(profile_vault),
+                    "--expect-sources", "0",
+                    "--expect-profile",
+                    "--json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            assert profile_checked.returncode == 0, profile_checked.stdout + profile_checked.stderr
+
+        extraction_vault = Path(raw) / "extraction-vault"
+        extraction_vault.mkdir()
+        extraction_output = extraction_vault / "05 Source Text/Full Text/Full Text — Two Page Fixture.md"
+        extraction_manifest = extraction_vault / "05 Source Text/Manifests/Source Text — Two Page Fixture.md"
+        extracted = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/extract_source_text.py"),
+                str(ROOT / "evals/fixtures/source-text/two-page.pdf"),
+                "--output", str(extraction_output),
+                "--manifest", str(extraction_manifest),
+                "--vault-root", str(extraction_vault),
+                "--source-name", "Two Page Fixture",
+                "--reference-type", "Paper",
+                "--storage", "vault-local",
+                "--basis", "native-text",
+                "--json",
+            ],
+            check=False, capture_output=True, text=True,
+        )
+        assert extracted.returncode == 0, extracted.stdout + extracted.stderr
+        extraction_result = json.loads(extracted.stdout)
+        assert extraction_result["pages"] == 2
+        assert extraction_output.read_text(encoding="utf-8").count("<!-- pdf-page:") == 2
+        extraction_checked = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_source_text.py"),
+                str(extraction_manifest),
+                "--vault-root", str(extraction_vault),
+                "--json",
+            ],
+            check=False, capture_output=True, text=True,
+        )
+        assert extraction_checked.returncode == 0, extraction_checked.stdout + extraction_checked.stderr
+        assert json.loads(extraction_checked.stdout)["canonical_page_count"] == 2
+
         vault = Path(raw) / "vault"
         templates = ROOT / "templates"
         write(
@@ -145,6 +301,14 @@ def main() -> None:
             vault,
             "Reference Index",
             render(templates / "reference-index.md", VALUES),
+        )
+        write(
+            vault,
+            "Reference Profile",
+            render(
+                templates / "reference-profile.md",
+                VALUES | {"source_text_storage": "vault-local"},
+            ),
         )
         write(
             vault,
@@ -180,6 +344,7 @@ def main() -> None:
                 str(vault),
                 "--expect-sources",
                 "2",
+                "--expect-profile",
                 "--json",
             ],
             check=False,
@@ -195,6 +360,80 @@ def main() -> None:
         assert result["promoted_notes"] == 1
         assert result["source_text_manifests"] == 1
         assert result["available_source_text"] == 1
+        assert result["reference_profiles"] == 1
+
+        unsafe_profile = Path(raw) / "unsafe-profile"
+        shutil.copytree(vault, unsafe_profile)
+        unsafe_profile_note = unsafe_profile / "Reference Profile.md"
+        unsafe_profile_note.write_text(
+            unsafe_profile_note.read_text(encoding="utf-8").replace(
+                "sync_exposure: none", "sync_exposure: public", 1
+            ),
+            encoding="utf-8",
+        )
+        unsafe_profile_checked = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_notes.py"),
+                str(unsafe_profile),
+                "--expect-sources", "2",
+                "--expect-profile",
+                "--json",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert unsafe_profile_checked.returncode == 1
+        assert "unsafe searchable profile storage" in unsafe_profile_checked.stdout
+
+        semantic_empty = Path(raw) / "semantic-empty"
+        shutil.copytree(vault, semantic_empty)
+        semantic_source = semantic_empty / "20 Papers/Paper — Anchor Review.md"
+        semantic_source.write_text(
+            semantic_source.read_text(encoding="utf-8")
+            .replace(VALUES["source_summary"], "not supplied")
+            .replace(VALUES["source_method"], "not supplied")
+            .replace(VALUES["source_measurement"], "not supplied")
+            .replace(VALUES["source_theory"], "not supplied")
+            .replace(VALUES["source_limitations"], "not supplied")
+            .replace(VALUES["review_trace"], "not supplied"),
+            encoding="utf-8",
+        )
+        semantic_checked = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_notes.py"),
+                str(semantic_empty),
+                "--expect-sources", "2",
+                "--json",
+            ],
+            check=False, capture_output=True, text=True,
+        )
+        assert semantic_checked.returncode == 1
+        assert "source abstract and scope is not supplied" in semantic_checked.stdout
+
+        partial_promotion = Path(raw) / "partial-promotion"
+        shutil.copytree(vault, partial_promotion)
+        partial_source = partial_promotion / "20 Papers/Paper — Anchor Review.md"
+        partial_source.write_text(
+            partial_source.read_text(encoding="utf-8").replace(
+                "status: reviewed", "status: partial", 1
+            ),
+            encoding="utf-8",
+        )
+        partial_checked = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/check_notes.py"),
+                str(partial_promotion),
+                "--expect-sources", "2",
+                "--json",
+            ],
+            check=False, capture_output=True, text=True,
+        )
+        assert partial_checked.returncode == 1
+        assert "promoted note references a non-reviewed source" in partial_checked.stdout
 
         source_text_check = subprocess.run(
             [

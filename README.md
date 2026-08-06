@@ -21,9 +21,12 @@ scope, method, measurements, model assumptions, anchored results, and
 limitations visible instead of compressing a paper into an unsupported
 paragraph.
 
-On first run, the skill asks a short two-stage set of questions. It recommends
-`paper-first`, `balanced`, or `concept-network` organization independently from
-the source-text choice. Private Vaults that need agent/Obsidian full-text
+On first run, the skill first offers notes only, searchable library
+(recommended), or knowledge network. That depth preset maps to `paper-first`,
+`balanced`, or `concept-network`, while source-text storage remains an
+independent safety choice. The approved choice is persisted in a validated
+`Reference Profile`, including source-text policy, availability, storage, and
+readiness. Private Vaults that need agent/Obsidian full-text
 search can use a vault-local regenerable cache; shared, published, publicly
 synchronized, or uncertain Vaults are steered to external storage.
 
@@ -88,6 +91,7 @@ templates/
   question.md
   reading-queue.md
   reference-index.md
+  reference-profile.md
   source-capture.md
   source.md
   source-text-manifest.md
@@ -113,10 +117,14 @@ The read-only lint is a quality check over discovered notes, not proof that the
 correct Vault was selected. Handoff runs it with the approved Blueprint count:
 
 ```bash
-python scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
+python scripts/check_notes.py <approved-vault> \
+  --expect-sources <approved-count> \
+  --expect-profile
 ```
 
-A count mismatch fails. A run without `--expect-sources` is exploratory only.
+A count or profile mismatch fails. A run without these expectations is
+exploratory only. The smoke verifies the source contract and synthetic Apply;
+it does not prove the wording of an actual agent's first response.
 
 Run the standalone release smoke before publishing or installing a local copy:
 

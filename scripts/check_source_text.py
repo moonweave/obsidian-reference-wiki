@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
-PAGE_MARKER = re.compile(r"<!--\s*pdf-page:\s*\d+\s*-->")
+PAGE_MARKER = re.compile(r"<!--\s*pdf-page:\s*(\d+)\s*-->")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
@@ -68,6 +68,40 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     actual_hash = ""
     byte_count = 0
     page_markers = 0
+    marker_numbers: list[int] = []
+    canonical_page_count = 0
+    provenance_version = metadata.get("source_text_provenance_version", "")
+    if provenance_version == "1":
+        canonical_location = Path(metadata.get("canonical_location", "")).expanduser()
+        if not canonical_location.is_absolute() or not canonical_location.is_file():
+            errors.append("canonical_location must name an existing external PDF")
+        elif canonical_location.resolve().is_relative_to(vault_root):
+            errors.append("canonical PDF must remain outside the approved Vault")
+        else:
+            canonical_raw = canonical_location.read_bytes()
+            canonical_hash = f"sha256:{hashlib.sha256(canonical_raw).hexdigest()}"
+            if canonical_hash != metadata.get("canonical_source_hash", ""):
+                errors.append("canonical_source_hash mismatch")
+        try:
+            canonical_page_count = int(metadata.get("canonical_page_count", ""))
+            extracted_pages = int(metadata.get("source_text_extracted_pages", ""))
+        except ValueError:
+            errors.append("canonical_page_count and source_text_extracted_pages must be integers")
+            extracted_pages = 0
+        else:
+            if canonical_page_count < 1:
+                errors.append("canonical_page_count must be positive")
+            if extracted_pages < 1 or extracted_pages > canonical_page_count:
+                errors.append("source_text_extracted_pages is outside the canonical page range")
+        for key in (
+            "source_text_extractor",
+            "source_text_extractor_version",
+            "source_text_extraction_mode",
+        ):
+            if not metadata.get(key) or metadata.get(key) == "not provided":
+                errors.append(f"missing {key}")
+    elif provenance_version not in {"", "not provided"}:
+        errors.append("unsupported source_text_provenance_version")
     if location is not None and location.is_file():
         raw = location.read_bytes()
         byte_count = len(raw)
@@ -79,9 +113,12 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         except UnicodeDecodeError as exc:
             errors.append(f"derived source text is not valid UTF-8: {exc}")
         else:
-            page_markers = len(PAGE_MARKER.findall(text))
+            marker_numbers = [int(value) for value in PAGE_MARKER.findall(text)]
+            page_markers = len(marker_numbers)
             if metadata.get("source_text_page_map") == "pdf-page-comments" and page_markers == 0:
                 errors.append("source_text_page_map declares pdf-page-comments but no page markers were found")
+            if provenance_version == "1" and marker_numbers != list(range(1, canonical_page_count + 1)):
+                errors.append("pdf-page markers must cover every canonical page exactly once and in order")
 
     return {
         "status": "pass" if not errors else "fail",
@@ -91,6 +128,8 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         "expected_hash": expected_hash,
         "actual_hash": actual_hash,
         "page_markers": page_markers,
+        "canonical_page_count": canonical_page_count,
+        "marker_numbers": marker_numbers,
         "errors": errors,
     }
 

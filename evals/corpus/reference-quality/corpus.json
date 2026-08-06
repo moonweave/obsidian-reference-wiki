@@ -1,0 +1,23 @@
+{
+  "corpus_id": "two-page-source-to-dossier-v1",
+  "source_pdf": "../../fixtures/source-text/two-page.pdf",
+  "source_sha256": "sha256:a45e0af0d041a07df42bffa5280f9acde444662d957f13f776e5bfdea8ec20d9",
+  "facts": [
+    {"id":"reported-response","terms":["12 mA","condition A"],"page":1,"label":"reported","quantitative":true},
+    {"id":"reported-baseline","terms":["baseline","5 mA"],"page":1,"label":"reported","quantitative":true},
+    {"id":"repeatability-boundary","terms":["does not establish repeatability"],"page":2,"label":"reported","quantitative":false},
+    {"id":"next-trial","terms":["second trial","required"],"page":2,"label":"reported","quantitative":false}
+  ],
+  "unsupported_patterns": [
+    "\\b20\\s*mA\\b",
+    "\\bestablishes repeatability\\b"
+  ],
+  "required_sections": [
+    "## Abstract and scope",
+    "## Method as used in this paper",
+    "## Reported evidence or results",
+    "### Evidence ledger",
+    "## Limitations as supplied",
+    "## Extraction and review trace"
+  ]
+}

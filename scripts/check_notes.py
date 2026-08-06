@@ -20,6 +20,12 @@ VALID_SOURCE_TEXT_STORAGE = {"external", "vault-local", "not supplied", "not rev
 VALID_PAGE_MAPS = {"pdf-page-comments", "section-only", "not provided"}
 SOURCE_TEXT_HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 SOURCE_TEXT_MANIFEST_TYPE = "source-text-manifest"
+REFERENCE_PROFILE_TYPE = "reference-profile"
+PRESET_ORGANIZATIONS = {
+    "notes-only": "paper-first",
+    "searchable-library": "balanced",
+    "knowledge-network": "concept-network",
+}
 REQUIRED_SOURCE_HEADINGS = (
     "## Paper map",
     "## Abstract and scope",
@@ -85,13 +91,37 @@ def evidence_bullets(section: str) -> list[str]:
     return bullets
 
 
-def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
+def section_preamble(text: str, heading: str) -> str:
+    match = re.search(
+        rf"^{re.escape(heading)}\s*\n(.*?)(?=^#{{2,3}}\s|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def substantive(value: str) -> bool:
+    normalized = re.sub(r"[`*_]", "", value).strip().lower().rstrip(".")
+    return normalized not in {"", "not provided", "not supplied", "not reviewed", "unknown", "n/a"}
+
+
+def check(
+    root: Path,
+    expected_sources: int | None = None,
+    expect_profile: bool = False,
+) -> dict[str, object]:
     errors: list[str] = []
     notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
     name_paths: dict[str, list[Path]] = {}
     for path in notes:
         name_paths.setdefault(path.stem, []).append(path)
     references = source_notes(root)
+    profiles = [
+        path
+        for path in notes
+        if frontmatter(path.read_text(encoding="utf-8")).get("type")
+        == REFERENCE_PROFILE_TYPE
+    ]
 
     for name, paths in sorted(name_paths.items()):
         if len(paths) > 1:
@@ -112,6 +142,72 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
             elif len(candidates) > 1:
                 locations = ", ".join(str(candidate.relative_to(root)) for candidate in candidates)
                 errors.append(f"ambiguous wikilink: {path.relative_to(root)} -> {target} ({locations})")
+
+    if expect_profile and len(profiles) != 1:
+        errors.append(f"reference profile count mismatch: expected 1, found {len(profiles)}")
+    if len(profiles) > 1:
+        errors.append(f"multiple reference profiles found: {len(profiles)}")
+    for path in profiles:
+        meta = frontmatter(path.read_text(encoding="utf-8"))
+        relative = path.relative_to(root)
+        for key in (
+            "profile_contract_version",
+            "preset",
+            "organization_mode",
+            "source_text_policy",
+            "source_text_availability",
+            "source_text_storage",
+            "preset_status",
+            "sharing",
+            "sync_exposure",
+        ):
+            if not meta.get(key):
+                errors.append(f"missing {key}: {relative}")
+        preset = meta.get("preset", "")
+        organization = meta.get("organization_mode", "")
+        policy = meta.get("source_text_policy", "")
+        availability = meta.get("source_text_availability", "")
+        storage = meta.get("source_text_storage", "")
+        status = meta.get("preset_status", "")
+        sharing = meta.get("sharing", "")
+        exposure = meta.get("sync_exposure", "")
+        if meta.get("profile_contract_version") != "1":
+            errors.append(f"invalid profile_contract_version: {relative}")
+        if preset not in PRESET_ORGANIZATIONS:
+            errors.append(f"invalid preset: {relative} -> {preset or 'missing'}")
+        elif organization != PRESET_ORGANIZATIONS[preset]:
+            errors.append(f"preset organization mismatch: {relative}")
+        if sharing not in {"private", "shared", "published"}:
+            errors.append(f"invalid profile sharing: {relative}")
+        if exposure not in {"none", "controlled", "public", "uncertain"}:
+            errors.append(f"invalid profile sync_exposure: {relative}")
+        if availability not in {"available", "unavailable"}:
+            errors.append(f"invalid source_text_availability: {relative}")
+        if preset == "notes-only":
+            if (policy, storage, status) != ("omit", "not-applicable", "ready"):
+                errors.append(f"notes-only profile state mismatch: {relative}")
+        elif preset in {"searchable-library", "knowledge-network"}:
+            if policy != "searchable":
+                errors.append(f"searchable preset policy mismatch: {relative}")
+            if availability == "available":
+                if storage not in {"vault-local", "external"} or status != "ready":
+                    errors.append(f"available searchable profile state mismatch: {relative}")
+                if (
+                    sharing in {"shared", "published"}
+                    or exposure in {"public", "uncertain"}
+                ) and storage != "external":
+                    errors.append(f"unsafe searchable profile storage: {relative}")
+            elif availability == "unavailable" and (
+                storage != "not supplied" or status != "pending-source-text"
+            ):
+                errors.append(f"pending searchable profile state mismatch: {relative}")
+        if "## Next action" not in path.read_text(encoding="utf-8"):
+            errors.append(f"reference profile missing next action: {relative}")
+
+    if profiles:
+        indexes = [path for path in notes if path.stem == "Reference Index"]
+        if len(indexes) != 1 or "[[Reference Profile]]" not in indexes[0].read_text(encoding="utf-8"):
+            errors.append("Reference Index must link exactly one Reference Profile")
 
     manifests = [
         path
@@ -244,6 +340,20 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                 f"{meta.get('source_text_basis', '') or 'missing'}"
             )
         if status == "reviewed":
+            for heading, label in (
+                ("## Paper map", "source paper map"),
+                ("## Abstract and scope", "source abstract and scope"),
+                ("### Procedure and variables", "source method"),
+                ("### Measurement and analysis", "source measurement and analysis"),
+                ("### Controls or baseline", "source controls or baseline"),
+                ("## Background theory and model", "source theory or model"),
+                ("## Reported evidence or results", "source evidence or results"),
+                ("## Limitations as supplied", "source limitations"),
+                ("## Extraction and review trace", "source review trace"),
+            ):
+                if not substantive(section_preamble(text, heading)):
+                    verb = "are" if label == "source limitations" else "is"
+                    errors.append(f"{label} {verb} not supplied: {path.relative_to(root)}")
             if not PAGE_ANCHOR.search(text):
                 errors.append(f"missing page anchor: {path.relative_to(root)}")
             if not EVIDENCE_LABEL.search(text):
@@ -273,6 +383,10 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
                     )
 
     promoted = 0
+    source_statuses = {
+        path.stem: frontmatter(path.read_text(encoding="utf-8")).get("status", "")
+        for path in references
+    }
     for path in notes:
         if not any(in_domain(path, folder) for folder in ("Claims", "Evidence & Methods", "Theories & Background", "Limitations")):
             continue
@@ -280,6 +394,19 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
         text = path.read_text(encoding="utf-8")
         if "Source anchor" not in text and not re.search(r"(?:Paper|Source|Reference): \[\[", text):
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
+        source_targets = [
+            target.strip()
+            for target in LINK.findall(text)
+            if target.strip().startswith(("Paper — ", "Source — "))
+        ]
+        for target in source_targets:
+            if source_statuses.get(target) != "reviewed":
+                errors.append(
+                    f"promoted note references a non-reviewed source: "
+                    f"{path.relative_to(root)} -> {target}"
+                )
+        if source_targets and not PAGE_ANCHOR.search(text):
+            errors.append(f"promoted note lacks a PDF page anchor: {path.relative_to(root)}")
 
     if expected_sources is not None and len(references) != expected_sources:
         errors.append(
@@ -291,6 +418,7 @@ def check(root: Path, expected_sources: int | None = None) -> dict[str, object]:
         "notes": len(notes),
         "sources": len(references),
         "expected_sources": expected_sources,
+        "reference_profiles": len(profiles),
         "reviewed_sources": reviewed,
         "partial_sources": partial,
         "capture_sources": captured,
@@ -313,6 +441,11 @@ def main() -> int:
         type=int,
         help="fail unless the discovered Paper/Source note count matches this value",
     )
+    parser.add_argument(
+        "--expect-profile",
+        action="store_true",
+        help="fail unless one valid persisted Reference Profile is present",
+    )
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
     if args.expect_sources is not None and args.expect_sources < 0:
@@ -321,7 +454,11 @@ def main() -> int:
     if not root.is_dir():
         print(f"Vault does not exist: {root}", file=sys.stderr)
         return 2
-    result = check(root, expected_sources=args.expect_sources)
+    result = check(
+        root,
+        expected_sources=args.expect_sources,
+        expect_profile=args.expect_profile,
+    )
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

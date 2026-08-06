@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
-"""Recommend Reference organization and source-text storage from onboarding answers."""
+"""Recommend a Reference onboarding preset and its safe storage profile."""
 from __future__ import annotations
 
 import argparse
 import json
+
+
+PRESET_DEFAULTS = {
+    "notes-only": ("paper-first", "not-required"),
+    "searchable-library": ("balanced", "required"),
+    "knowledge-network": ("concept-network", "required"),
+}
+
+PRESET_REASONS = {
+    "notes-only": "Create reviewed Paper/Source dossiers without creating or importing a full-text derivative.",
+    "searchable-library": "Keep reviewed dossiers and make authorized full text searchable for later verification.",
+    "knowledge-network": "Keep searchable full text and dossiers, then promote reusable cross-paper knowledge selectively.",
+}
 
 
 def recommend(
@@ -46,13 +59,61 @@ def recommend(
     }
 
 
+def recommend_preset(
+    preset: str,
+    sharing: str,
+    sync_exposure: str,
+    derived_text: str,
+) -> dict[str, str]:
+    organization, full_text_search = PRESET_DEFAULTS[preset]
+    source_text_policy = "omit" if preset == "notes-only" else "searchable"
+    source_text_availability = "available" if derived_text == "available" else "unavailable"
+    retrieval = {
+        "paper-first": "paper",
+        "balanced": "both",
+        "concept-network": "concept",
+    }[organization]
+    result = recommend(
+        retrieval,
+        full_text_search,
+        sharing,
+        sync_exposure,
+        derived_text,
+    )
+    if preset == "notes-only":
+        result["source_text_storage"] = "not-applicable"
+        result["storage_reason"] = (
+            "The notes-only preset does not create or import a full-text derivative. "
+            "Preserve any existing derivative in place unless it is separately authorized."
+        )
+        preset_status = "ready"
+        next_action = "Create reviewed Paper/Source dossiers; preserve any existing derivative in place."
+    elif source_text_availability == "unavailable":
+        preset_status = "pending-source-text"
+        next_action = "Supply or authorize a derivative before claiming full-text search is ready."
+    else:
+        preset_status = "ready"
+        next_action = "Create the approved searchable source-text layer and reviewed dossiers."
+    return {
+        "preset": preset,
+        "preset_reason": PRESET_REASONS[preset],
+        "source_text_policy": source_text_policy,
+        "source_text_availability": source_text_availability,
+        "preset_status": preset_status,
+        "sharing": sharing,
+        "sync_exposure": sync_exposure,
+        "next_action": next_action,
+        **result,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--retrieval", choices=("paper", "concept", "both"), required=True)
+    parser.add_argument("--preset", choices=tuple(PRESET_DEFAULTS))
+    parser.add_argument("--retrieval", choices=("paper", "concept", "both"))
     parser.add_argument(
         "--full-text-search",
         choices=("required", "not-required"),
-        required=True,
     )
     parser.add_argument("--sharing", choices=("private", "shared", "published"), required=True)
     parser.add_argument(
@@ -63,16 +124,37 @@ def main() -> int:
     parser.add_argument("--derived-text", choices=("available", "none"), required=True)
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
-    result = recommend(
-        args.retrieval,
-        args.full_text_search,
-        args.sharing,
-        args.sync_exposure,
-        args.derived_text,
-    )
+    if args.preset and (args.retrieval or args.full_text_search):
+        parser.error("--preset cannot be combined with legacy retrieval arguments")
+    if args.preset:
+        result = recommend_preset(
+            args.preset,
+            args.sharing,
+            args.sync_exposure,
+            args.derived_text,
+        )
+    else:
+        if not args.retrieval or not args.full_text_search:
+            parser.error("use --preset, or provide both --retrieval and --full-text-search")
+        result = recommend(
+            args.retrieval,
+            args.full_text_search,
+            args.sharing,
+            args.sync_exposure,
+            args.derived_text,
+        )
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
+        if "preset" in result:
+            print(f"Preset: {result['preset']}")
+            print(f"Depth: {result['preset_reason']}")
+            print(
+                "Source text: "
+                f"{result['source_text_policy']} + {result['source_text_availability']}"
+            )
+            print(f"Preset status: {result['preset_status']}")
+            print(f"Next action: {result['next_action']}")
         print(f"Recommended configuration: {result['organization']} + {result['source_text_storage']}")
         print(f"Organization: {result['organization_reason']}")
         print(f"Storage: {result['storage_reason']}")

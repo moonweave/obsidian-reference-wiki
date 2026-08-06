@@ -4,7 +4,9 @@ Reference note quality depends on the source text and the reading trace, not on
 the amount of prose in a template. Keep the canonical source, the full parsed
 text derivative, and the reviewed dossier distinct. The skill may use an LLM
 to draft Markdown after the user supplies or authorizes the source, but it is
-not an automatic PDF-ingestion or OCR pipeline.
+not an automatic library-wide ingestion or OCR pipeline. For one explicitly
+approved native-text PDF, `scripts/extract_source_text.py` provides the bounded
+PDF-to-Markdown adapter described below.
 
 ## Source-text integrity
 
@@ -16,6 +18,20 @@ page-map convention. Prefer `<!-- pdf-page: N -->` markers in Markdown
 derivatives so a reviewed result can be traced back to the PDF page. The
 manifest records provenance only; the Source dossier contains the
 interpretation.
+
+For an approved PDF with a usable text layer, run:
+
+```bash
+python scripts/extract_source_text.py <canonical.pdf> \
+  --output <derived.md> --manifest <manifest.md> \
+  --vault-root <approved-vault> --source-name <name> \
+  --reference-type Paper --storage vault-local --basis native-text
+```
+
+The adapter records the canonical PDF hash and page count, Poppler extractor
+version/mode, extracted-text page count, derivative hash, and one ordered
+`pdf-page` marker for every canonical page. It refuses implicit overwrite and
+fails on an image-only PDF. OCR remains a separate, explicit recovery step.
 
 `vault-local` is appropriate for a private Vault when full-text Obsidian or
 agent search is part of the workflow. Render the derivative with
@@ -45,9 +61,10 @@ default; link it through `reference_type` instead of renaming it silently.
 ## Handoff count gate
 
 Run `python scripts/check_notes.py <approved-vault> --expect-sources
-<approved-count>` before handoff. The approved count includes both `Paper — …`
-and `Source — …` records. A count mismatch is a failed handoff; an exploratory
-run without the option is not completion evidence.
+<approved-count> --expect-profile` before a preset-aware handoff. The approved
+count includes both `Paper — …` and `Source — …` records. A count or profile
+mismatch is a failed handoff; an exploratory run without the expectations is
+not completion evidence.
 
 ## Two source states
 
@@ -117,3 +134,13 @@ Graph can display template placeholders beside factual nodes. Exclude that
 folder with the graph filter when the installed Obsidian version supports it;
 otherwise review factual edges through Backlinks/Outgoing links. Do not edit
 `.obsidian` automatically for this display preference.
+
+## Source-to-dossier semantic regression
+
+Run `scripts/score_dossier.py` against
+`evals/corpus/reference-quality/corpus.json` for the fixed source-to-dossier
+regression. It checks required fact coverage, expected evidence labels and PDF
+anchors, quantitative value/unit/condition retention, and explicitly forbidden
+contradictions. The good candidate must pass and the unsupported candidate
+must fail. This small deterministic corpus catches known semantic regressions;
+it does not replace human reading or a broader multi-paper benchmark.

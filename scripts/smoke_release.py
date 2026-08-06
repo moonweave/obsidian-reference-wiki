@@ -40,6 +40,7 @@ VALUES = {
     "canonical_page_count": "not provided",
     "source_text_extractor": "not provided",
     "source_text_extractor_version": "not provided",
+    "source_text_extractor_options": "not provided",
     "source_text_extraction_mode": "not provided",
     "source_text_extracted_pages": "not provided",
     "reviewed_scope": "PDF pp. 1-2; abstract and results",

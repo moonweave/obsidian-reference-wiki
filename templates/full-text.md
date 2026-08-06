@@ -8,6 +8,7 @@ source_text_page_map: {source_text_page_map}
 source_text_provenance_version: {source_text_provenance_version}
 source_text_extractor: {source_text_extractor}
 source_text_extractor_version: {source_text_extractor_version}
+source_text_extractor_options: {source_text_extractor_options}
 source_text_extraction_mode: {source_text_extraction_mode}
 source_text_extracted_pages: {source_text_extracted_pages}
 ---

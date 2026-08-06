@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
+import importlib.util
 import json
 import os
 import re
@@ -17,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")
 PAGES = re.compile(r"^Pages:\s+(\d+)\s*$", re.MULTILINE)
+PAGE_BREAK_TOKEN = "<<<REFERENCE_WIKI_PDF_PAGE_BREAK>>>"
 
 
 def sha256(path: Path) -> str:
@@ -30,7 +33,7 @@ def sha256(path: Path) -> str:
 def command_path(name: str) -> str:
     resolved = shutil.which(name)
     if not resolved:
-        raise RuntimeError(f"required Poppler command is unavailable: {name}")
+        raise RuntimeError(f"required command is unavailable: {name}")
     return resolved
 
 
@@ -92,6 +95,114 @@ def extract_pages(pdftotext: str, source: Path, page_count: int) -> tuple[str, i
     return "\n\n".join(rendered) + "\n", text_pages
 
 
+def docling_python() -> str:
+    override = os.environ.get("REFERENCE_DOCLING_PYTHON", "").strip()
+    if override:
+        interpreter = Path(override).expanduser().absolute()
+        if not interpreter.is_file() or not os.access(interpreter, os.X_OK):
+            raise RuntimeError(f"REFERENCE_DOCLING_PYTHON is not executable: {interpreter}")
+        return str(interpreter)
+    if importlib.util.find_spec("docling") is not None:
+        return sys.executable
+    command = Path(command_path("docling")).resolve()
+    try:
+        first_line = command.read_text(encoding="utf-8").splitlines()[0]
+    except (OSError, UnicodeDecodeError, IndexError) as exc:
+        raise RuntimeError(f"cannot inspect the Docling launcher: {command}") from exc
+    if not first_line.startswith("#!"):
+        raise RuntimeError(
+            "cannot determine Docling's Python environment; set REFERENCE_DOCLING_PYTHON"
+        )
+    # Keep a virtual-environment symlink intact: resolving it can bypass that
+    # environment's site-packages and make an installed Docling disappear.
+    interpreter = Path(first_line[2:].strip()).expanduser().absolute()
+    if not interpreter.is_file() or not os.access(interpreter, os.X_OK):
+        raise RuntimeError(f"Docling Python is not executable: {interpreter}")
+    return str(interpreter)
+
+
+def extract_docling(
+    source: Path, page_count: int, ocr_mode: str, formula_mode: str
+) -> tuple[str, int, str, str]:
+    interpreter = docling_python()
+    with tempfile.TemporaryDirectory() as raw:
+        temporary = Path(raw)
+        markdown_path = temporary / "docling.md"
+        metadata_path = temporary / "docling.json"
+        result = run(
+            [
+                interpreter,
+                str(Path(__file__).resolve()),
+                "--docling-worker",
+                str(source),
+                "--output", str(markdown_path),
+                "--metadata", str(metadata_path),
+                "--ocr", ocr_mode,
+                "--formula", formula_mode,
+            ]
+        )
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()
+            raise RuntimeError(detail or "Docling extraction failed")
+        if not markdown_path.is_file() or not metadata_path.is_file():
+            raise RuntimeError("Docling worker did not create its expected outputs")
+        markdown = markdown_path.read_text(encoding="utf-8")
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    pages = [normalize_page(part) for part in markdown.split(PAGE_BREAK_TOKEN)]
+    if len(pages) != page_count:
+        raise RuntimeError(
+            f"Docling page boundary mismatch: expected {page_count}, found {len(pages)}"
+        )
+    text_pages = sum(bool(page) for page in pages)
+    if text_pages == 0:
+        raise RuntimeError("Docling produced no readable page content")
+    rendered = [f"<!-- pdf-page: {index} -->\n{page}".rstrip() for index, page in enumerate(pages, 1)]
+    formula_enabled = str(formula_mode == "on").lower()
+    options = (
+        f"pipeline=standard;ocr={ocr_mode};formula_enrichment={formula_enabled};"
+        "remote_services=false;external_plugins=false;page_breaks=pdf-page-comments"
+    )
+    return "\n\n".join(rendered) + "\n", text_pages, str(metadata["version"]), options
+
+
+def docling_worker(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("source", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--metadata", type=Path, required=True)
+    parser.add_argument("--ocr", choices=("auto", "off"), required=True)
+    parser.add_argument("--formula", choices=("on", "off"), required=True)
+    args = parser.parse_args(argv)
+    try:
+        import docling
+        from docling.datamodel.base_models import InputFormat
+        from docling.datamodel.pipeline_options import PdfPipelineOptions
+        from docling.document_converter import DocumentConverter, PdfFormatOption
+
+        options = PdfPipelineOptions()
+        options.do_ocr = args.ocr == "auto"
+        options.do_formula_enrichment = args.formula == "on"
+        options.enable_remote_services = False
+        options.allow_external_plugins = False
+        converter = DocumentConverter(
+            format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=options)}
+        )
+        result = converter.convert(args.source)
+        markdown = result.document.export_to_markdown(
+            page_break_placeholder=PAGE_BREAK_TOKEN,
+            traverse_pictures=True,
+        )
+        version = getattr(docling, "__version__", None) or importlib.metadata.version("docling")
+        args.output.write_text(markdown, encoding="utf-8")
+        args.metadata.write_text(
+            json.dumps({"version": version}, ensure_ascii=False), encoding="utf-8"
+        )
+    except Exception as exc:
+        print(f"Docling worker failed: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def render(template: Path, values: dict[str, str]) -> str:
     text = template.read_text(encoding="utf-8")
     for key, value in values.items():
@@ -137,11 +248,23 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
         if path.exists() and not args.overwrite:
             raise RuntimeError(f"refusing to overwrite existing file: {path}")
 
-    pdftotext = command_path("pdftotext")
     pdfinfo = command_path("pdfinfo")
     page_count = pdf_page_count(pdfinfo, source)
-    extracted_text, text_pages = extract_pages(pdftotext, source, page_count)
-    version = extractor_version(pdftotext)
+    if args.engine == "docling":
+        if args.basis != "mixed":
+            raise RuntimeError("Docling extraction must use --basis mixed")
+        extracted_text, text_pages, version, extractor_options = extract_docling(
+            source, page_count, args.docling_ocr, args.docling_formula
+        )
+        extractor = "docling"
+        extraction_mode = "docling-standard-page-marked"
+    else:
+        pdftotext = command_path("pdftotext")
+        extracted_text, text_pages = extract_pages(pdftotext, source, page_count)
+        version = extractor_version(pdftotext)
+        extractor_options = "-layout -nopgbrk -enc UTF-8 per-page"
+        extractor = "pdftotext"
+        extraction_mode = "layout-per-page"
     canonical_hash = sha256(source)
     location = (
         os.path.relpath(output, manifest.parent)
@@ -154,10 +277,11 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
         "canonical_page_count": str(page_count),
         "source_text_basis": args.basis,
         "source_text_page_map": "pdf-page-comments",
-        "source_text_provenance_version": "1",
-        "source_text_extractor": "pdftotext",
+        "source_text_provenance_version": "2",
+        "source_text_extractor": extractor,
         "source_text_extractor_version": version,
-        "source_text_extraction_mode": "layout-per-page",
+        "source_text_extractor_options": extractor_options,
+        "source_text_extraction_mode": extraction_mode,
         "source_text_extracted_pages": str(text_pages),
         "full_text_content": extracted_text.rstrip(),
     }
@@ -187,8 +311,9 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
         "pages": page_count,
         "text_pages": text_pages,
         "source_text_hash": derivative_hash,
-        "extractor": "pdftotext",
+        "extractor": extractor,
         "extractor_version": version,
+        "extractor_options": extractor_options,
     }
 
 
@@ -202,10 +327,21 @@ def main() -> int:
     parser.add_argument("--reference-type", choices=("Paper", "Source"), required=True)
     parser.add_argument("--storage", choices=("vault-local", "external"), required=True)
     parser.add_argument("--basis", choices=("native-text", "OCR", "mixed"), required=True)
+    parser.add_argument(
+        "--engine",
+        choices=("pdftotext", "docling"),
+        default=os.environ.get("REFERENCE_PDF_ENGINE", "pdftotext"),
+    )
+    parser.add_argument("--docling-ocr", choices=("auto", "off"), default="off")
+    parser.add_argument("--docling-formula", choices=("on", "off"), default="off")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
     try:
+        if args.engine not in ("pdftotext", "docling"):
+            raise RuntimeError(
+                "REFERENCE_PDF_ENGINE must be either 'pdftotext' or 'docling'"
+            )
         result = extract(args)
     except RuntimeError as exc:
         if args.as_json:
@@ -224,4 +360,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--docling-worker":
+        raise SystemExit(docling_worker(sys.argv[2:]))
     raise SystemExit(main())

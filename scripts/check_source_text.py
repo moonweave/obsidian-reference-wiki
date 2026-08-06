@@ -27,6 +27,7 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     errors: list[str] = []
+    warnings: list[str] = []
     vault_root = vault_root.resolve()
     manifest = manifest.resolve()
     if not vault_root.is_dir():
@@ -70,8 +71,10 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     page_markers = 0
     marker_numbers: list[int] = []
     canonical_page_count = 0
+    formula_placeholders = 0
+    image_placeholders = 0
     provenance_version = metadata.get("source_text_provenance_version", "")
-    if provenance_version == "1":
+    if provenance_version in {"1", "2"}:
         canonical_location = Path(metadata.get("canonical_location", "")).expanduser()
         if not canonical_location.is_absolute() or not canonical_location.is_file():
             errors.append("canonical_location must name an existing external PDF")
@@ -100,6 +103,8 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         ):
             if not metadata.get(key) or metadata.get(key) == "not provided":
                 errors.append(f"missing {key}")
+        if provenance_version == "2" and not metadata.get("source_text_extractor_options"):
+            errors.append("missing source_text_extractor_options")
     elif provenance_version not in {"", "not provided"}:
         errors.append("unsupported source_text_provenance_version")
     if location is not None and location.is_file():
@@ -115,10 +120,20 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         else:
             marker_numbers = [int(value) for value in PAGE_MARKER.findall(text)]
             page_markers = len(marker_numbers)
+            formula_placeholders = text.count("<!-- formula-not-decoded -->")
+            image_placeholders = text.count("<!-- image -->")
             if metadata.get("source_text_page_map") == "pdf-page-comments" and page_markers == 0:
                 errors.append("source_text_page_map declares pdf-page-comments but no page markers were found")
-            if provenance_version == "1" and marker_numbers != list(range(1, canonical_page_count + 1)):
+            if provenance_version in {"1", "2"} and marker_numbers != list(range(1, canonical_page_count + 1)):
                 errors.append("pdf-page markers must cover every canonical page exactly once and in order")
+            if formula_placeholders:
+                warnings.append(
+                    f"derived text contains {formula_placeholders} undecoded formula placeholders"
+                )
+            if image_placeholders:
+                warnings.append(
+                    f"derived text contains {image_placeholders} image placeholders"
+                )
 
     return {
         "status": "pass" if not errors else "fail",
@@ -130,6 +145,9 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         "page_markers": page_markers,
         "canonical_page_count": canonical_page_count,
         "marker_numbers": marker_numbers,
+        "formula_placeholders": formula_placeholders,
+        "image_placeholders": image_placeholders,
+        "warnings": warnings,
         "errors": errors,
     }
 
@@ -146,10 +164,13 @@ def main() -> int:
     else:
         print(
             "Source text check: "
-            f"{result['status']} (bytes={result['byte_count']}, page_markers={result['page_markers']})"
+            f"{result['status']} (bytes={result.get('byte_count', 0)}, "
+            f"page_markers={result.get('page_markers', 0)})"
         )
         for error in result["errors"]:
             print(f"- {error}")
+        for warning in result.get("warnings", []):
+            print(f"- warning: {warning}")
     return 0 if result["status"] == "pass" else 1
 
 

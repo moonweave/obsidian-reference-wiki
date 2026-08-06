@@ -98,6 +98,8 @@ The Blueprint must state:
 - exact folders and templates proposed;
 - canonical PDF/Zotero boundary;
 - vault-local cache or external derivative location rule;
+- extraction engine for each pilot source: `pdftotext` compatibility for a
+  simple usable text layer, or local `docling` for complex scientific layout;
 - the first real `Reference Index -> Paper/Source` route and any justified
   promoted links;
 - exact Apply scope and expected Paper/Source count;

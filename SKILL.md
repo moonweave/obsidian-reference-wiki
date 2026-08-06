@@ -109,14 +109,22 @@ it reads the named derivative, verifies its hash, and checks the declared page
 markers without modifying either file. A changed hash marks the dossier for
 review; it does not authorize automatic rewriting of claims.
 
-When the user explicitly authorizes extracting one native-text PDF, use
+When the user explicitly authorizes extracting one PDF, use
 `python scripts/extract_source_text.py <canonical.pdf> --output <derived.md>
 --manifest <manifest.md> --vault-root <approved-vault> --source-name <name>
 --reference-type <Paper|Source> --storage <vault-local|external> --basis
-native-text`. The adapter keeps the canonical PDF external, creates ordered
+native-text --engine pdftotext` for the compatibility path. For a complex
+scientific PDF where formulas, columns, or reading order matter, prefer
+`--basis mixed --engine docling`. Docling runs locally with remote services and
+external plugins disabled and no silent fallback to `pdftotext`. Formula
+enrichment is an explicit high-cost option, `--docling-formula on`; leave it
+off for the first layout pass. The adapter keeps the canonical PDF external,
+creates ordered
 page markers, records canonical and derivative hashes plus extractor metadata,
 and refuses existing outputs unless `--overwrite` is explicitly supplied. If
-the PDF has no text layer, stop at an extraction failure; do not silently OCR.
+the selected engine fails or cannot preserve every page boundary, stop at an
+extraction failure. Treat either derivative as parsed input that still needs
+formula and reading-order review, not as source truth.
 
 ## Method and theory boundary
 

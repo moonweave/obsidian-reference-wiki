@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 10`
+`contract_version: 11`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -82,14 +82,19 @@ If no derivative was supplied, record `source_text_status: not supplied` and
 Artifact verification requires the exact approved `--vault-root`; reject a
 vault-local path whose resolved target, including symlinks, is outside it.
 
-When the user authorizes native PDF text extraction,
+When the user authorizes PDF text extraction,
 `scripts/extract_source_text.py` creates the page-marked derivative and its
-manifest from explicit input/output paths. It uses Poppler `pdfinfo` and
-`pdftotext`, never overwrites without `--overwrite`, and rejects a canonical
-PDF inside the Vault. Provenance version 1 records the canonical PDF hash/page
-count, extractor/version/mode, extracted-text page count, derivative hash, and
-a complete ordered marker for every PDF page. A PDF with no extractable text
-fails and requires a separately authorized OCR input.
+manifest from explicit input/output paths. `--engine pdftotext --basis
+native-text` remains the compatibility path. `--engine docling --basis mixed`
+is the recommended local path for complex scientific PDFs. It disables remote
+services and external plugins. Formula enrichment is disabled by default and
+requires the explicit high-cost `--docling-formula on` option. Neither path
+falls back silently. The adapter never overwrites without `--overwrite` and
+rejects a canonical PDF inside the Vault. Existing provenance version 1
+manifests remain valid. New provenance version 2 records the canonical PDF
+hash/page count, extractor/version/options/mode, extracted-text page count,
+derivative hash, and a complete ordered marker for every PDF page. Any engine
+failure or page-boundary mismatch is an explicit failure.
 
 The note-quality procedure is defined in `docs/NOTE_QUALITY.md`. A reviewed
 Source must declare its text basis and derived-text status, include method,

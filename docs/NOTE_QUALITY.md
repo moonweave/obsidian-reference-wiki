@@ -5,7 +5,7 @@ the amount of prose in a template. Keep the canonical source, the full parsed
 text derivative, and the reviewed dossier distinct. The skill may use an LLM
 to draft Markdown after the user supplies or authorizes the source, but it is
 not an automatic library-wide ingestion or OCR pipeline. For one explicitly
-approved native-text PDF, `scripts/extract_source_text.py` provides the bounded
+approved PDF, `scripts/extract_source_text.py` provides the bounded
 PDF-to-Markdown adapter described below.
 
 ## Source-text integrity
@@ -25,13 +25,33 @@ For an approved PDF with a usable text layer, run:
 python scripts/extract_source_text.py <canonical.pdf> \
   --output <derived.md> --manifest <manifest.md> \
   --vault-root <approved-vault> --source-name <name> \
-  --reference-type Paper --storage vault-local --basis native-text
+  --reference-type Paper --storage vault-local \
+  --basis native-text --engine pdftotext
 ```
 
-The adapter records the canonical PDF hash and page count, Poppler extractor
-version/mode, extracted-text page count, derivative hash, and one ordered
-`pdf-page` marker for every canonical page. It refuses implicit overwrite and
-fails on an image-only PDF. OCR remains a separate, explicit recovery step.
+For a complex scientific PDF with formulas, columns, or nontrivial reading
+order, prefer the local Docling path:
+
+```bash
+python scripts/extract_source_text.py <canonical.pdf> \
+  --output <derived.md> --manifest <manifest.md> \
+  --vault-root <approved-vault> --source-name <name> \
+  --reference-type Paper --storage vault-local \
+  --basis mixed --engine docling
+```
+
+The adapter records the canonical PDF hash and page count, extractor version,
+options and mode, extracted-text page count, derivative hash, and one ordered
+`pdf-page` marker for every canonical page. Docling runs locally with remote
+services and external plugins disabled. Formula enrichment is intentionally
+off by default because it can be substantially slower on CPU; add
+`--docling-formula on` only when equation recovery justifies that cost. There
+is no silent OCR: OCR is also off by default and requires
+`--docling-ocr auto` for an authorized scan. There is no silent engine
+fallback. The adapter refuses implicit overwrite and fails
+on an engine or page-boundary error. Both outputs remain parsed derivatives:
+visually check important equations, symbols, tables, captions, and multi-column
+reading order before promoting claims.
 
 `vault-local` is appropriate for a private Vault when full-text Obsidian or
 agent search is part of the workflow. Render the derivative with
@@ -127,6 +147,11 @@ manifest is available, verify its external file separately:
 ```bash
 python scripts/check_source_text.py <source-text-manifest.md> --vault-root <approved-vault>
 ```
+
+The checker treats missing, duplicate, or reordered page markers as failures
+for provenance versions 1 and 2. Undecoded formula and image placeholders are
+reported as quality warnings: the hash can be valid while scientific content
+still needs visual review.
 
 Graph inspection is a presentation check, not a replacement for the Markdown
 lint. Because `_templates` contains Markdown files, an unfiltered Obsidian

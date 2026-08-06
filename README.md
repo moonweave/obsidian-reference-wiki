@@ -30,6 +30,13 @@ readiness. Private Vaults that need agent/Obsidian full-text
 search can use a vault-local regenerable cache; shared, published, publicly
 synchronized, or uncertain Vaults are steered to external storage.
 
+For an explicitly approved pilot PDF, `scripts/extract_source_text.py` keeps
+the canonical PDF external and provides two local adapters: the compatible
+`pdftotext` path and a Docling path for complex scientific layout. Docling OCR
+and formula enrichment are separate explicit options. Every new derivative
+records provenance version 2, engine options, hashes, and ordered page markers;
+`scripts/check_source_text.py` also reports undecoded formulas and images.
+
 ## What it does
 
 - designs or safely onboards a reference-focused Obsidian Vault;
@@ -80,6 +87,7 @@ docs/ONBOARDING.md
 evals/evals.json
 scripts/check_notes.py
 scripts/check_source_text.py
+scripts/extract_source_text.py
 scripts/recommend_profile.py
 scripts/smoke_release.py
 templates/

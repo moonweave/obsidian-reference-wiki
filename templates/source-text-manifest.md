@@ -13,6 +13,7 @@ source_text_page_map: {source_text_page_map}
 source_text_provenance_version: {source_text_provenance_version}
 source_text_extractor: {source_text_extractor}
 source_text_extractor_version: {source_text_extractor_version}
+source_text_extractor_options: {source_text_extractor_options}
 source_text_extraction_mode: {source_text_extraction_mode}
 source_text_extracted_pages: {source_text_extracted_pages}
 ---
@@ -32,6 +33,7 @@ It is not the canonical source and it is not a reviewed claim or summary.
 - Integrity hash: {source_text_hash}
 - Page mapping: {source_text_page_map}
 - Extractor: {source_text_extractor} {source_text_extractor_version}
+- Extractor options: {source_text_extractor_options}
 - Extraction mode: {source_text_extraction_mode}
 - Pages with extracted text: {source_text_extracted_pages}
 

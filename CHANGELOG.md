@@ -5,7 +5,7 @@ tags while the first-user beta gate remains open.
 
 ## [Unreleased]
 
-No changes yet.
+- Added a Korean README and language switch links on both README pages.
 
 ## [0.1.0-beta.1] — 2026-08-06
 

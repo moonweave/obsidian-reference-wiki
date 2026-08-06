@@ -1,5 +1,7 @@
 # Obsidian Research Wiki: Reference
 
+[한국어](README.ko.md) | English
+
 > **Status: Technical Beta (`v0.1.0-beta.1`).** Automated release gates and
 > maintainer dogfooding pass. The three-researcher first-user gate is still
 > open; see [the beta protocol](docs/BETA_TEST.md).
@@ -108,6 +110,7 @@ is in [docs/CONTRACT.md](docs/CONTRACT.md).
 
 ```text
 README.md
+README.ko.md
 SKILL.md
 CHANGELOG.md
 CONTRIBUTING.md

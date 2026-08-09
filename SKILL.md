@@ -20,32 +20,48 @@ location outside Zotero storage, ask the user to confirm the exact path, and
 stop before creating it. A Vault is the Markdown workspace, not a copy of the
 PDF library. Do not create a second Vault if the user has an authorized one.
 
+## Entry gate
+
+Every request that would create or change a Vault file passes through this
+gate, whatever the user opened with. A dropped PDF, `이 논문 정리해줘`, a Zotero
+folder, or an explicit onboarding request all arrive at the same check. Do not
+treat a task-shaped opening as permission to skip it.
+
+1. Resolve the target Vault, then look for a `Reference Profile` in it.
+2. Profile found: read it, follow it, and do not ask again. State the mode you
+   are applying in one line so the user can correct it, then continue with the
+   request.
+3. No profile: run the first-run interview below before any file is created.
+
+The profile is the record of what the user agreed to, so onboarding happens
+once per Vault rather than once per conversation. A user who has answered
+already must never be asked a second time.
+
 ## First-run workflow
 
-Use a two-stage onboarding interview before proposing files. The questions are
-decision inputs, not a generic questionnaire; reuse facts already supplied by
-the user and do not ask for information that can be established safely later.
+Ask what the user can answer now, and defer what depends on having notes. Reuse
+facts they already supplied and do not re-ask them.
 
-1. Start with one plain-language depth choice: `notes-only`,
-   `searchable-library` (recommended), or `knowledge-network`. Explain these as
-   Paper/Source dossiers; dossiers plus searchable full text; or searchable
-   full text plus selectively promoted cross-paper knowledge. Do not call the
-   derivative raw truth.
-2. Confirm the safety context needed to realize that preset: private versus
-   shared/published Vault, synchronization exposure, and the current
-   Zotero/PDF/parsed-Markdown/existing-Vault workflow. The preset maps to
-   `paper-first`, `balanced`, or `concept-network`; storage remains an
-   independent safety outcome of `vault-local`, `external`, or `not supplied`.
-   Use `scripts/recommend_profile.py --preset ...` so the same choice and
-   safety facts produce a consistent default. Preserve the legacy
-   retrieval/full-text arguments for existing callers, but do not lead a new
-   user through those technical axes.
-3. Only after the recommendation is understood, confirm three execution facts:
-   new or existing exact Vault path; first Apply scope (default pilot: one to
-   three supplied sources); and the exact preservation/no-touch list.
+1. Ask one plain-language question that shows all three peer presets up front:
+   `notes-only`, `searchable-library`, and `knowledge-network`. Explain them as
+   reviewed Paper/Source dossiers; dossiers plus searchable full text; or both
+   plus selectively promoted cross-paper knowledge. Recommend
+   `searchable-library` when the user is unsure, and explain that the presets
+   are cumulative capabilities rather than incompatible schemas. Never hide or
+   defer `knowledge-network` merely to simplify the first choice.
+2. Ask the safety facts only when the answer changes what you write. Extraction
+   needs to know whether the Vault is private or shared and how far it
+   synchronizes; notes only does not. Map the answer with
+   `scripts/recommend_profile.py --preset ...` so the same inputs produce the
+   same profile. `notes-only` maps to `paper-first`; `searchable-library` to
+   `balanced`; and `knowledge-network` maps to `concept-network`.
+   Preserve the legacy retrieval/full-text arguments for existing callers.
+3. Confirm the execution facts: new or existing exact Vault path; first Apply
+   scope (default pilot: one to three supplied sources); and the exact
+   preservation/no-touch list.
 4. Inspect an existing Vault only after the user names it. Report the baseline
    without treating file names as facts.
-5. Return a Blueprint with the selected preset, mapped configuration and
+5. Return a Blueprint with the selected mode, mapped configuration and
    rationale, a persisted `Reference Profile`, complete map, note meanings,
    placement rules, labelled link rules,
    canonical-source boundary, source-text mode, first real source route,

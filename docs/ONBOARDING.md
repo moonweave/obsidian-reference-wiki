@@ -6,8 +6,9 @@ or ask the user to make every implementation decision.
 
 ## Stage 1 — depth preset and safety context
 
-Start with one plain-language choice. Recommend `searchable-library` when the
-user is unsure.
+Start with one plain-language choice that presents all three presets as peer
+options. Do not hide or defer `knowledge-network` to simplify onboarding.
+Recommend `searchable-library` when the user is unsure.
 
 | Preset | User-facing meaning | Internal mapping |
 |---|---|---|

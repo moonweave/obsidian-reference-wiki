@@ -147,9 +147,10 @@ def main() -> None:
         "pending-source-text",
     ):
         assert required in onboarding_text
-    assert onboarding_text.index("Start with one plain-language choice") < onboarding_text.index(
+    assert onboarding_text.index("Start with one plain-language choice that presents all three presets") < onboarding_text.index(
         "After the preset choice"
     )
+    assert re.search(r"Never hide or\s+defer `knowledge-network`", skill_text)
     assert "persisted `Reference Profile`" in skill_text
     payload = json.loads((ROOT / "evals/evals.json").read_text(encoding="utf-8"))
     assert payload["skill_name"] == "obsidian-research-wiki-reference"

@@ -18,6 +18,10 @@
 
 ## 빠른 시작
 
+명령어보다 화면을 따라가는 쪽이 편하면
+[설치와 사용 가이드](https://moonweave.github.io/obsidian-reference-wiki/guide.html)를
+먼저 보세요. Claude Code와 Codex를 모두 다루고, 터미널 없이도 설치할 수 있습니다.
+
 사용 중인 에이전트가 지원하는 스킬 관리자로 설치합니다. 공통 Skills CLI를
 사용할 때는 다음 명령을 실행합니다.
 

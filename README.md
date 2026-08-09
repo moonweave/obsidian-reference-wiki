@@ -17,8 +17,12 @@ libraries remain untouched unless the user explicitly approves otherwise.
 
 ## Quick start
 
-Install it with the skill manager supported by your agent. With the portable
-Skills CLI:
+If you would rather follow screenshots and plain steps than a command, read the
+[install and usage guide](https://moonweave.github.io/obsidian-reference-wiki/guide.html).
+It covers Claude Code and Codex, and gets you there without a terminal.
+
+Otherwise, install it with the skill manager supported by your agent. With the
+portable Skills CLI:
 
 ```bash
 npx skills add moonweave/obsidian-reference-wiki

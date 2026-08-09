@@ -20,9 +20,24 @@ project or global scope. To inspect the package without installing it:
 npx skills add moonweave/obsidian-reference-wiki --list
 ```
 
-For a manual installation, clone the repository into the skills directory
-documented by your agent. The installed directory must contain `SKILL.md` at
-its root and should retain the basename `obsidian-research-wiki-reference`.
+For a manual installation, clone or unzip the repository into the personal
+skills directory your agent reads. The installed directory must contain
+`SKILL.md` at its root and should retain the basename
+`obsidian-research-wiki-reference`.
+
+| Agent | Personal skills directory | Explicit invocation |
+| --- | --- | --- |
+| Claude Code | `~/.claude/skills/` | `/obsidian-research-wiki-reference` |
+| Codex | `~/.agents/skills/` | `$obsidian-research-wiki-reference` |
+
+Both agents also pick the skill up from the description alone, so naming it in
+plain language is enough. A project-scoped install goes in `.claude/skills/` or
+`.agents/skills/` inside the Vault instead. Other agents that implement the
+specification use their own paths; check their documentation.
+
+The skill writes notes into a folder on your machine, so it needs an agent with
+local file access. A browser-only or cloud session can hold the design
+conversation but cannot create the Vault files.
 
 Start a new agent session after installation, then ask:
 

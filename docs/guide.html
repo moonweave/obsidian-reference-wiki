@@ -1,0 +1,1407 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Obsidian Reference Wiki 스킬 설치와 사용 가이드. 논문 PDF를 넘기면 에이전트가 읽고 정리하고, 값마다 페이지와 그림 번호를 남깁니다.">
+<meta property="og:title" content="페이지까지 남는 논문 정리">
+<meta property="og:description" content="Obsidian에서 논문을 정리하는 에이전트 스킬. 설치부터 첫 대화, 정리 구조까지.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>📚</text></svg>">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  ul, ol { list-style: none; }
+  button { font: inherit; }
+  pre { white-space: pre; }
+  img { max-width: 100%; }
+</style>
+<title>Obsidian Reference Wiki 설치와 사용 가이드</title>
+<style>
+  :root {
+    /* white ground, black type. grey is reserved for captions and labels only */
+    --paper: oklch(1 0 0);
+    --surface: oklch(0.968 0 0);
+    --ink: oklch(0 0 0);
+    --ink-2: oklch(0.06 0 0);
+    --ink-3: oklch(0.505 0 0);
+    --rule: oklch(0.845 0 0);
+    --rule-soft: oklch(0.915 0 0);
+    --accent: oklch(0.415 0.078 195);
+    --accent-quiet: oklch(0.945 0.018 195);
+    --mark: oklch(0.895 0.085 95);
+    --deep: oklch(0.255 0.040 197);
+    --deep-ink: oklch(1 0 0);
+    --deep-ink-2: oklch(0.815 0.014 192);
+    --deep-rule: oklch(0.375 0.034 197);
+    --code-bg: oklch(0.155 0 0);
+    --code-ink: oklch(0.965 0 0);
+    --code-dim: oklch(0.635 0 0);
+
+    --f-sans: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, sans-serif;
+    --f-mono: ui-monospace, "SF Mono", "JetBrains Mono", "D2Coding", Menlo, Consolas, monospace;
+
+    --s1: .35rem;
+    --s2: .7rem;
+    --s3: 1.15rem;
+    --s4: 1.9rem;
+    --s5: 3rem;
+    --s6: clamp(3.75rem, 9vw, 6.5rem);
+
+    --col: 40rem;
+    --page: 66rem;
+    --bar: 3rem;
+
+    color-scheme: light;
+  }
+
+  /* single light theme on purpose: the viewer's dark toggle must not repaint it */
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] body,
+  :root[data-theme="light"] body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-size: 17px;
+    line-height: 1.82;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  h1, h2, h3, h4 { text-wrap: balance; line-height: 1.3; letter-spacing: -.022em; }
+  p { max-width: var(--col); }
+
+  a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: .22em; text-decoration-thickness: 1.5px; }
+  a:hover { color: var(--accent); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: .87em;
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    padding: .06em .32em;
+    border-radius: 3px;
+  }
+  code.nw { white-space: nowrap; }
+
+  em.hl { font-style: normal; background: var(--mark); padding: .04em .22em; box-decoration-break: clone; }
+
+  /* grid/flex children must shrink, or wide code blocks widen the page */
+  .sec, .sec-body, .steps, .step, .step-in, .split, .col,
+  .layers, .layer, .faq, .qa, .panel, .cmd, .paste,
+  .tablewrap, pre.tree, .note-mock { min-width: 0; }
+
+  /* ---------------- hero ---------------- */
+
+  .hero {
+    background: var(--deep);
+    color: var(--deep-ink);
+    padding: clamp(3.5rem, 9vw, 6rem) 1.4rem clamp(3rem, 7vw, 4.5rem);
+  }
+
+  .hero-in { max-width: var(--page); margin: 0 auto; }
+
+  .kicker {
+    font-family: var(--f-mono);
+    font-size: .74rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--deep-ink-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem .9rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 6.4vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    max-width: 24ch;
+    margin-top: var(--s3);
+  }
+
+  .hero-lede {
+    margin-top: var(--s4);
+    max-width: 36rem;
+    font-size: clamp(1.02rem, 2.2vw, 1.16rem);
+    color: var(--deep-ink);
+  }
+
+  .hero-lede strong { font-weight: 700; }
+
+  .hero-grid {
+    margin-top: clamp(2.2rem, 5vw, 3.2rem);
+    display: grid;
+    gap: var(--s4);
+    align-items: end;
+  }
+
+  @media (min-width: 56rem) {
+    .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 3.5rem; }
+  }
+
+  .hero-facts {
+    display: grid;
+    gap: var(--s2);
+    font-size: .92rem;
+    color: var(--deep-ink-2);
+  }
+
+  .hero-facts div { display: flex; gap: .8rem; border-top: 1px solid var(--deep-rule); padding-top: var(--s2); }
+  .hero-facts dt { font-family: var(--f-mono); font-size: .74rem; letter-spacing: .05em; text-transform: uppercase; flex: none; width: 5.2rem; padding-top: .25rem; }
+  .hero-facts dd { color: var(--deep-ink); }
+
+  /* paste block: bordered panel, label sits on the border */
+  .paste {
+    border: 1px solid var(--deep-rule);
+    border-radius: 8px;
+    padding: 1.5rem 1.1rem 1.05rem;
+    position: relative;
+    background: color-mix(in oklch, var(--deep) 82%, black);
+  }
+
+  .paste-label {
+    position: absolute;
+    top: -.62rem;
+    left: 1rem;
+    background: var(--deep);
+    padding: 0 .5rem;
+    font-family: var(--f-mono);
+    font-size: .7rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--mark);
+  }
+
+  .paste-text {
+    font-family: var(--f-mono);
+    font-size: .83rem;
+    line-height: 1.75;
+    color: var(--deep-ink);
+  }
+
+  .paste-foot { display: flex; justify-content: flex-end; margin-top: var(--s2); }
+
+  .btn {
+    font-family: var(--f-mono);
+    font-size: .7rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: .25rem .6rem;
+    cursor: pointer;
+    color: var(--deep-ink-2);
+    flex: none;
+  }
+  .btn:hover { color: var(--mark); }
+  .btn[data-done="1"] { color: var(--mark); }
+
+  /* ---------------- section nav ---------------- */
+
+  .tocbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .tocbar-in {
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 0 1.4rem;
+    display: flex;
+    gap: 1.35rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    height: var(--bar);
+    align-items: center;
+  }
+
+  .tocbar-in::-webkit-scrollbar { display: none; }
+
+  .tocbar a {
+    font-size: .86rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+    padding: .1rem 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tocbar a:hover { color: var(--ink); }
+  .tocbar a[aria-current="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------------- page shell ---------------- */
+
+  .shell { max-width: var(--page); margin: 0 auto; padding: 0 1.4rem 5rem; }
+
+  .sec {
+    padding-top: var(--s6);
+    scroll-margin-top: calc(var(--bar) + 1rem);
+    display: grid;
+    gap: var(--s4);
+  }
+
+  .sec-title { display: flex; align-items: baseline; gap: 1rem; }
+
+  .sec-title .no {
+    font-family: var(--f-mono);
+    font-size: 1rem;
+    color: var(--accent);
+    flex: none;
+    padding-top: .1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sec-title h2 { font-size: clamp(1.5rem, 3.4vw, 2.05rem); font-weight: 750; }
+
+  .sec-body { display: grid; gap: var(--s3); }
+
+  @media (min-width: 64rem) {
+    .sec { grid-template-columns: 4.5rem minmax(0, 1fr); column-gap: 2.5rem; }
+    .sec-title { grid-column: 1 / -1; display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); column-gap: 2.5rem; }
+    .sec-title .no { grid-column: 1; text-align: right; font-size: 1.15rem; }
+    .sec-title h2 { grid-column: 2; }
+    .sec-body { grid-column: 2; }
+  }
+
+  .lead { font-size: 1.06rem; color: var(--ink-2); }
+
+  h3.sub {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin-top: var(--s3);
+    padding-bottom: var(--s1);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .steps { display: grid; gap: var(--s5); }
+  .step-in { display: grid; gap: var(--s3); }
+  .step-in > h3.sub { margin-top: 0; }
+
+  .method {
+    font-family: var(--f-mono);
+    font-size: .73rem;
+    letter-spacing: .05em;
+    color: var(--accent);
+    margin-bottom: calc(var(--s3) * -1 + var(--s1));
+  }
+
+  /* ---------------- lists ---------------- */
+
+  ul.dash { display: grid; gap: .5rem; max-width: var(--col); }
+  ul.dash li { padding-left: 1rem; position: relative; }
+  ul.dash li::before { content: ""; position: absolute; left: 0; top: .82em; width: .45rem; height: 1px; background: var(--accent); }
+
+  ul.no { display: grid; gap: .55rem; max-width: var(--col); }
+  ul.no li { padding-left: 1.3rem; position: relative; }
+  ul.no li::before { content: "×"; position: absolute; left: 0; top: 0; font-family: var(--f-mono); color: var(--ink-3); }
+
+  ol.howto { display: grid; gap: .5rem; max-width: var(--col); counter-reset: ht; font-size: .97rem; }
+  ol.howto li { position: relative; padding-left: 1.6rem; }
+  ol.howto li::before {
+    counter-increment: ht;
+    content: counter(ht);
+    position: absolute;
+    left: 0;
+    top: .12rem;
+    font-family: var(--f-mono);
+    font-size: .74rem;
+    color: var(--accent);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    width: 1.15rem;
+    height: 1.15rem;
+    display: grid;
+    place-items: center;
+  }
+
+  /* two columns divided by a rule, no card chrome */
+  .split { display: grid; gap: var(--s3); }
+
+  @media (min-width: 44rem) {
+    .split { grid-template-columns: 1fr 1fr; gap: 2.4rem; }
+    .split .col + .col { border-left: 1px solid var(--rule); padding-left: 2.4rem; }
+  }
+
+  .col { display: grid; gap: var(--s2); align-content: start; }
+  .col h4 { font-size: .95rem; font-weight: 700; }
+  .col ul { display: grid; gap: .4rem; font-size: .95rem; color: var(--ink-2); }
+  .col li { padding-left: .9rem; position: relative; }
+  .col li::before { content: ""; position: absolute; left: 0; top: .82em; width: .38rem; height: 1px; background: var(--ink-3); }
+
+  /* ---------------- code ---------------- */
+
+  .cmd {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 7px;
+    padding: .95rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .cmd pre { font-family: var(--f-mono); font-size: .845rem; line-height: 1.7; overflow-x: auto; flex: 1; min-width: 0; padding-bottom: 2px; }
+  .cmd .p { color: var(--code-dim); user-select: none; }
+  .cmd .btn { color: var(--code-dim); }
+  .cmd .btn:hover, .cmd .btn[data-done="1"] { color: var(--code-ink); }
+
+  /* light-surface paste panel, same border-label device as the hero */
+  .panel {
+    border: 1px solid var(--rule);
+    border-radius: 7px;
+    padding: 1.4rem 1rem .9rem;
+    position: relative;
+    background: var(--surface);
+  }
+
+  .panel-label {
+    position: absolute;
+    top: -.6rem;
+    left: .9rem;
+    background: var(--paper);
+    padding: 0 .45rem;
+    font-family: var(--f-mono);
+    font-size: .69rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .panel.plain { padding-top: 1rem; }
+  .panel-text { font-family: var(--f-mono); font-size: .82rem; line-height: 1.75; }
+  .panel-foot { display: flex; justify-content: flex-end; margin-top: var(--s2); }
+  .panel .btn { color: var(--ink-3); }
+  .panel .btn:hover, .panel .btn[data-done="1"] { color: var(--accent); }
+
+  pre.tree {
+    font-family: var(--f-mono);
+    font-size: .81rem;
+    line-height: 1.9;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 7px;
+    padding: 1.05rem 1.15rem;
+    overflow-x: auto;
+  }
+  pre.tree .dim { color: var(--ink-3); }
+  pre.tree .hot { color: var(--accent); }
+
+  /* ---------------- note mock ---------------- */
+
+  .note-mock {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .note-bar {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .55rem .9rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: .76rem;
+    color: var(--ink-2);
+    background: color-mix(in oklch, var(--surface) 60%, var(--paper));
+  }
+
+  .note-bar span.dot { width: .42rem; height: .42rem; border-radius: 50%; background: var(--accent); flex: none; }
+
+  .note-body { padding: 1rem 1.1rem 1.2rem; display: grid; gap: .75rem; font-size: .86rem; line-height: 1.75; overflow-x: auto; }
+
+  .note-fm {
+    font-family: var(--f-mono);
+    font-size: .77rem;
+    line-height: 1.85;
+    color: var(--ink-3);
+    border-left: 1px solid var(--rule);
+    padding-left: .8rem;
+  }
+
+  .note-fm b { color: var(--ink-2); font-weight: 400; }
+
+  .note-h { font-family: var(--f-mono); font-size: .78rem; color: var(--accent); }
+
+  .note-body ul { display: grid; gap: .3rem; }
+  .note-body li { padding-left: .85rem; position: relative; color: var(--ink-2); }
+  .note-body li::before { content: ""; position: absolute; left: 0; top: .82em; width: .35rem; height: 1px; background: var(--ink-3); }
+
+  .anchor { font-family: var(--f-mono); font-size: .74rem; color: var(--ink-2); }
+  .lbl {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    letter-spacing: .03em;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: .02rem .35rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .wl { color: var(--accent); font-family: var(--f-mono); font-size: .78rem; }
+
+  .figcap { font-size: .87rem; color: var(--ink-3); max-width: var(--col); }
+
+  /* ---------------- layers ---------------- */
+
+  .layers { display: grid; gap: 0; }
+
+  .layer {
+    display: grid;
+    gap: .3rem;
+    padding: var(--s3) 0;
+    border-top: 1px solid var(--rule);
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+
+  .layer:last-child { border-bottom: 1px solid var(--rule); }
+
+  .layer-n { font-family: var(--f-mono); font-size: .78rem; color: var(--accent); grid-row: 1 / span 2; padding-top: .28rem; }
+  .layer-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: .45rem .7rem; }
+  .layer-top strong { font-size: 1rem; font-weight: 700; }
+  .layer p { font-size: .95rem; color: var(--ink-2); margin: 0; }
+
+  .where {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    letter-spacing: .03em;
+    padding: .04rem .45rem;
+    border-radius: 99px;
+    border: 1px solid var(--rule);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .where-out { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
+
+  /* ---------------- table ---------------- */
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 7px; }
+  table { border-collapse: collapse; width: 100%; min-width: 33rem; font-size: .93rem; background: var(--surface); }
+  th, td { text-align: left; padding: .68rem .9rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th { font-size: .78rem; color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--rule); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.k { font-family: var(--f-mono); font-size: .83rem; white-space: nowrap; }
+  td.k b { color: var(--accent); font-weight: 500; }
+
+  /* ---------------- faq + footer ---------------- */
+
+  .does { display: grid; }
+
+  .does > div {
+    display: grid;
+    gap: .35rem;
+    padding: var(--s3) 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .does > div:last-child { border-bottom: 1px solid var(--rule); }
+
+  @media (min-width: 48rem) {
+    .does > div { grid-template-columns: 16rem minmax(0, 1fr); column-gap: 2rem; align-items: start; }
+  }
+
+  .does dt { font-size: .98rem; font-weight: 700; }
+  .does dd { font-size: .96rem; color: var(--ink-2); }
+
+  /* ---------- flow diagram ---------- */
+
+  .flow { display: grid; gap: .55rem; }
+
+  .flow-row { display: grid; gap: .45rem; }
+
+  @media (min-width: 54rem) {
+    .flow-row {
+      grid-template-columns: 1fr auto 1.3fr auto 1fr;
+      gap: .6rem;
+      align-items: stretch;
+    }
+  }
+
+  .node {
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: .95rem 1rem;
+    display: grid;
+    gap: .28rem;
+    align-content: start;
+    background: var(--surface);
+  }
+
+  .node-tag {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    letter-spacing: .04em;
+    color: var(--ink-3);
+  }
+
+  .node strong { font-size: 1rem; font-weight: 700; }
+  .node p { font-size: .87rem; color: var(--ink-2); margin: 0; max-width: none; }
+
+  .node-agent {
+    background: var(--deep);
+    border-color: var(--deep);
+    color: var(--deep-ink);
+  }
+  .node-agent .node-tag { color: var(--mark); }
+  .node-agent p { color: var(--deep-ink-2); }
+
+  .link {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: .3rem;
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    color: var(--ink-3);
+    padding: .2rem 0;
+  }
+
+  .bar { position: relative; background: var(--rule); }
+
+  .bar::after { content: ""; position: absolute; }
+
+  @media (max-width: 53.99rem) {
+    .bar { width: 1px; height: 1.5rem; }
+    .bar::after {
+      bottom: -1px; left: 50%; transform: translateX(-50%);
+      border-top: 6px solid var(--rule);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+  }
+
+  @media (min-width: 54rem) {
+    .bar { width: 2.6rem; height: 1px; }
+    .bar::after {
+      right: -1px; top: 50%; transform: translateY(-50%);
+      border-left: 6px solid var(--rule);
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+  }
+
+  .flow-back { display: grid; gap: .5rem; }
+
+  .back-line {
+    height: 1.35rem;
+    border: 1px dashed var(--accent);
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+    position: relative;
+    margin: 0 1.5rem;
+  }
+
+  .back-line::after {
+    content: "";
+    position: absolute;
+    left: -4.5px;
+    top: -7px;
+    border-bottom: 7px solid var(--accent);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+
+  .back-label {
+    font-size: .89rem;
+    color: var(--ink-2);
+    text-align: center;
+    max-width: none;
+  }
+
+  .back-label b { color: var(--accent); font-family: var(--f-mono); font-size: .85rem; font-weight: 500; }
+
+  @media (max-width: 53.99rem) {
+    .back-line { display: none; }
+    .back-label {
+      text-align: left;
+      border: 1px dashed var(--accent);
+      border-radius: 9px;
+      padding: .7rem .9rem;
+      font-size: .88rem;
+    }
+  }
+
+  .faq { display: grid; }
+  .qa { border-top: 1px solid var(--rule-soft); padding: var(--s3) 0; display: grid; gap: .35rem; }
+  .qa:last-child { border-bottom: 1px solid var(--rule-soft); }
+  .qa h3 { font-size: 1rem; font-weight: 700; }
+  .qa p { font-size: .96rem; color: var(--ink-2); }
+
+  .foot { margin-top: var(--s6); padding-top: var(--s3); border-top: 1px solid var(--rule); display: grid; gap: var(--s3); }
+  .links { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; font-size: .86rem; }
+  .foot p { font-size: .86rem; color: var(--ink-3); max-width: 42rem; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn, a, .tocbar a { transition: color .16s cubic-bezier(.22,1,.36,1), border-color .16s cubic-bezier(.22,1,.36,1); }
+  }
+
+  /* ---------- narrow screens: nothing may hide off the right edge ---------- */
+
+  @media (max-width: 46rem) {
+    /* tables become stacked records; a third column must never scroll out of sight */
+    .tablewrap { border: 0; border-radius: 0; overflow: visible; }
+    table { min-width: 0; background: transparent; }
+    thead { display: none; }
+    tbody, tr, td { display: block; }
+
+    tr {
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      background: var(--surface);
+      padding: .1rem .9rem;
+      margin-bottom: .6rem;
+    }
+
+    td { border: 0; padding: .6rem 0; }
+    td + td { border-top: 1px solid var(--rule-soft); }
+    td.k { white-space: normal; }
+
+    td::before {
+      content: attr(data-label);
+      display: block;
+      font-size: .74rem;
+      color: var(--ink-3);
+      margin-bottom: .15rem;
+      font-family: var(--f-sans);
+    }
+
+    /* commands wrap instead of scrolling */
+    .cmd pre { white-space: pre-wrap; word-break: break-all; }
+
+    /* tree annotations would sit past the right edge */
+    pre.tree .dim { display: none; }
+
+    /* stacked columns need a visible seam */
+    .split .col + .col { border-top: 1px solid var(--rule); padding-top: var(--s3); }
+  }
+
+  /* the section nav scrolls sideways: show that it does */
+  .tocwrap { position: sticky; top: 0; z-index: 10; }
+  .tocwrap::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3rem;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--paper));
+  }
+
+  @media (min-width: 46rem) { .tocwrap::after { display: none; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-in">
+    <div class="kicker">
+      <span>Obsidian Agent Skill</span>
+      <span>v0.1.0</span>
+      <span>Moonweave</span>
+    </div>
+
+    <h1>페이지까지 남는 논문 정리</h1>
+
+    <p class="hero-lede">
+      PDF를 넘기고 정리해 달라고 하면 끝이에요. 에이전트가 본문을 읽고, 방법과 결과와 한계를
+      갈라서 노트로 만들고, <strong>값마다 몇 페이지 몇 번 그림에서 나왔는지까지</strong>
+      붙여 둡니다. Obsidian Vault 안에 그대로 쌓여요.
+    </p>
+
+    <div class="hero-grid">
+      <div class="paste">
+        <span class="paste-label">에이전트에 붙여넣으면 설치 끝</span>
+        <div class="paste-text">https://github.com/moonweave/obsidian-reference-wiki를 내려받아서<br>이 에이전트가 읽는 개인 스킬 폴더에<br>obsidian-research-wiki-reference 라는 이름으로 설치해줘</div>
+        <div class="paste-foot">
+          <button class="btn" data-copy="https://github.com/moonweave/obsidian-reference-wiki를 내려받아서 이 에이전트가 읽는 개인 스킬 폴더에 obsidian-research-wiki-reference 라는 이름으로 설치해줘">복사</button>
+        </div>
+      </div>
+
+      <dl class="hero-facts">
+        <div><dt>필요한 것</dt><dd>Obsidian, 그리고 스킬을 읽는 에이전트 (Claude Code, Codex 등)</dd></div>
+        <div><dt>설치</dt><dd>앱 두 개 받고 문장 하나 붙여넣기. 내려받는 시간 빼면 몇 분이면 끝나요</dd></div>
+        <div><dt>라이선스</dt><dd>비상업 이용 무료 (PolyForm Noncommercial)</dd></div>
+      </dl>
+    </div>
+  </div>
+</header>
+
+<div class="tocwrap">
+<nav class="tocbar" aria-label="목차">
+  <div class="tocbar-in">
+    <a href="#why">할 수 있는 일</a>
+    <a href="#install">설치</a>
+    <a href="#onboard">첫 대화</a>
+    <a href="#structure">정리 구조</a>
+    <a href="#safety">안 하는 일</a>
+    <a href="#check">점검</a>
+    <a href="#faq">FAQ</a>
+  </div>
+</nav>
+</div>
+
+<div class="shell">
+  <main>
+
+    <section class="sec" id="why">
+      <div class="sec-title"><span class="no">01</span><h2>이걸 깔면 뭘 할 수 있나</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          읽을 논문을 넘겨주면 에이전트가 알아서 읽고 갈래를 잡아 정리해요.
+          <em class="hl">분류도, 노트 사이를 잇는 링크도 사람이 손대지 않습니다.</em>
+          쌓이고 나면 이렇게 부려먹을 수 있어요.
+        </p>
+
+        <dl class="does">
+          <div>
+            <dt>“이 PDF 읽고 정리해줘”</dt>
+            <dd>본문을 텍스트로 뽑아 페이지 표시를 붙이고, 방법과 측정 조건, 결과, 한계가 각각 자리를 잡은 노트 한 장을 만들어요.</dd>
+          </div>
+          <div>
+            <dt>“이 수치 어디서 나온 거야?”</dt>
+            <dd>노트에 페이지와 그림 번호가 박혀 있어서 바로 되짚어 줘요. PDF를 처음부터 다시 훑을 일이 없습니다.</dd>
+          </div>
+          <div>
+            <dt>“이 주장 나오는 논문들 묶어줘”</dt>
+            <dd>여러 논문에 반복해서 나오는 주장, 방법, 이론을 따로 노트로 떼어내고 원 논문마다 링크를 겁니다.</dd>
+          </div>
+          <div>
+            <dt>“서론 쓸 건데 근거 모아줘”</dt>
+            <dd>주제별로 묶인 노트와 원문 위치를 같이 꺼내 줘요. 인용할 값의 출처가 페이지 단위로 붙어 나옵니다.</dd>
+          </div>
+          <div>
+            <dt>“정리 상태 점검해줘”</dt>
+            <dd>끊긴 링크, 근거 없이 적힌 값, 아직 안 읽은 자료를 훑어서 알려줘요. Vault를 고치지는 않습니다.</dd>
+          </div>
+        </dl>
+
+        <h3 class="sub">논문 한 편이 들어가서 나오기까지</h3>
+        <div class="flow">
+          <div class="flow-row">
+            <div class="node">
+              <span class="node-tag">VAULT 밖 · 그대로 둠</span>
+              <strong>내 논문 자료</strong>
+              <p>PDF, Zotero 항목, 웹페이지</p>
+            </div>
+
+            <div class="link">
+              <span class="bar"></span>
+              <span>넘겨주기</span>
+            </div>
+
+            <div class="node node-agent">
+              <span class="node-tag">에이전트가 하는 일</span>
+              <strong>읽고, 갈래를 잡고, 잇기</strong>
+              <p>본문 추출 → 방법·결과·한계로 가르기 → 값마다 페이지·그림 번호 붙이기 → 관련 노트끼리 링크</p>
+            </div>
+
+            <div class="link">
+              <span class="bar"></span>
+              <span>저장</span>
+            </div>
+
+            <div class="node">
+              <span class="node-tag">VAULT 안 · 쌓임</span>
+              <strong>노트로 남음</strong>
+              <p>Paper 노트, 검색용 본문 파일, 여러 논문에 걸친 지식 노트</p>
+            </div>
+          </div>
+
+          <div class="flow-back">
+            <div class="back-line"></div>
+            <p class="back-label">
+              나중에 “이 값 어디서 나왔어?”라고 물으면 <b>p.5 Fig.4</b>로 원문 그 자리를 짚어 줘요
+            </p>
+          </div>
+        </div>
+        <p class="figcap">
+          원본 PDF는 처음 있던 자리에서 움직이지 않아요. Vault에는 읽은 결과만 쌓입니다.
+        </p>
+
+        <div class="split">
+          <div class="col">
+            <h4>이런 경우에 맞아요</h4>
+            <ul>
+              <li>Zotero에 PDF는 쌓였는데 읽은 내용이 흩어져 있을 때</li>
+              <li>리뷰 논문이나 학위논문 서론을 쓰려고 근거를 모을 때</li>
+              <li>인용할 값의 출처를 페이지 단위로 되짚어야 할 때</li>
+              <li>여러 논문에 걸친 주장, 방법, 이론을 비교하고 싶을 때</li>
+            </ul>
+          </div>
+          <div class="col">
+            <h4>이건 범위 밖이에요</h4>
+            <ul>
+              <li>실험 기록, 관측 로그, 랩노트 정리</li>
+              <li>읽을 논문을 대신 검색하고 내려받기</li>
+              <li>Zotero 라이브러리 자체의 관리와 동기화</li>
+              <li>인용 스타일 서식(APA, IEEE) 맞추기</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="install">
+      <div class="sec-title"><span class="no">02</span><h2>설치, 터미널 없이도 됩니다</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          이 스킬은 Obsidian 폴더 안에 노트를 직접 만들어야 해요. 그래서 조건이 두 개예요.
+          <em class="hl">내 컴퓨터 폴더를 열 수 있을 것</em>, 그리고
+          <em class="hl">Agent Skills를 읽을 것</em>. Claude Code와 Codex가 대표적이고,
+          같은 조건만 맞으면 다른 에이전트여도 괜찮아요.
+        </p>
+        <p class="figcap">
+          중간에 잘못 눌러도 큰일 나지 않아요. 스킬은 폴더 하나를 넣고 빼는 게 전부고,
+          노트를 만들기 전에 무엇을 만들지 먼저 보여주고 물어봅니다.
+        </p>
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-in">
+              <h3 class="sub">1. Obsidian을 설치하고 Vault를 만들어요</h3>
+              <p>
+                <a href="https://obsidian.md/download">obsidian.md/download</a>에서 받아 설치하고,
+                <code>Create new vault</code>로 Vault를 하나 만들어 주세요. Vault는 노트를 담는
+                폴더예요. PDF를 복사해 두는 곳이 아니라서
+                <strong>Zotero 저장소 안에는 만들지 마세요.</strong>
+                이미 쓰는 Vault가 있으면 그대로 쓰면 됩니다.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-in">
+              <h3 class="sub">2. 에이전트를 열고 Vault 폴더를 지정해요</h3>
+              <div class="split">
+                <div class="col">
+                  <h4>Claude Code</h4>
+                  <ul>
+                    <li><a href="https://claude.com/download">claude.com/download</a>에서 macOS나 Windows 설치 파일을 받아 실행해요. 터미널을 안 써도 됩니다.</li>
+                    <li>로그인한 다음 <strong>Code 탭</strong>에서 작업 폴더로 방금 만든 Vault를 고르면 끝이에요.</li>
+                    <li>터미널이 편하면 Vault 폴더에서 <code>claude</code>를 실행해도 똑같아요.</li>
+                  </ul>
+                </div>
+                <div class="col">
+                  <h4>Codex</h4>
+                  <ul>
+                    <li>터미널에서 <code>npm i -g @openai/codex</code>로 설치해요. Node가 필요합니다.</li>
+                    <li>Vault 폴더로 이동한 다음 <code>codex</code>를 실행하면 그 폴더가 작업 공간이 돼요.</li>
+                    <li>설치된 스킬 목록은 <code>/skills</code>로 확인해요.</li>
+                  </ul>
+                </div>
+              </div>
+              <p class="figcap">
+                어느 쪽이든 에이전트는 Vault 폴더 안에서만 움직여요. 웹이나 클라우드 세션은
+                내 폴더를 못 보니 여기서는 쓸 수 없어요.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-in">
+              <h3 class="sub">3. 스킬을 넣어요</h3>
+              <p>셋 중 편한 걸 고르면 됩니다. 위에서부터 쉬운 순서예요.</p>
+
+              <h4 class="method">방법 A · 에이전트에게 부탁하기</h4>
+              <div class="panel plain">
+                <div class="panel-text">https://github.com/moonweave/obsidian-reference-wiki를 내려받아서<br>이 에이전트가 읽는 개인 스킬 폴더에<br>obsidian-research-wiki-reference 라는 이름으로 설치해줘</div>
+                <div class="panel-foot">
+                  <button class="btn" data-copy="https://github.com/moonweave/obsidian-reference-wiki를 내려받아서 이 에이전트가 읽는 개인 스킬 폴더에 obsidian-research-wiki-reference 라는 이름으로 설치해줘">복사</button>
+                </div>
+              </div>
+              <p>
+                Claude Code든 Codex든 자기 스킬 폴더를 알고 있어서, 이 문장이면 알아서 내려받아
+                넣어줘요. 도중에 “이 명령을 실행할까요?” 하고 물으면 허용해 주세요. 경로를 직접
+                박아 주고 싶으면 아래 표를 참고하세요.
+              </p>
+
+              <div class="tablewrap">
+                <table>
+                  <thead><tr><th>에이전트</th><th>개인 스킬 폴더</th><th>불러올 때</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td data-label="에이전트"><strong>Claude Code</strong></td>
+                      <td class="k" data-label="개인 스킬 폴더">~/.claude/skills/</td>
+                      <td class="k" data-label="불러올 때">/스킬이름</td>
+                    </tr>
+                    <tr>
+                      <td data-label="에이전트"><strong>Codex</strong></td>
+                      <td class="k" data-label="개인 스킬 폴더">~/.agents/skills/</td>
+                      <td class="k" data-label="불러올 때">$스킬이름</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="figcap">
+                둘 다 이름만 대고 부탁해도 스킬이 알아서 걸립니다. 위 표기는 직접 지목할 때 쓰는
+                방식이에요. 프로젝트 단위로만 쓰려면 Vault 안의 <code>.claude/skills/</code>나
+                <code>.agents/skills/</code>에 넣어도 됩니다.
+              </p>
+
+              <h4 class="method">방법 B · 설치 프로그램에 맡기기</h4>
+              <div class="cmd">
+                <pre><span class="p">$ </span>npx skills add moonweave/obsidian-reference-wiki</pre>
+                <button class="btn" data-copy="npx skills add moonweave/obsidian-reference-wiki">복사</button>
+              </div>
+              <p>
+                Node가 깔린 터미널에서 한 줄이면 돼요. 설치 프로그램이 컴퓨터에 있는 호환
+                에이전트를 찾아서 어디에 넣을지 물어보기 때문에, 여러 에이전트를 같이 쓴다면
+                이 방법이 제일 정확합니다. 내용만 먼저 보고 싶으면 뒤에 <code>--list</code>를 붙이세요.
+              </p>
+
+              <h4 class="method">방법 C · 폴더를 직접 옮기기</h4>
+              <ol class="howto">
+                <li><a href="https://github.com/moonweave/obsidian-reference-wiki">GitHub 저장소</a>에서 초록색 <code>Code</code> 버튼을 누르고 <code>Download ZIP</code>을 골라요.</li>
+                <li>압축을 풀면 <code>obsidian-reference-wiki-main</code> 폴더가 나와요. 이름을 <code>obsidian-research-wiki-reference</code>로 바꿔 주세요.</li>
+                <li>Finder에서 <code>Cmd + Shift + G</code>를 누르고 위 표의 스킬 폴더 경로를 입력해 이동해요. 윈도우는 탐색기 주소 표시줄에 <code>%USERPROFILE%\.claude\skills</code>처럼 넣으면 됩니다.</li>
+                <li>그 폴더가 없으면 <code>skills</code> 폴더를 새로 만들고, 이름을 바꾼 폴더를 통째로 넣어요.</li>
+                <li>폴더를 이번에 처음 만들었다면 에이전트를 껐다 켜 주세요.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-in">
+              <h3 class="sub">4. 새 대화를 열고 스킬을 불러요</h3>
+              <div class="panel">
+                <span class="panel-label">첫 문장 예시</span>
+                <div class="panel-text">obsidian-research-wiki-reference로 문헌 Vault를 설계해줘</div>
+                <div class="panel-foot">
+                  <button class="btn" data-copy="obsidian-research-wiki-reference로 문헌 Vault를 설계해줘">복사</button>
+                </div>
+              </div>
+              <p>
+                저장소 주소는 <code>obsidian-reference-wiki</code>인데 부를 때 쓰는 이름은
+                <code>obsidian-research-wiki-reference</code>예요. 헷갈리기 쉬운 지점이라 적어둡니다.
+                설치 직후에는 대화를 새로 시작해야 스킬이 잡혀요.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <p>
+          첫 응답으로 파일이 아니라 <strong>질문</strong>이 돌아오면 제대로 설치된 거예요.
+          정리 깊이를 고르는 세 가지 선택지부터 먼저 나옵니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec" id="onboard">
+      <div class="sec-title"><span class="no">03</span><h2>첫 대화는 설계 회의처럼 흘러가요</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          온보딩은 두 단계로 나뉘어요. 앞 단계에서 무엇을 만들지 정하고, 뒤 단계에서 어디에
+          어디까지 만들지 확정합니다. 설계 단계는 읽기 전용이라 이 대화 중에는 파일이 하나도
+          생기지 않아요.
+        </p>
+
+        <h3 class="sub">1단계. 정리 깊이 고르기</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>프리셋</th><th>어디까지 만드나</th><th>이럴 때</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="k" data-label="프리셋">notes-only</td>
+                <td data-label="어디까지 만드나">검토한 Paper / Source 노트만</td>
+                <td data-label="이럴 때">읽기에 집중, 본문 파일은 안 만듦</td>
+              </tr>
+              <tr>
+                <td class="k" data-label="프리셋"><b>searchable-library</b></td>
+                <td data-label="어디까지 만드나">노트에 더해 검색 가능한 본문 파일까지</td>
+                <td data-label="이럴 때">대부분 여기서 시작 (권장)</td>
+              </tr>
+              <tr>
+                <td class="k" data-label="프리셋">knowledge-network</td>
+                <td data-label="어디까지 만드나">위에 더해 따로 떼어낸 지식 노트까지</td>
+                <td data-label="이럴 때">논문 사이를 엮어 종합할 때</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          셋은 다른 체계가 아니라 같은 체계의 깊이 차이예요. 나중에 올려도 되니 처음부터
+          제일 깊은 걸 고를 필요는 없습니다.
+        </p>
+
+        <h3 class="sub">2단계. 어디에 두면 안전한지 확인하기</h3>
+        <p>
+          그다음 질문은 취향이 아니라 설계를 가르는 조건이에요. Vault를 혼자 쓰는지 공유하는지,
+          어디까지 동기화되는지, PDF와 Zotero는 지금 어디에 있는지를 확인합니다. 공유하거나
+          공개되는 Vault, 노출 범위가 불확실한 Vault라면 본문 파일을 Vault 밖(<code>external</code>)에
+          두라고 권해요. 저작권 문제도 있고, 실수로 공개될 위험도 있어서예요.
+        </p>
+        <ul class="dash">
+          <li>새 Vault인지 기존 Vault인지, 그리고 <strong>정확한 경로</strong></li>
+          <li>첫 적용 범위 (기본은 논문 1~3편짜리 시험 적용)</li>
+          <li>손대면 안 되는 폴더, 파일, 설정 목록</li>
+        </ul>
+
+        <h3 class="sub">3단계. 설계안을 승인하면 그때 적용</h3>
+        <p>
+          여기까지 정리되면 Blueprint가 나와요. 만들 폴더와 템플릿, 노트마다 무슨 뜻인지,
+          원문 파일의 경계선, 첫 연결 경로가 적혀 있습니다. 바꿀 항목과 안 건드릴 항목도
+          따로 나와 있고요. 경로와 설계안을 승인하면 그때 파일이 만들어져요. 이미 있는 Vault를
+          통째로 옮기는 일은 없고, 승인한 범위만 적용합니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec" id="structure">
+      <div class="sec-title"><span class="no">04</span><h2>자료를 어떻게 나눠 두는가</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          핵심은 한 논문이 네 개의 서로 다른 물건으로 존재한다는 점이에요. 이걸 섞지 않는 게
+          이 스킬의 전부라고 해도 됩니다.
+        </p>
+
+        <div class="layers">
+          <div class="layer">
+            <span class="layer-n">01</span>
+            <div class="layer-top">
+              <strong>원문 파일</strong>
+              <span class="where where-out">Vault 밖</span>
+            </div>
+            <p>PDF, 웹페이지, Zotero 항목. 무엇이 맞는지 판단할 때 기준이 되는 원본이고, Vault로 복사하지 않아요.</p>
+          </div>
+          <div class="layer">
+            <span class="layer-n">02</span>
+            <div class="layer-top">
+              <strong>본문 텍스트 파일</strong>
+              <span class="where">선택 · 위치는 따로 결정</span>
+            </div>
+            <p>
+              논문 본문을 통째로 뽑아 텍스트로 저장한 파일이에요. 검색하고 다시 찾아볼 때 씁니다.
+              텍스트로 뽑는 과정에서 수식이 깨지거나 2단 편집의 읽기 순서가 뒤섞일 수 있어서
+              원본 취급은 안 해요.
+            </p>
+          </div>
+          <div class="layer">
+            <span class="layer-n">03</span>
+            <div class="layer-top">
+              <strong>Paper 또는 Source 노트</strong>
+              <span class="where">Vault 안 · 기본 기록</span>
+            </div>
+            <p>그 논문에서 실제로 검토한 방법, 측정 조건, 모델 가정, 결과, 한계를 적는 곳. 논문 한 편당 하나예요.</p>
+          </div>
+          <div class="layer">
+            <span class="layer-n">04</span>
+            <div class="layer-top">
+              <strong>따로 떼어낸 지식 노트</strong>
+              <span class="where">Vault 안 · 선택적</span>
+            </div>
+            <p>여러 논문에 걸쳐 다시 쓰는 Claim, Method, Theory, Evidence, Limitation, Theme, Question.</p>
+          </div>
+        </div>
+
+        <h3 class="sub">노트 한 장은 이렇게 생겼어요</h3>
+        <div class="note-mock">
+          <div class="note-bar"><span class="dot"></span>Paper — Ionic actuator fatigue.md</div>
+          <div class="note-body">
+            <div class="note-fm">
+              type: <b>reference-record</b><br>
+              review_status: <b>reviewed</b><br>
+              text_basis: <b>native-text</b><br>
+              source_location: <b>~/Zotero/storage/… .pdf</b>
+            </div>
+            <div>
+              <div class="note-h">## 방법</div>
+              <ul>
+                <li>3점 굽힘 반복 시험, 1 Hz, 상대습도 50 % <span class="anchor">p.3 §2.2</span></li>
+              </ul>
+            </div>
+            <div>
+              <div class="note-h">## 결과</div>
+              <ul>
+                <li>1만 사이클 후 변위 24 % 감소 <span class="anchor">p.5 Fig.4</span> <span class="lbl">reported</span></li>
+                <li>피로 수명 예측 2.3 × 10⁴ 사이클 <span class="anchor">p.6 Eq.7</span> <span class="lbl">modelled</span></li>
+              </ul>
+            </div>
+            <div>
+              <div class="note-h">## 한계</div>
+              <ul>
+                <li>단일 조성만 시험, 온도 의존성 <code>not supplied</code></li>
+              </ul>
+            </div>
+            <div class="wl">[[Claim — 이온성 액추에이터는 반복 구동에서 변위가 준다]]</div>
+          </div>
+        </div>
+        <p class="figcap">
+          값마다 페이지와 그림 번호가 붙고, 그 값이 보고된 건지 모델에서 나온 건지 라벨이 따라붙어요.
+          맨 아래 링크는 여러 논문에서 다시 쓸 주장으로 이어집니다.
+        </p>
+
+        <h3 class="sub">만들어지는 폴더</h3>
+        <pre class="tree">Vault/
+├── <span class="hot">Reference Index</span>            <span class="dim">여기서 다 뻗어나가요</span>
+├── <span class="hot">Reference Profile</span>          <span class="dim">승인한 설정을 파일로 남김</span>
+├── 05 Source Text/         <span class="dim">본문 파일 (vault-local일 때만)</span>
+├── 10 Sources/             <span class="dim">Paper — …  /  Source — …</span>
+├── 20 Claims/
+├── 30 Evidence &amp; Methods/
+├── 35 Theories/
+├── 40 Limitations/
+├── 50 Themes/
+├── 60 Questions/
+├── 90 Reading Queue/
+└── _templates/</pre>
+        <p>
+          승인한 설정은 대화 기록이 아니라 <code>Reference Profile</code> 노트에 남아요.
+          그래서 세션이 바뀌어도 같은 규칙으로 이어집니다.
+        </p>
+
+        <h3 class="sub">이름 규칙</h3>
+        <ul class="dash">
+          <li>학술 논문은 <code>Paper — 짧은 제목</code></li>
+          <li>보고서, 웹페이지, 표준, 데이터셋은 <code>Source — 이름</code></li>
+          <li>이름이 겹치면 연도를 붙이고, 그래도 겹치면 제1저자를 붙여요</li>
+          <li>이미 있는 파일명과 링크는 그대로 두고, 온보딩이 마음대로 이름을 바꾸지 않습니다</li>
+        </ul>
+
+        <h3 class="sub">노트를 쪼개는 기준</h3>
+        <p>
+          문단마다 노트를 만들면 그래프만 화려해지고 다시 못 읽어요. 그래서 기본은 논문 한 편에
+          노트 하나고, 아래 조건에 걸릴 때만 따로 떼어냅니다. 이걸 스킬에서는 승격이라고 불러요.
+        </p>
+        <ul class="dash">
+          <li>여러 자료에서 반복해서 인용하게 될 때</li>
+          <li>지금 붙잡고 있는 질문에 직접 답할 때</li>
+          <li>따로 고쳐 나가야 할 때</li>
+          <li>출처가 원 논문과 달라질 때</li>
+        </ul>
+        <p>
+          떼어낸 노트는 원 논문 노트의 복사본이 아니라, 돌아갈 링크가 달린 짧은 색인이에요.
+          사용자가 주지 않은 관계는 <code>not provided</code>로 남기고 연결을 지어내지 않습니다.
+        </p>
+
+        <h3 class="sub">읽은 내용을 적는 방식</h3>
+        <p>
+          논문은 한 번에 훑지 않고 순서대로 읽어요. 전체 지도, 방법과 측정과 대조군, 결과와
+          그림과 표, 그리고 결론과 한계 순입니다. 각 항목에는 페이지와 그림 번호, 단위, 조건을
+          같이 남기고, 그 값이 어떤 성격인지 라벨을 붙여요.
+        </p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>라벨</th><th>뜻</th></tr></thead>
+            <tbody>
+              <tr><td class="k" data-label="라벨">reported</td><td data-label="뜻">논문이 직접 보고한 값</td></tr>
+              <tr><td class="k" data-label="라벨">modelled</td><td data-label="뜻">모델에서 나온 값</td></tr>
+              <tr><td class="k" data-label="라벨">calculated</td><td data-label="뜻">계산으로 유도한 값</td></tr>
+              <tr><td class="k" data-label="라벨">author interpretation</td><td data-label="뜻">저자의 해석</td></tr>
+              <tr><td class="k" data-label="라벨">synthesis</td><td data-label="뜻">여러 근거를 묶은 정리</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          어디서 읽은 텍스트인지도 <code>native-text</code>, <code>OCR</code>, <code>mixed</code>,
+          <code>supplied-excerpt</code> 중 하나로 기록해요. OCR로 읽은 값과 원문에서 직접 확인한
+          값을 나중에 구분할 수 있어야 하니까요.
+        </p>
+
+        <h3 class="sub">PDF 본문 추출은 선택</h3>
+        <p>
+          사용자가 명시적으로 승인한 PDF만 추출해요. 원본은 밖에 그대로 두고, 페이지 표시가
+          붙은 본문 파일과 <code>Source Text Manifest</code>를 만듭니다. 이 파일에는 원본과 추출본의
+          해시, 추출기와 옵션, 페이지 수가 기록돼요. 나중에 해시가 달라지면 그 노트는 재검토
+          대상으로 표시됩니다.
+        </p>
+        <ul class="dash">
+          <li>텍스트 층이 멀쩡한 PDF는 <code>pdftotext</code> 경로 (macOS는 <code>brew install poppler</code>)</li>
+          <li>다단 편집이나 수식이 복잡한 논문은 Docling. 로컬에서 돌고 원격 전송은 꺼져 있어요</li>
+          <li>수식 복원은 비용이 커서 기본은 꺼짐. 필요한 페이지만 골라 켜는 게 낫습니다</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sec" id="safety">
+      <div class="sec-title"><span class="no">05</span><h2>이 스킬이 하지 않는 일</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          Vault는 몇 년 치 기록이 쌓이는 곳이라, 할 수 있는 일보다 안 하는 일이 더 중요해요.
+        </p>
+        <ul class="no">
+          <li>Obsidian 플러그인 설치나 <code>.obsidian</code> 설정 변경</li>
+          <li>PDF, Zotero 라이브러리, 연구 원자료, 코드 복사</li>
+          <li>기존 노트를 한꺼번에 옮기거나 이름 바꾸기 (별도 승인 없이는 제자리에 둡니다)</li>
+          <li>실험이나 관측 기록용 구조 만들기</li>
+          <li>파일명만 보고 논문 내용 추측하기</li>
+          <li>경로와 설계안을 승인하기 전에 파일 만들기</li>
+        </ul>
+        <p>
+          이미 쓰던 Vault라면 기존 파일을 <strong>제자리에 두기</strong>,
+          <strong>새 노트에서 링크만 걸기</strong>, <strong>나중에 따로 승인받고 옮기기</strong>
+          셋 중 하나로만 분류해요. 첫 연결을 승인했다고 해서 대규모 이동이 따라붙는 일은 없습니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec" id="check">
+      <div class="sec-title"><span class="no">06</span><h2>제대로 만들어졌는지 확인하기</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          마무리하기 전에 읽기 전용 검사를 한 번 돌려요. 링크가 다 이어지는지, 템플릿 자리표시자가
+          남아 있지 않은지, 승인한 자료 수와 맞는지를 봅니다. Vault를 고치지는 않아요.
+          직접 터미널에 칠 필요는 없고, <strong>“노트 검사 돌려줘”</strong>라고 하면 에이전트가 이 명령을 실행합니다.
+        </p>
+        <div class="cmd">
+          <pre><span class="p">$ </span>REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py &lt;vault 경로&gt; \
+    --expect-sources &lt;승인한 자료 수&gt; --expect-profile</pre>
+          <button class="btn" data-copy="REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <vault 경로> --expect-sources <승인한 자료 수> --expect-profile">복사</button>
+        </div>
+        <p>본문 파일을 만들었다면 해시와 페이지 맵도 따로 확인해요.</p>
+        <div class="cmd">
+          <pre><span class="p">$ </span>python scripts/check_source_text.py &lt;manifest.md&gt; --vault-root &lt;vault 경로&gt;</pre>
+          <button class="btn" data-copy="python scripts/check_source_text.py <manifest.md> --vault-root <vault 경로>">복사</button>
+        </div>
+        <p>
+          이 검사는 구조와 출처 추적의 구멍을 잡아줄 뿐, 원문을 대신 읽어주거나 과학적 주장이
+          맞는지 판단해 주지는 않아요. 그건 여전히 사람 몫입니다.
+        </p>
+
+        <h3 class="sub">자주 막히는 지점</h3>
+        <ul class="dash">
+          <li>스킬을 못 찾는다면 설치 후 대화를 새로 시작했는지 확인해 주세요.</li>
+          <li>그래프에 <code>{claim_name}</code> 같은 노드가 보이면 템플릿이에요. Obsidian 그래프 필터에서 <code class="nw">-path:_templates</code>로 빼면 됩니다.</li>
+          <li><code>--expect-sources</code> 없이 돌린 검사는 확인용일 뿐이라 마무리 근거로는 못 써요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sec" id="faq">
+      <div class="sec-title"><span class="no">07</span><h2>먼저 궁금할 만한 것</h2></div>
+      <div class="sec-body">
+        <div class="faq">
+          <div class="qa">
+            <h3>무료인가요?</h3>
+            <p>
+              개인 연구, 학습, 실험, 교육기관과 공공 연구기관은 무료예요.
+              상업적으로 쓰려면 Moonweave의 별도 라이선스가 필요합니다.
+              (PolyForm Noncommercial 1.0.0. 소스는 공개돼 있지만 OSI 승인 오픈소스는 아니에요.)
+            </p>
+          </div>
+          <div class="qa">
+            <h3>제 논문 파일이 어디로 올라가나요?</h3>
+            <p>
+              스킬이 파일을 어디로 보내지는 않아요. 원문 PDF는 원래 있던 자리에 그대로 있고,
+              노트만 내 컴퓨터의 Vault 폴더에 생깁니다. 다만 에이전트가 논문을 읽으려면
+              그 내용이 에이전트 서비스로 전달돼요. 아직 공개 전인 원고나 비밀 유지가 걸린
+              자료라면 그 점을 감안해 주세요.
+            </p>
+          </div>
+          <div class="qa">
+            <h3>이미 노트가 쌓인 Vault에 써도 되나요?</h3>
+            <p>돼요. 기존 노트는 기본적으로 제자리에 두고 새 노트에서 연결해요. 옮기는 건 따로 승인할 때만이에요.</p>
+          </div>
+          <div class="qa">
+            <h3>PDF를 한꺼번에 여러 편 줘도 되나요?</h3>
+            <p>
+              돼요. 다만 처음에는 한두 편으로 시험 적용을 해보고 결과를 본 다음 늘리는 걸 권합니다.
+              노트가 어떻게 생기는지 보고 규칙을 손볼 수 있거든요. 아직 안 읽은 자료는
+              <code>not reviewed</code>로 잡아두니 목록만 먼저 던져놔도 됩니다.
+            </p>
+          </div>
+          <div class="qa">
+            <h3>Codex에서도 똑같이 되나요?</h3>
+            <p>
+              됩니다. 공개된 Agent Skills 사양을 따르는 패키지라 SKILL.md 형식이 그대로 통해요.
+              다른 건 스킬 폴더 위치(<code>~/.agents/skills/</code>)와 직접 지목할 때 쓰는
+              <code>$스킬이름</code> 표기 정도예요. 대화 내용과 안전 규칙은 동일합니다.
+            </p>
+          </div>
+          <div class="qa">
+            <h3>웹이나 클라우드 세션에서 써도 되나요?</h3>
+            <p>
+              설계 대화는 되지만 내 컴퓨터의 Vault에는 파일을 못 만들어요. 웹 Claude나 Cowork,
+              Codex 클라우드 작업은 내 폴더를 직접 못 보거든요. Vault 폴더를 열어 둔 로컬
+              세션에서 쓰는 게 맞습니다.
+            </p>
+          </div>
+          <div class="qa">
+            <h3>Python이나 개발 도구를 따로 깔아야 하나요?</h3>
+            <p>
+              노트만 쓸 거면 필요 없어요. 검사와 PDF 본문 추출에만 Python을 쓰는데, 그것도
+              에이전트에게 시키면 알아서 실행합니다.
+            </p>
+          </div>
+          <div class="qa">
+            <h3>연구실 사람들과 같이 쓰는 Vault예요.</h3>
+            <p>
+              그럼 온보딩에서 공유와 동기화 상태를 그대로 말해 주세요. 본문 파일을 Vault 밖에
+              두는 쪽으로 설계가 바뀝니다. 저작권과 의도치 않은 공개를 피하려는 거예요.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <div class="links">
+      <a href="https://github.com/moonweave/obsidian-reference-wiki">GitHub 저장소</a>
+      <a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/README.ko.md">한국어 설명</a>
+      <a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/docs/INSTALLATION.md">설치 가이드</a>
+      <a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/docs/ONBOARDING.md">온보딩 문서</a>
+      <a href="https://obsidian.md/download">Obsidian 다운로드</a>
+      <a href="https://claude.com/download">Claude 앱 다운로드</a>
+      <a href="https://learn.chatgpt.com/docs/build-skills">Codex 스킬 문서</a>
+    </div>
+    <p>
+      Obsidian Research Wiki: Reference · v0.1.0 · Moonweave.
+      이 페이지의 명령과 규칙은 저장소 문서를 기준으로 정리했어요. 버전이 올라가면 저장소의
+      변경 이력을 먼저 확인해 주세요.
+    </p>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll(".btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      navigator.clipboard.writeText(btn.dataset.copy).then(function () {
+        var prev = btn.textContent;
+        btn.textContent = "복사됨";
+        btn.dataset.done = "1";
+        setTimeout(function () {
+          btn.textContent = prev;
+          delete btn.dataset.done;
+        }, 1600);
+      });
+    });
+  });
+
+  var links = [].slice.call(document.querySelectorAll(".tocbar a"));
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.removeAttribute("aria-current"); });
+      var a = byId[e.target.id];
+      if (a) a.setAttribute("aria-current", "true");
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+
+  document.querySelectorAll("section.sec").forEach(function (s) { io.observe(s); });
+</script>
+
+</body>
+</html>

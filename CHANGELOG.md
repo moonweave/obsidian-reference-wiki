@@ -5,6 +5,19 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Added an Answer mode: the skill now reads its own notes back, quoting the
+  recorded page anchor and evidence label, refusing unreviewed material as
+  evidence, and never editing the Vault while answering. Contract version 14.
+- Added an entry gate so every request that would create or change a Vault file
+  resolves the Vault and checks for a `Reference Profile` first, whatever the
+  user opened with. Onboarding now runs once per Vault instead of once per
+  conversation, and a question skips the interview.
+- Serialized external local file locations in frontmatter as percent-encoded
+  `file:///` URIs so cloud-storage directory names containing `@` are no longer
+  read as email links, with an explicit `Open canonical source` link in the
+  dossier body. Legacy absolute paths remain readable.
+- Published an install and usage guide page at `docs/guide.html`, covering
+  Claude Code and Codex, and linked it from both READMEs.
 - Reworked the English and Korean README pages around quick installation,
   visible output structure, preset selection, and provenance boundaries.
 - Clarified that the package is a portable Agent Skill and replaced

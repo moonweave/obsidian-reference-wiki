@@ -1,6 +1,6 @@
 ---
 name: obsidian-research-wiki-reference
-description: Design, safely onboard, or extend an Obsidian reference knowledge system for papers, Zotero, citations, claims, evidence, literature methods, background theories, limitations, themes, and literature questions. Use for rigorous literature/reference organization, not research records or combined workspaces.
+description: Design, onboard, or extend an Obsidian reference Vault for papers, Zotero, citations, claims, evidence, and limitations, and answer questions from it with the page anchor each value was recorded with. Not for research records or combined workspaces.
 ---
 
 # Obsidian Research Wiki: Reference
@@ -37,22 +37,38 @@ The profile is the record of what the user agreed to, so onboarding happens
 once per Vault rather than once per conversation. A user who has answered
 already must never be asked a second time.
 
-## Entry gate
+A question is not a mutation. When the user asks what a stored paper said
+rather than asking for structure, skip the interview and answer under
+`Answering from the Vault`.
 
-Every request that would create or change a Vault file passes through this
-gate, whatever the user opened with. A dropped PDF, `이 논문 정리해줘`, a Zotero
-folder, or an explicit onboarding request all arrive at the same check. Do not
-treat a task-shaped opening as permission to skip it.
+## Answering from the Vault
 
-1. Resolve the target Vault, then look for a `Reference Profile` in it.
-2. Profile found: read it, follow it, and do not ask again. State the mode you
-   are applying in one line so the user can correct it, then continue with the
-   request.
-3. No profile: run the first-run interview below before any file is created.
+A Vault that cannot be asked anything is an archive, not a knowledge system.
+The same schema this skill writes is the schema it reads back, so answer from
+the notes rather than from model memory or the web.
 
-The profile is the record of what the user agreed to, so onboarding happens
-once per Vault rather than once per conversation. A user who has answered
-already must never be asked a second time.
+1. Read the notes before answering. If no reviewed note covers the question,
+   say that plainly and stop. Do not fall back to general knowledge while
+   sounding like the Vault said it.
+2. Carry the anchor. Quote the recorded page anchor with the value, in the form
+   the note stores (`PDF p. 1 / printed p. 713, Fig. 1`). A value without its
+   anchor is not an answer this skill gives.
+3. Carry the label unchanged. `reported`, `modelled`, `calculated`, `author
+   interpretation`, and `synthesis` mean different things; never promote one to
+   another, and never present a modelled number as a measurement.
+4. Material marked `not reviewed` or `not supplied` is not evidence. Name it as
+   an unread lead instead of answering from it.
+5. Route cross-paper questions through the promoted Claim, Theory, or Theme
+   notes, then back to each Source dossier. Do not synthesize across papers
+   that the Vault never connected.
+6. Name the notes you answered from so the user can open them. The route is
+   part of the answer.
+7. If a `Source Text Manifest` hash no longer matches its derivative, say the
+   dossier is due for review rather than quoting it as current.
+
+Answering never edits the Vault. When an answer reveals a missing note or a
+stale dossier, propose the change and wait; do not write it as a side effect of
+a question.
 
 ## First-run workflow
 

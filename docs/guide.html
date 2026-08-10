@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Obsidian Reference Wiki 스킬 설치와 사용 가이드. 논문 PDF를 넘기면 에이전트가 읽고 정리하고, 값마다 페이지와 그림 번호를 남깁니다.">
 <meta property="og:title" content="페이지까지 남는 논문 정리">
-<meta property="og:description" content="Obsidian에서 논문을 정리하는 에이전트 스킬. 설치부터 첫 대화, 정리 구조까지.">
+<meta property="og:description" content="Obsidian에서 논문을 정리하는 에이전트 스킬. 설치부터 첫 대화, 정리 구조, 꺼내 쓰기까지.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>📚</text></svg>">
 <style>
@@ -748,6 +748,7 @@
     <a href="#install">설치</a>
     <a href="#onboard">첫 대화</a>
     <a href="#structure">정리 구조</a>
+    <a href="#ask">꺼내 쓰기</a>
     <a href="#safety">안 하는 일</a>
     <a href="#check">점검</a>
     <a href="#faq">FAQ</a>
@@ -1231,8 +1232,42 @@
       </div>
     </section>
 
+    <section class="sec" id="ask">
+      <div class="sec-title"><span class="no">05</span><h2>쌓아둔 걸 꺼내 쓰는 법</h2></div>
+      <div class="sec-body">
+        <p class="lead">
+          노트는 쌓는 게 목적이 아니라 다시 꺼내 쓰는 게 목적이죠. 정리를 마친 뒤에는
+          같은 스킬에게 그냥 물어보면 됩니다. 따로 설치할 게 없어요.
+        </p>
+
+        <div class="note-mock">
+          <div class="note-bar"><span class="dot"></span>이 수치 어디서 나왔어?</div>
+          <div class="note-body">
+            <ul>
+              <li>440 V 직류에서 1 kg 이상 <span class="lbl">reported</span></li>
+            </ul>
+            <div class="anchor">Provenance anchor: PDF p. 1 / printed p. 713, Fig. 1</div>
+            <div class="wl">[[Paper — Electro-adhesion and its applications]]</div>
+          </div>
+        </div>
+        <p class="figcap">
+          값과 함께 어느 페이지 몇 번 그림인지, 보고된 값인지, 어느 노트에서 나왔는지가 같이 옵니다.
+        </p>
+
+        <h3 class="sub">답할 때 지키는 것</h3>
+        <ul class="dash">
+          <li>노트에 없으면 <strong>없다고 말하고 멈춥니다.</strong> 아는 척 일반 지식으로 채우지 않아요</li>
+          <li>값에는 항상 페이지 앵커가 따라붙습니다. 앵커 없는 값은 답으로 내놓지 않아요</li>
+          <li>라벨을 바꾸지 않습니다. <code>modelled</code>를 측정값처럼 말하지 않아요</li>
+          <li>아직 안 읽은 자료(<code>not reviewed</code>)는 근거로 쓰지 않습니다</li>
+          <li>여러 논문에 걸친 질문은 묶어둔 주장 노트를 거쳐 가요. 연결을 지어내지 않습니다</li>
+          <li>답하면서 Vault를 고치지 않습니다. 빠진 노트가 보이면 제안만 하고 기다려요</li>
+        </ul>
+      </div>
+    </section>
+
     <section class="sec" id="safety">
-      <div class="sec-title"><span class="no">05</span><h2>이 스킬이 하지 않는 일</h2></div>
+      <div class="sec-title"><span class="no">06</span><h2>이 스킬이 하지 않는 일</h2></div>
       <div class="sec-body">
         <p class="lead">
           Vault는 몇 년 치 기록이 쌓이는 곳이라, 할 수 있는 일보다 안 하는 일이 더 중요해요.
@@ -1254,7 +1289,7 @@
     </section>
 
     <section class="sec" id="check">
-      <div class="sec-title"><span class="no">06</span><h2>제대로 만들어졌는지 확인하기</h2></div>
+      <div class="sec-title"><span class="no">07</span><h2>제대로 만들어졌는지 확인하기</h2></div>
       <div class="sec-body">
         <p class="lead">
           마무리하기 전에 읽기 전용 검사를 한 번 돌려요. 링크가 다 이어지는지, 템플릿 자리표시자가
@@ -1286,7 +1321,7 @@
     </section>
 
     <section class="sec" id="faq">
-      <div class="sec-title"><span class="no">07</span><h2>먼저 궁금할 만한 것</h2></div>
+      <div class="sec-title"><span class="no">08</span><h2>먼저 궁금할 만한 것</h2></div>
       <div class="sec-body">
         <div class="faq">
           <div class="qa">

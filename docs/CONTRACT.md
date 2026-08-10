@@ -1,17 +1,35 @@
 # Reference contract
 
-`contract_version: 13`
+`contract_version: 14`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
 reading queue. It does not own the user's experiment history, raw data, code,
 or next research decision.
 
-Design mode is read-only and limited to paths the user names. Apply requires
-an exact Vault path and an approved Blueprint. The default mutation set is
-folders, approved templates, and supplied factual notes. `.obsidian`, plugins,
-bulk moves, renames, deletes, and copies of source material remain out of
-scope.
+There are three modes. Design is read-only and limited to paths the user names.
+Apply requires an exact Vault path and an approved Blueprint; its default
+mutation set is folders, approved templates, and supplied factual notes.
+Answer is read-only and needs no interview: it reads the existing notes and
+returns what they record. `.obsidian`, plugins, bulk moves, renames, deletes,
+and copies of source material remain out of scope in every mode.
+
+Every request that would create or change a Vault file passes the same entry
+gate regardless of how it was phrased. A supplied PDF, a task-shaped
+instruction, and an explicit onboarding request all resolve the Vault and look
+for a `Reference Profile` first. A profile that exists is followed without
+re-asking; its absence triggers the first-run interview before any file is
+created. A question is not a mutation and skips the interview entirely.
+
+Answer mode inherits the provenance rules rather than relaxing them. It
+responds only from reviewed notes, quotes the recorded page anchor with every
+value, repeats the evidence label as written without promoting `modelled` or
+`synthesis` into a reported measurement, refuses `not reviewed` and `not
+supplied` material as evidence, routes cross-paper questions through promoted
+Claim, Theory, or Theme notes rather than inventing a connection, and names the
+notes it answered from. It never edits the Vault as a side effect of a
+question; a missing note or a stale `Source Text Manifest` hash is reported and
+proposed, not written.
 
 First run uses the two-stage interview in `docs/ONBOARDING.md`. Stage 1 starts
 with one depth preset: `notes-only`, `searchable-library` (the default), or

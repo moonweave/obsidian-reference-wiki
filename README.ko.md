@@ -43,6 +43,22 @@ obsidian-research-wiki-reference로 문헌 Vault를 설계해줘.
 패키지 확인, 수동 설치, 업데이트, 제거와 선택적 PDF 의존성은
 [설치 가이드](docs/INSTALLATION.md)에서 확인할 수 있습니다.
 
+## 정리한 것에 물어보기
+
+노트가 쌓이면 같은 스킬이 그 노트에서 답합니다. 이 값이 어디서 나왔는지,
+저장한 논문이 무엇을 보고했는지, 어떤 노트가 그 주장을 뒷받침하는지 물으면
+노트에 기록된 페이지 앵커와 함께 답이 돌아옵니다.
+
+```text
+"이 수치 어디서 나왔어?"
+→ 440 V 직류에서 1 kg 이상 [reported]
+   Provenance anchor: PDF p. 1 / printed p. 713, Fig. 1
+   Paper — Electro-adhesion and its applications
+```
+
+답변은 읽기 전용입니다. 노트에 없는 값을 지어내지 않고, 모델에서 나온 값을
+측정값처럼 바꾸지 않으며, 질문에 답하면서 Vault를 고치지 않습니다.
+
 ## 만들어지는 구조
 
 첫 시험 적용에서는 Reference Index에서 실제 논문이나 자료까지 따라갈 수

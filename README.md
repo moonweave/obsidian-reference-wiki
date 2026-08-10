@@ -42,6 +42,23 @@ Use obsidian-research-wiki-reference to design a literature Vault.
 See the [installation guide](docs/INSTALLATION.md) for package inspection,
 manual installation, updates, removal, and optional PDF dependencies.
 
+## Asking the Vault
+
+Once notes exist, the same skill answers from them. Ask where a value came
+from, what a stored paper reported, or which notes support a claim, and the
+answer arrives with the page anchor the note recorded:
+
+```text
+"이 수치 어디서 나왔어?"
+→ 440 V 직류에서 1 kg 이상 [reported]
+   Provenance anchor: PDF p. 1 / printed p. 713, Fig. 1
+   Paper — Electro-adhesion and its applications
+```
+
+Answering is read-only. It never invents a value the notes do not hold, never
+promotes a modelled number into a measurement, and never edits the Vault as a
+side effect of a question.
+
 ## What you get
 
 A first pilot creates a navigable route from the Reference Index to a real

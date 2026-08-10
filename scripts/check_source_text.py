@@ -7,10 +7,20 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 PAGE_MARKER = re.compile(r"<!--\s*pdf-page:\s*(\d+)\s*-->")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
+def local_path(value: str) -> Path | None:
+    if value.startswith("file:"):
+        parsed = urlparse(value)
+        if parsed.scheme != "file" or parsed.netloc not in {"", "localhost"}:
+            return None
+        return Path(unquote(parsed.path))
+    return Path(value).expanduser()
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -47,20 +57,24 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         errors.append("source_text_location is not supplied")
         location = None
     else:
-        supplied_location = Path(location_value).expanduser()
-        if storage == "external" and not supplied_location.is_absolute():
-            errors.append("external source_text_location must be absolute")
-        if storage == "vault-local" and supplied_location.is_absolute():
-            errors.append("vault-local source_text_location must be relative to the manifest")
-        location = supplied_location
-        if not location.is_absolute():
-            location = manifest.parent / location
-        location = location.resolve()
-        if storage == "vault-local" and not location.is_relative_to(vault_root):
-            errors.append("vault-local derived source text is outside the approved Vault root")
+        supplied_location = local_path(location_value)
+        if supplied_location is None:
+            errors.append("source_text_location must be a local path or file URI")
             location = None
-        elif not location.is_file():
-            errors.append(f"derived source text does not exist: {location}")
+        else:
+            if storage == "external" and not supplied_location.is_absolute():
+                errors.append("external source_text_location must be absolute")
+            if storage == "vault-local" and supplied_location.is_absolute():
+                errors.append("vault-local source_text_location must be relative to the manifest")
+            location = supplied_location
+            if not location.is_absolute():
+                location = manifest.parent / location
+            location = location.resolve()
+            if storage == "vault-local" and not location.is_relative_to(vault_root):
+                errors.append("vault-local derived source text is outside the approved Vault root")
+                location = None
+            elif not location.is_file():
+                errors.append(f"derived source text does not exist: {location}")
 
     expected_hash = metadata.get("source_text_hash", "")
     if not SHA256.fullmatch(expected_hash):
@@ -75,8 +89,8 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
     image_placeholders = 0
     provenance_version = metadata.get("source_text_provenance_version", "")
     if provenance_version in {"1", "2"}:
-        canonical_location = Path(metadata.get("canonical_location", "")).expanduser()
-        if not canonical_location.is_absolute() or not canonical_location.is_file():
+        canonical_location = local_path(metadata.get("canonical_location", ""))
+        if canonical_location is None or not canonical_location.is_absolute() or not canonical_location.is_file():
             errors.append("canonical_location must name an existing external PDF")
         elif canonical_location.resolve().is_relative_to(vault_root):
             errors.append("canonical PDF must remain outside the approved Vault")

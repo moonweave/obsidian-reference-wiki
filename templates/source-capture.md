@@ -11,6 +11,11 @@ source_text_hash: not provided
 source_text_page_map: not provided
 source_text_manifest: not provided
 ---
+## Canonical source
+
+- [Open canonical source]({canonical_location})
+- Location URI: `{canonical_location}`
+
 ## Capture reason
 
 {capture_reason}

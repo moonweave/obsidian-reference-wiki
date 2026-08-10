@@ -384,10 +384,10 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
     location = (
         os.path.relpath(output, manifest.parent)
         if args.storage == "vault-local"
-        else str(output)
+        else output.as_uri()
     )
     values = {
-        "canonical_location": str(source),
+        "canonical_location": source.as_uri(),
         "canonical_source_hash": canonical_hash,
         "canonical_page_count": str(page_count),
         "source_text_basis": args.basis,

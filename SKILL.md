@@ -102,6 +102,15 @@ Keep four representations distinct:
 3. the `Paper — …` or `Source — …` dossier that records the reviewed meaning;
 4. promoted Claim, Method, Theory, Evidence, Limitation, or Theme notes.
 
+Serialize an external local file recorded in a frontmatter location field as
+a percent-encoded `file:///` URI, for example by using Python
+`Path.resolve().as_uri()`. This prevents an `@` inside a cloud-storage folder
+name from being misread by Obsidian as an email link. Because Markdown is not
+rendered inside Properties, also render an explicit `Open canonical source`
+Markdown link in the dossier body. Continue accepting legacy absolute paths
+when reading existing notes; migrate only notes in the approved mutation set.
+Vault-local derivative locations remain relative paths.
+
 The derived text is not raw truth: OCR can introduce errors and parsing can
 lose layout. Recommend `vault-local` when a private researcher wants Obsidian
 or an agent to search and reread the full text. Render the cache with

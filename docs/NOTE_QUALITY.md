@@ -56,6 +56,13 @@ on an engine or page-boundary error. Both outputs remain parsed derivatives:
 visually check important equations, symbols, tables, captions, and multi-column
 reading order before promoting claims.
 
+The adapter writes external local locations as percent-encoded `file:///`
+URIs. In particular, encoding `@` as `%40` prevents Obsidian from treating a
+Google Drive account folder as an email address. Source and manifest bodies
+provide an explicit Markdown link for opening the exact file because Markdown
+is not rendered inside Properties. Vault-local derivative locations remain
+relative.
+
 `vault-local` is appropriate for a private Vault when full-text Obsidian or
 agent search is part of the workflow. Render the derivative with
 `templates/full-text.md`; do not add knowledge claims to that file. `external`

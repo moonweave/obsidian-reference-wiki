@@ -47,6 +47,14 @@ location. Unread material is labelled `not reviewed`; it is never summarized
 from a filename. Existing Vault candidates are classified as `keep in place`,
 `link from a new note`, or `move later only with separate approval`.
 
+An external local file location in frontmatter is serialized as a
+percent-encoded `file:///` URI. This prevents cloud-storage directory names
+containing `@` from being interpreted as email links. Because Obsidian does not
+render Markdown inside Properties, the dossier body also provides an explicit
+`Open canonical source` Markdown link. Readers and validators continue to
+accept legacy absolute paths; migration remains limited to the approved
+mutation set. Vault-local derivative locations remain relative paths.
+
 Reference `Method` notes describe a method as reported by a source. Research
 `Method` notes describe the user's own research process; the two meanings must
 not be merged. `Theory` notes capture source-grounded background mechanisms,

@@ -5,6 +5,8 @@ versioning for public releases.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-08-10
+
 - Added an Answer mode: the skill now reads its own notes back, quoting the
   recorded page anchor and evidence label, refusing unreviewed material as
   evidence, and never editing the Vault while answering. Contract version 14.
@@ -43,6 +45,7 @@ versioning for public releases.
 - Adopted the PolyForm Noncommercial License 1.0.0 for current releases.
 - Added reproducible Agent Skill installation, update, and removal guidance.
 
-[Unreleased]: https://github.com/moonweave/obsidian-reference-wiki/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/moonweave/obsidian-reference-wiki/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/moonweave/obsidian-reference-wiki/releases/tag/v0.2.0
 [0.1.0]: https://github.com/moonweave/obsidian-reference-wiki/releases/tag/v0.1.0
 [0.1.0-beta.1]: https://github.com/moonweave/obsidian-reference-wiki/releases/tag/v0.1.0-beta.1

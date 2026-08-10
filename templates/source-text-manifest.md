@@ -24,7 +24,8 @@ It is not the canonical source and it is not a reviewed claim or summary.
 
 ## Extraction record
 
-- Canonical source: {canonical_location}
+- [Open canonical source]({canonical_location})
+- Canonical source URI: `{canonical_location}`
 - Canonical source hash: {canonical_source_hash}
 - Canonical page count: {canonical_page_count}
 - Storage: {source_text_storage}

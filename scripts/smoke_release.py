@@ -273,13 +273,17 @@ def main() -> None:
 
         extraction_vault = Path(raw) / "extraction-vault"
         extraction_vault.mkdir()
+        canonical_dir = Path(raw) / "GoogleDrive-user@gmail.com" / "My Drive"
+        canonical_dir.mkdir(parents=True)
+        canonical_pdf = canonical_dir / "two page.pdf"
+        shutil.copy2(ROOT / "evals/fixtures/source-text/two-page.pdf", canonical_pdf)
         extraction_output = extraction_vault / "05 Source Text/Full Text/Full Text — Two Page Fixture.md"
         extraction_manifest = extraction_vault / "05 Source Text/Manifests/Source Text Manifest — Two Page Fixture.md"
         extracted = subprocess.run(
             [
                 sys.executable,
                 str(ROOT / "scripts/extract_source_text.py"),
-                str(ROOT / "evals/fixtures/source-text/two-page.pdf"),
+                str(canonical_pdf),
                 "--output", str(extraction_output),
                 "--manifest", str(extraction_manifest),
                 "--vault-root", str(extraction_vault),
@@ -294,6 +298,10 @@ def main() -> None:
         assert extracted.returncode == 0, extracted.stdout + extracted.stderr
         extraction_result = json.loads(extracted.stdout)
         assert extraction_result["pages"] == 2
+        extraction_manifest_text = extraction_manifest.read_text(encoding="utf-8")
+        assert canonical_pdf.resolve().as_uri() in extraction_manifest_text
+        assert "@gmail.com" not in extraction_manifest_text
+        assert "%40gmail.com" in extraction_manifest_text
         assert extraction_output.read_text(encoding="utf-8").count("<!-- pdf-page:") == 2
         extraction_checked = subprocess.run(
             [

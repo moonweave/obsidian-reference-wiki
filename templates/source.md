@@ -13,6 +13,11 @@ source_text_manifest: {source_text_manifest}
 reviewed_scope: {reviewed_scope}
 unreviewed_scope: {unreviewed_scope}
 ---
+## Canonical source
+
+- [Open canonical source]({canonical_location})
+- Location URI: `{canonical_location}`
+
 ## Reference map
 
 - Problem or research question: {research_problem}

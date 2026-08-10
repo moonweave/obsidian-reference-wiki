@@ -37,6 +37,23 @@ The profile is the record of what the user agreed to, so onboarding happens
 once per Vault rather than once per conversation. A user who has answered
 already must never be asked a second time.
 
+## Entry gate
+
+Every request that would create or change a Vault file passes through this
+gate, whatever the user opened with. A dropped PDF, `이 논문 정리해줘`, a Zotero
+folder, or an explicit onboarding request all arrive at the same check. Do not
+treat a task-shaped opening as permission to skip it.
+
+1. Resolve the target Vault, then look for a `Reference Profile` in it.
+2. Profile found: read it, follow it, and do not ask again. State the mode you
+   are applying in one line so the user can correct it, then continue with the
+   request.
+3. No profile: run the first-run interview below before any file is created.
+
+The profile is the record of what the user agreed to, so onboarding happens
+once per Vault rather than once per conversation. A user who has answered
+already must never be asked a second time.
+
 ## First-run workflow
 
 Ask what the user can answer now, and defer what depends on having notes. Reuse

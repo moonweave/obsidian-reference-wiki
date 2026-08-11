@@ -120,8 +120,19 @@
     color: var(--deep-ink-2);
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: .3rem .9rem;
   }
+
+  .kicker-repo {
+    color: var(--deep-ink);
+    text-decoration: none;
+    border: 1px solid var(--deep-rule);
+    border-radius: 99px;
+    padding: .12rem .55rem;
+    letter-spacing: .06em;
+  }
+  .kicker-repo:hover { border-color: var(--mark); color: var(--mark); }
 
   .hero h1 {
     font-size: clamp(2.2rem, 6.4vw, 4rem);
@@ -642,7 +653,29 @@
   .qa h3 { font-size: 1rem; font-weight: 700; }
   .qa p { font-size: .96rem; color: var(--ink-2); }
 
-  .foot { margin-top: var(--s6); padding-top: var(--s3); border-top: 1px solid var(--rule); display: grid; gap: var(--s3); }
+  .star {
+    margin-top: var(--s6);
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    background: var(--surface);
+    padding: 1.3rem 1.4rem;
+    display: grid;
+    gap: .7rem;
+    justify-items: start;
+  }
+  .star p { font-size: .97rem; color: var(--ink-2); margin: 0; }
+  .star strong { color: var(--ink); }
+  .star a {
+    font-size: .93rem;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: .45rem .9rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .star a:hover { background: var(--accent-quiet); }
+
+  .foot { margin-top: var(--s4); padding-top: var(--s3); border-top: 1px solid var(--rule); display: grid; gap: var(--s3); }
   .links { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; font-size: .86rem; }
   .foot p { font-size: .86rem; color: var(--ink-3); max-width: 42rem; }
 
@@ -713,6 +746,7 @@
       <span>Obsidian Agent Skill</span>
       <span>v0.2.0</span>
       <span>Moonweave</span>
+      <a class="kicker-repo" href="https://github.com/moonweave/obsidian-reference-wiki" target="_blank" rel="noopener">★ GitHub</a>
     </div>
 
     <h1>페이지까지 남는 논문 정리</h1>
@@ -1388,6 +1422,12 @@
     </section>
 
   </main>
+
+  <div class="star">
+    <p><strong>써보고 쓸 만하셨다면 GitHub에서 별 하나 눌러주세요.</strong></p>
+    <p>별이 붙으면 같은 문제로 검색하던 사람이 이 저장소를 찾게 됩니다. 이 스킬은 논문 정리에 지친 대학원생이 쓰라고 만든 거라, 그게 제일 도움이 돼요.</p>
+    <a href="https://github.com/moonweave/obsidian-reference-wiki" target="_blank" rel="noopener">★ GitHub에서 별 누르기</a>
+  </div>
 
   <footer class="foot">
     <div class="links">

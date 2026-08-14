@@ -14,6 +14,15 @@ Answer is read-only and needs no interview: it reads the existing notes and
 returns what they record. `.obsidian`, plugins, bulk moves, renames, deletes,
 and copies of source material remain out of scope in every mode.
 
+Before Apply, classify the exact target. A persisted `Reference Profile` is the
+Reference authority. A path with existing Markdown or markers such as `wiki/`,
+`.graph_index/`, `PRIVATE_VAULT_MANIFEST.json`, `Research Index`, `Workspace
+Index`, or `00 Company/Company.md`, but no profile, is `existing but unprofiled`
+or another system: baseline and Blueprint only, with no Reference Apply. Names,
+citation keys, and paper counts do not establish ownership. A legacy or private
+`research-wiki` corpus remains external until an explicit Blueprint names its
+scope and preservation set.
+
 Every request that would create or change a Vault file passes the same entry
 gate regardless of how it was phrased. A supplied PDF, a task-shaped
 instruction, and an explicit onboarding request all resolve the Vault and look

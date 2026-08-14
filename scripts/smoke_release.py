@@ -131,6 +131,9 @@ def main() -> None:
     assert re.search(r"^name: obsidian-research-wiki-reference$", skill_text, re.M)
     legacy_names = ("Reference-First " + "Starter", "Research Workspace " + "Advanced")
     assert not any(name in skill_text for name in legacy_names)
+    assert "## Target preflight" in skill_text
+    assert re.search(r"existing\s+but\s+unprofiled", skill_text)
+    assert re.search(r"do not\s+Apply", skill_text)
     assert (ROOT / "scripts/check_notes.py").is_file()
     assert (ROOT / "scripts/run_extraction_corpus.py").is_file()
     assert (ROOT / "templates/reference-profile.md").is_file()

@@ -37,6 +37,23 @@ The profile is the record of what the user agreed to, so onboarding happens
 once per Vault rather than once per conversation. A user who has answered
 already must never be asked a second time.
 
+## Target preflight
+
+Before treating a path as a Reference Vault, classify the exact target:
+
+- A valid `Reference Profile` is the persisted onboarding authority; read and
+  follow it.
+- If no profile exists but the path already contains Markdown, `wiki/`,
+  `.graph_index/`, `PRIVATE_VAULT_MANIFEST.json`, `Research Index`,
+  `Workspace Index`, or `00 Company/Company.md`, classify it as `existing but
+  unprofiled` or another system. Run a read-only baseline and Blueprint only;
+  do not Apply or describe it as Reference-ready.
+- Filenames, citation keys, paper counts, and a large corpus do not establish
+  ownership.
+- A legacy or private `research-wiki` corpus remains an external existing
+  corpus until an explicit Reference Blueprint names its scope and preservation
+  set.
+
 A question is not a mutation. When the user asks what a stored paper said
 rather than asking for structure, skip the interview and answer under
 `Answering from the Vault`.

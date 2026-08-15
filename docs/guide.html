@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Obsidian Reference Wiki 스킬 설치와 사용 가이드. 논문 PDF를 넘기면 에이전트가 읽고 정리하고, 값마다 페이지와 그림 번호를 남깁니다.">
-<meta property="og:title" content="페이지까지 남는 논문 정리">
-<meta property="og:description" content="Obsidian에서 논문을 정리하는 에이전트 스킬. 설치부터 첫 대화, 정리 구조, 꺼내 쓰기까지.">
+<meta name="description" content="Obsidian Reference Wiki 스킬 설치와 사용 가이드. 로컬 에이전트가 승인한 논문을 읽고, 원문 페이지까지 따라갈 수 있는 노트로 남기는 방법을 안내합니다.">
+<meta name="author" content="moon · phd.ai.log">
+<link rel="canonical" href="https://moonweave.github.io/obsidian-reference-wiki/guide.html">
+<meta property="og:title" content="Obsidian에 원문 페이지까지 남기는 논문 정리">
+<meta property="og:description" content="설치부터 첫 대화, 원문과 노트의 분리, 페이지 앵커를 따라 다시 꺼내 쓰는 방법까지.">
+<meta property="og:url" content="https://moonweave.github.io/obsidian-reference-wiki/guide.html">
+<meta property="og:site_name" content="moon · phd.ai.log">
 <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>📚</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,7 +20,7 @@
   pre { white-space: pre; }
   img { max-width: 100%; }
 </style>
-<title>Obsidian Reference Wiki 설치와 사용 가이드</title>
+<title>Obsidian에 원문 페이지까지 남기는 논문 정리</title>
 <style>
   :root {
     /* white ground, black type. grey is reserved for captions and labels only */
@@ -124,16 +129,6 @@
     gap: .3rem .9rem;
   }
 
-  .kicker-repo {
-    color: var(--deep-ink);
-    text-decoration: none;
-    border: 1px solid var(--deep-rule);
-    border-radius: 99px;
-    padding: .12rem .55rem;
-    letter-spacing: .06em;
-  }
-  .kicker-repo:hover { border-color: var(--mark); color: var(--mark); }
-
   .hero h1 {
     font-size: clamp(2.2rem, 6.4vw, 4rem);
     font-weight: 800;
@@ -150,6 +145,42 @@
   }
 
   .hero-lede strong { font-weight: 700; }
+
+  .hero-subtitle {
+    margin-top: var(--s3);
+    max-width: 38rem;
+    font-size: clamp(1rem, 2.1vw, 1.14rem);
+    line-height: 1.65;
+    color: var(--deep-ink-2);
+  }
+
+  .hero-subtitle + .hero-lede { margin-top: var(--s2); }
+
+  .hero-star {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .85rem;
+    color: var(--mark);
+    font-size: .82rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--mark) 70%, transparent);
+    padding-bottom: .12rem;
+  }
+
+  .hero-star:hover { color: var(--deep-ink); border-color: var(--deep-ink); }
+
+  .hero-explainer {
+    max-width: 38rem;
+    margin-top: var(--s3);
+    padding-left: .9rem;
+    border-left: 2px solid var(--mark);
+    color: var(--deep-ink-2);
+    font-size: .94rem;
+  }
+
+  .hero-explainer strong { color: var(--mark); font-weight: 700; }
 
   .hero-grid {
     margin-top: clamp(2.2rem, 5vw, 3.2rem);
@@ -172,6 +203,8 @@
   .hero-facts div { display: flex; gap: .8rem; border-top: 1px solid var(--deep-rule); padding-top: var(--s2); }
   .hero-facts dt { font-family: var(--f-mono); font-size: .74rem; letter-spacing: .05em; text-transform: uppercase; flex: none; width: 5.2rem; padding-top: .25rem; }
   .hero-facts dd { color: var(--deep-ink); }
+
+  .creator-mark { color: var(--mark); }
 
   /* paste block: bordered panel, label sits on the border */
   .paste {
@@ -252,6 +285,18 @@
 
   .tocbar a:hover { color: var(--ink); }
   .tocbar a[aria-current="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tocbar-in::after {
+    content: "← 좌우로 밀어 보기";
+    display: none;
+    margin-left: auto;
+    padding-left: 1rem;
+    flex: none;
+    color: var(--ink-3);
+    font-size: .72rem;
+    white-space: nowrap;
+    background: linear-gradient(to right, transparent, var(--paper) 1rem);
+  }
 
   /* ---------------- page shell ---------------- */
 
@@ -467,6 +512,69 @@
 
   .figcap { font-size: .87rem; color: var(--ink-3); max-width: var(--col); }
 
+  .notice {
+    max-width: var(--col);
+    margin: var(--s3) 0;
+    padding: .9rem 1rem;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--accent-quiet);
+    color: var(--ink-2);
+    font-size: .92rem;
+  }
+
+  .notice strong { display: block; margin-bottom: .2rem; color: var(--ink); }
+
+  caption {
+    padding: .7rem .9rem;
+    text-align: left;
+    color: var(--ink-3);
+    font-size: .78rem;
+    font-weight: 600;
+  }
+
+  .method-note {
+    color: var(--accent);
+    font-size: .78rem;
+    font-weight: 500;
+  }
+
+  .advanced-method {
+    max-width: var(--col);
+    margin-top: var(--s3);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .advanced-method summary,
+  .advanced-check summary {
+    padding: .8rem 0;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: .92rem;
+    font-weight: 700;
+  }
+
+  .advanced-method summary::marker,
+  .advanced-check summary::marker { color: var(--accent); }
+
+  .advanced-method-body { padding-bottom: var(--s3); }
+
+  .advanced-check {
+    max-width: var(--col);
+    margin-top: var(--s3);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .source-note {
+    margin-top: var(--s2);
+    color: var(--ink-3);
+    font-size: .78rem;
+  }
+
+  .source-note a { color: inherit; }
+
   /* ---------------- layers ---------------- */
 
   .layers { display: grid; gap: 0; }
@@ -506,8 +614,8 @@
   th, td { text-align: left; padding: .68rem .9rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
   thead th { font-size: .78rem; color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--rule); }
   tbody tr:last-child td { border-bottom: 0; }
-  td.k { font-family: var(--f-mono); font-size: .83rem; white-space: nowrap; }
-  td.k b { color: var(--accent); font-weight: 500; }
+  td.k, th.k { font-family: var(--f-mono); font-size: .83rem; white-space: nowrap; }
+  td.k b, th.k b { color: var(--accent); font-weight: 500; }
 
   /* ---------------- faq + footer ---------------- */
 
@@ -690,7 +798,7 @@
     .tablewrap { border: 0; border-radius: 0; overflow: visible; }
     table { min-width: 0; background: transparent; }
     thead { display: none; }
-    tbody, tr, td { display: block; }
+    tbody, tr, td, th { display: block; }
 
     tr {
       border: 1px solid var(--rule);
@@ -700,11 +808,11 @@
       margin-bottom: .6rem;
     }
 
-    td { border: 0; padding: .6rem 0; }
-    td + td { border-top: 1px solid var(--rule-soft); }
-    td.k { white-space: normal; }
+    td, th { border: 0; padding: .6rem 0; }
+    td + td, th + td, td + th { border-top: 1px solid var(--rule-soft); }
+    td.k, th.k { white-space: normal; }
 
-    td::before {
+    td::before, th::before {
       content: attr(data-label);
       display: block;
       font-size: .74rem;
@@ -721,6 +829,8 @@
 
     /* stacked columns need a visible seam */
     .split .col + .col { border-top: 1px solid var(--rule); padding-top: var(--s3); }
+
+    .tocbar-in::after { display: block; }
   }
 
   /* the section nav scrolls sideways: show that it does */
@@ -746,15 +856,28 @@
       <span>Obsidian Agent Skill</span>
       <span>v0.2.0</span>
       <span>Moonweave</span>
-      <a class="kicker-repo" href="https://github.com/moonweave/obsidian-reference-wiki" target="_blank" rel="noopener">★ GitHub</a>
+      <span class="creator-mark">moon · phd.ai.log</span>
     </div>
 
-    <h1>페이지까지 남는 논문 정리</h1>
+    <h1>Obsidian에 원문 페이지까지 남기는 논문 정리</h1>
+
+    <p class="hero-subtitle">
+      논문 정리 규칙을 스킬로 묶어, 다시 찾을 수 있는 기록으로 남기는 방법
+    </p>
+
+    <a class="hero-star" href="https://github.com/moonweave/obsidian-reference-wiki" target="_blank" rel="noopener">
+      도움이 됐다면 GitHub에 별표 하나 남겨주세요 <span aria-hidden="true">↗</span>
+    </a>
 
     <p class="hero-lede">
-      PDF를 넘기고 정리해 달라고 하면 끝이에요. 에이전트가 본문을 읽고, 방법과 결과와 한계를
-      갈라서 노트로 만들고, <strong>값마다 몇 페이지 몇 번 그림에서 나왔는지까지</strong>
-      붙여 둡니다. Obsidian Vault 안에 그대로 쌓여요.
+      PDF를 넘기면 먼저 정리할 범위를 잡고, 내가 승인한 뒤 노트가 만들어져요. 에이전트가
+      본문에서 방법과 결과와 한계를 나누고, <strong>확인한 값에는 페이지와 그림 번호</strong>를
+      남겨 둡니다. 결과는 Obsidian의 Vault에 쌓여요.
+    </p>
+
+    <p class="hero-explainer">
+      <strong>스킬이란?</strong> Obsidian 플러그인이 아니라, 내 컴퓨터의 Vault(Obsidian이 노트를
+      담는 폴더)를 읽고 쓰는 로컬 에이전트가 같은 논문 정리 규칙을 따르게 하는 안내서예요.
     </p>
 
     <div class="hero-grid">
@@ -767,9 +890,9 @@
       </div>
 
       <dl class="hero-facts">
-        <div><dt>필요한 것</dt><dd>Obsidian, 그리고 스킬을 읽는 에이전트 (Claude Code, Codex 등)</dd></div>
-        <div><dt>설치</dt><dd>앱 두 개 받고 문장 하나 붙여넣기. 내려받는 시간 빼면 몇 분이면 끝나요</dd></div>
-        <div><dt>라이선스</dt><dd>비상업 이용 무료 (PolyForm Noncommercial)</dd></div>
+        <div><dt>필요한 것</dt><dd>Obsidian + 내 컴퓨터 폴더를 읽고 쓸 수 있는 로컬 에이전트 (Claude Code, Codex 등)</dd></div>
+        <div><dt>설치</dt><dd>Codex 앱이나 Claude 앱의 Code 탭에서 Vault를 고른 뒤 시작해요. CLI는 선택 경로예요</dd></div>
+        <div><dt>라이선스</dt><dd><a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/LICENSE">비상업 이용 무료</a> (PolyForm Noncommercial)</dd></div>
       </dl>
     </div>
   </div>
@@ -791,15 +914,16 @@
 </div>
 
 <div class="shell">
-  <main>
+    <main>
+    <article>
 
     <section class="sec" id="why">
-      <div class="sec-title"><span class="no">01</span><h2>이걸 깔면 뭘 할 수 있나</h2></div>
+      <div class="sec-title"><span class="no">01</span><h2>이걸 설치하면 무엇이 달라지나</h2></div>
       <div class="sec-body">
         <p class="lead">
-          읽을 논문을 넘겨주면 에이전트가 알아서 읽고 갈래를 잡아 정리해요.
-          <em class="hl">분류도, 노트 사이를 잇는 링크도 사람이 손대지 않습니다.</em>
-          쌓이고 나면 이렇게 부려먹을 수 있어요.
+          읽을 논문을 넘겨주면, 먼저 어디까지 읽고 무엇을 남길지 정한 뒤 정리해요.
+          <em class="hl">반복되는 분류와 링크 연결은 스킬이 맡고, 범위와 적용 시점은 내가 승인해요.</em>
+          쌓이고 나면 이렇게 다시 꺼내 쓸 수 있어요.
         </p>
 
         <dl class="does">
@@ -809,7 +933,7 @@
           </div>
           <div>
             <dt>“이 수치 어디서 나온 거야?”</dt>
-            <dd>노트에 페이지와 그림 번호가 박혀 있어서 바로 되짚어 줘요. PDF를 처음부터 다시 훑을 일이 없습니다.</dd>
+            <dd>노트에 페이지와 그림 번호가 박혀 있어서 바로 되짚어 줘요. PDF를 처음부터 다시 훑을 일이 없어요.</dd>
           </div>
           <div>
             <dt>“이 주장 나오는 논문들 묶어줘”</dt>
@@ -865,7 +989,7 @@
           </div>
         </div>
         <p class="figcap">
-          원본 PDF는 처음 있던 자리에서 움직이지 않아요. Vault에는 읽은 결과만 쌓입니다.
+          원본 PDF는 처음 있던 자리에서 움직이지 않아요. Vault에는 읽은 결과만 쌓여요.
         </p>
 
         <div class="split">
@@ -892,14 +1016,23 @@
     </section>
 
     <section class="sec" id="install">
-      <div class="sec-title"><span class="no">02</span><h2>설치, 터미널 없이도 됩니다</h2></div>
+      <div class="sec-title"><span class="no">02</span><h2>설치 방법은 에이전트에 따라 달라요</h2></div>
       <div class="sec-body">
         <p class="lead">
-          이 스킬은 Obsidian 폴더 안에 노트를 직접 만들어야 해요. 그래서 조건이 두 개예요.
-          <em class="hl">내 컴퓨터 폴더를 열 수 있을 것</em>, 그리고
-          <em class="hl">Agent Skills를 읽을 것</em>. Claude Code와 Codex가 대표적이고,
-          같은 조건만 맞으면 다른 에이전트여도 괜찮아요.
+          이 가이드는 Obsidian과 내 컴퓨터의 Vault 폴더를 읽고 쓸 수 있는 로컬 에이전트를
+          함께 쓰는 사람을 위한 안내예요. <strong>Codex 앱</strong>이나
+          <strong>Claude 앱의 Code 탭</strong>에서 Vault를 고른 뒤 시작할 수 있고,
+          터미널이 편하면 Codex CLI나 Claude Code CLI를 써도 돼요. 공통 조건은
+          <em class="hl">내 컴퓨터 폴더에 접근할 수 있을 것</em>과
+          <em class="hl">Agent Skills를 읽을 것</em>이에요.
         </p>
+
+        <aside class="notice privacy" aria-label="파일을 넘기기 전에 확인할 내용">
+          <strong>파일을 넘기기 전에</strong>
+          원본 PDF는 원래 자리에 남지만, 에이전트가 읽는 과정에서 내용이 사용 중인 AI 서비스나
+          모델로 전달될 수 있어요. 미공개 원고나 보안 자료라면 먼저 확인해 주세요.
+        </aside>
+
         <p class="figcap">
           중간에 잘못 눌러도 큰일 나지 않아요. 스킬은 폴더 하나를 넣고 빼는 게 전부고,
           노트를 만들기 전에 무엇을 만들지 먼저 보여주고 물어봅니다.
@@ -915,35 +1048,34 @@
                 <code>Create new vault</code>로 Vault를 하나 만들어 주세요. Vault는 노트를 담는
                 폴더예요. PDF를 복사해 두는 곳이 아니라서
                 <strong>Zotero 저장소 안에는 만들지 마세요.</strong>
-                이미 쓰는 Vault가 있으면 그대로 쓰면 됩니다.
+                이미 쓰는 Vault가 있으면 그대로 쓰면 돼요.
               </p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-in">
-              <h3 class="sub">2. 에이전트를 열고 Vault 폴더를 지정해요</h3>
+              <h3 class="sub">2. 쓰고 싶은 앱에서 Vault를 열어요</h3>
               <div class="split">
                 <div class="col">
-                  <h4>Claude Code</h4>
+                  <h4>Codex 앱</h4>
                   <ul>
-                    <li><a href="https://claude.com/download">claude.com/download</a>에서 macOS나 Windows 설치 파일을 받아 실행해요. 터미널을 안 써도 됩니다.</li>
-                    <li>로그인한 다음 <strong>Code 탭</strong>에서 작업 폴더로 방금 만든 Vault를 고르면 끝이에요.</li>
-                    <li>터미널이 편하면 Vault 폴더에서 <code>claude</code>를 실행해도 똑같아요.</li>
+                    <li>Codex 앱을 열고, 작업할 프로젝트로 방금 만든 Vault 폴더를 추가해요. ChatGPT 데스크톱에서 Codex 화면으로 들어가도 같은 흐름이에요.</li>
+                    <li>Vault가 열려 있는 로컬 작업 공간에서 아래 설치 문장을 붙여넣어요. 파일 작성이나 명령 실행을 허용할지 물으면 범위를 확인한 뒤 승인해요.</li>
+                    <li>설치가 끝나면 대화창에서 <code>@</code>로 스킬을 골라 쓰거나, 논문 정리 요청을 자연어로 말하면 돼요.</li>
                   </ul>
                 </div>
                 <div class="col">
-                  <h4>Codex</h4>
+                  <h4>Claude 앱 · Code 탭</h4>
                   <ul>
-                    <li>터미널에서 <code>npm i -g @openai/codex</code>로 설치해요. Node가 필요합니다.</li>
-                    <li>Vault 폴더로 이동한 다음 <code>codex</code>를 실행하면 그 폴더가 작업 공간이 돼요.</li>
-                    <li>설치된 스킬 목록은 <code>/skills</code>로 확인해요.</li>
+                    <li><a href="https://claude.com/download">claude.com/download</a>에서 앱을 받아 실행하고, <strong>Code 탭</strong>에서 <strong>Local</strong> 환경과 Vault 폴더를 골라요.</li>
+                    <li>아래 설치 문장을 붙여넣고, 권한 확인이 나오면 어떤 파일과 명령에 접근하는지 확인한 뒤 허용해요.</li>
+                    <li>설치가 끝나면 입력창에서 <code>/</code>를 입력하거나 <code>+</code> 메뉴의 Slash commands에서 스킬을 골라 쓰면 돼요.</li>
                   </ul>
                 </div>
               </div>
               <p class="figcap">
-                어느 쪽이든 에이전트는 Vault 폴더 안에서만 움직여요. 웹이나 클라우드 세션은
-                내 폴더를 못 보니 여기서는 쓸 수 없어요.
+                일반 Claude 채팅 화면에서 스킬만 쓰려면 <a href="https://support.claude.com/en/articles/12512180-use-skills-in-claude"><code>Customize &gt; Skills</code></a>에서 ZIP을 올리는 별도 흐름을 이용해요. 다만 내 컴퓨터의 Vault에 노트를 만들 목적이라면 Claude 앱의 <strong>Code 탭 · Local</strong>이나 Codex 앱의 로컬 작업 공간을 열어야 해요. 웹이나 클라우드 세션은 내 폴더를 못 보니 여기서는 쓸 수 없어요.
               </p>
             </div>
           </div>
@@ -951,9 +1083,9 @@
           <div class="step">
             <div class="step-in">
               <h3 class="sub">3. 스킬을 넣어요</h3>
-              <p>셋 중 편한 걸 고르면 됩니다. 위에서부터 쉬운 순서예요.</p>
+              <p>처음이라면 지금 열어 둔 앱에서 방법 A부터 시도해 보세요. 터미널이 익숙하거나 여러 에이전트를 함께 쓰는 경우에는 아래 다른 방법도 있어요.</p>
 
-              <h4 class="method">방법 A · 에이전트에게 부탁하기</h4>
+              <h4 class="method">방법 A · 에이전트에게 부탁하기 <span class="method-note">처음이라면 여기부터</span></h4>
               <div class="panel plain">
                 <div class="panel-text">https://github.com/moonweave/obsidian-reference-wiki를 내려받아서<br>이 에이전트가 읽는 개인 스킬 폴더에<br>obsidian-research-wiki-reference 라는 이름으로 설치해줘</div>
                 <div class="panel-foot">
@@ -961,22 +1093,25 @@
                 </div>
               </div>
               <p>
-                Claude Code든 Codex든 자기 스킬 폴더를 알고 있어서, 이 문장이면 알아서 내려받아
-                넣어줘요. 도중에 “이 명령을 실행할까요?” 하고 물으면 허용해 주세요. 경로를 직접
-                박아 주고 싶으면 아래 표를 참고하세요.
+                Codex 앱이나 Claude 앱의 Code 탭에서 이 문장을 붙여넣으면, 각 에이전트가 자기
+                방식에 맞는 스킬 위치를 찾아 내려받아 넣어줘요. 도중에 “이 명령을 실행할까요?”
+                하고 물으면 내용을 확인한 뒤 허용해 주세요. 일반 Claude 채팅 화면에서는 이
+                문장을 실행할 로컬 폴더가 없을 수 있으니, 그때는 위의 ZIP 업로드 방식을 써요.
+                경로를 직접 지정하고 싶으면 아래 표를 참고하세요.
               </p>
 
               <div class="tablewrap">
                 <table>
-                  <thead><tr><th>에이전트</th><th>개인 스킬 폴더</th><th>불러올 때</th></tr></thead>
+                  <caption>로컬 에이전트에서 직접 설치할 때의 스킬 폴더와 호출 방식</caption>
+                  <thead><tr><th scope="col">에이전트</th><th scope="col">개인 스킬 폴더</th><th scope="col">불러올 때</th></tr></thead>
                   <tbody>
                     <tr>
-                      <td data-label="에이전트"><strong>Claude Code</strong></td>
+                      <th scope="row" data-label="에이전트"><strong>Claude Code</strong></th>
                       <td class="k" data-label="개인 스킬 폴더">~/.claude/skills/</td>
                       <td class="k" data-label="불러올 때">/스킬이름</td>
                     </tr>
                     <tr>
-                      <td data-label="에이전트"><strong>Codex</strong></td>
+                      <th scope="row" data-label="에이전트"><strong>Codex</strong></th>
                       <td class="k" data-label="개인 스킬 폴더">~/.agents/skills/</td>
                       <td class="k" data-label="불러올 때">$스킬이름</td>
                     </tr>
@@ -986,28 +1121,33 @@
               <p class="figcap">
                 둘 다 이름만 대고 부탁해도 스킬이 알아서 걸립니다. 위 표기는 직접 지목할 때 쓰는
                 방식이에요. 프로젝트 단위로만 쓰려면 Vault 안의 <code>.claude/skills/</code>나
-                <code>.agents/skills/</code>에 넣어도 됩니다.
+                <code>.agents/skills/</code>에 넣어도 돼요.
               </p>
 
-              <h4 class="method">방법 B · 설치 프로그램에 맡기기</h4>
-              <div class="cmd">
-                <pre><span class="p">$ </span>npx skills add moonweave/obsidian-reference-wiki</pre>
-                <button class="btn" data-copy="npx skills add moonweave/obsidian-reference-wiki">복사</button>
-              </div>
-              <p>
-                Node가 깔린 터미널에서 한 줄이면 돼요. 설치 프로그램이 컴퓨터에 있는 호환
-                에이전트를 찾아서 어디에 넣을지 물어보기 때문에, 여러 에이전트를 같이 쓴다면
-                이 방법이 제일 정확합니다. 내용만 먼저 보고 싶으면 뒤에 <code>--list</code>를 붙이세요.
-              </p>
+              <details class="advanced-method">
+                <summary>다른 설치 방법 보기</summary>
+                <div class="advanced-method-body">
+                  <h4 class="method">방법 B · 설치 프로그램에 맡기기</h4>
+                  <div class="cmd">
+                    <pre><span class="p">$ </span>npx skills add moonweave/obsidian-reference-wiki</pre>
+                    <button class="btn" data-copy="npx skills add moonweave/obsidian-reference-wiki">복사</button>
+                  </div>
+                  <p>
+                    Node가 깔린 터미널에서 한 줄이면 돼요. 설치 프로그램이 호환되는 에이전트를
+                    찾아서 어디에 넣을지 물어봐요. 여러 에이전트를 함께 쓴다면 이 방법이 덜
+                    헷갈립니다. 내용만 먼저 보고 싶으면 뒤에 <code>--list</code>를 붙이세요.
+                  </p>
 
-              <h4 class="method">방법 C · 폴더를 직접 옮기기</h4>
-              <ol class="howto">
-                <li><a href="https://github.com/moonweave/obsidian-reference-wiki">GitHub 저장소</a>에서 초록색 <code>Code</code> 버튼을 누르고 <code>Download ZIP</code>을 골라요.</li>
-                <li>압축을 풀면 <code>obsidian-reference-wiki-main</code> 폴더가 나와요. 이름을 <code>obsidian-research-wiki-reference</code>로 바꿔 주세요.</li>
-                <li>Finder에서 <code>Cmd + Shift + G</code>를 누르고 위 표의 스킬 폴더 경로를 입력해 이동해요. 윈도우는 탐색기 주소 표시줄에 <code>%USERPROFILE%\.claude\skills</code>처럼 넣으면 됩니다.</li>
-                <li>그 폴더가 없으면 <code>skills</code> 폴더를 새로 만들고, 이름을 바꾼 폴더를 통째로 넣어요.</li>
-                <li>폴더를 이번에 처음 만들었다면 에이전트를 껐다 켜 주세요.</li>
-              </ol>
+                  <h4 class="method">방법 C · 폴더를 직접 옮기기</h4>
+                  <ol class="howto">
+                    <li><a href="https://github.com/moonweave/obsidian-reference-wiki">GitHub 저장소</a>에서 초록색 <code>Code</code> 버튼을 누르고 <code>Download ZIP</code>을 골라요.</li>
+                    <li>압축을 풀면 <code>obsidian-reference-wiki-main</code> 폴더가 나와요. 이름을 <code>obsidian-research-wiki-reference</code>로 바꿔 주세요.</li>
+                    <li>Finder에서 <code>Cmd + Shift + G</code>를 누르고 위 표의 스킬 폴더 경로를 입력해 이동해요. 윈도우는 탐색기 주소 표시줄에 <code>%USERPROFILE%\.claude\skills</code>처럼 넣으면 돼요.</li>
+                    <li>그 폴더가 없으면 <code>skills</code> 폴더를 새로 만들고, 이름을 바꾼 폴더를 통째로 넣어요.</li>
+                    <li>폴더를 이번에 처음 만들었다면 에이전트를 껐다 켜 주세요.</li>
+                  </ol>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -1039,33 +1179,34 @@
     </section>
 
     <section class="sec" id="onboard">
-      <div class="sec-title"><span class="no">03</span><h2>첫 대화는 설계 회의처럼 흘러가요</h2></div>
+      <div class="sec-title"><span class="no">03</span><h2>첫 대화에서 정리 규칙을 정해요</h2></div>
       <div class="sec-body">
         <p class="lead">
-          온보딩은 두 단계로 나뉘어요. 앞 단계에서 무엇을 만들지 정하고, 뒤 단계에서 어디에
-          어디까지 만들지 확정합니다. 설계 단계는 읽기 전용이라 이 대화 중에는 파일이 하나도
+          온보딩, 즉 첫 설정 대화는 세 단계로 나뉘어요. 앞 단계에서 무엇을 만들지 정하고, 뒤 단계에서 어디에
+          어디까지 만들지 확정해요. 설계 단계는 읽기 전용이라 이 대화 중에는 파일이 하나도
           생기지 않아요.
         </p>
 
         <h3 class="sub">1단계. 정리 깊이 고르기</h3>
         <div class="tablewrap">
           <table>
+            <caption>정리 깊이에 따른 세 가지 프리셋</caption>
             <thead>
-              <tr><th>프리셋</th><th>어디까지 만드나</th><th>이럴 때</th></tr>
+              <tr><th scope="col">프리셋</th><th scope="col">어디까지 만드나</th><th scope="col">이럴 때</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td class="k" data-label="프리셋">notes-only</td>
+                <th scope="row" class="k" data-label="프리셋">notes-only</th>
                 <td data-label="어디까지 만드나">검토한 Paper / Source 노트만</td>
                 <td data-label="이럴 때">읽기에 집중, 본문 파일은 안 만듦</td>
               </tr>
               <tr>
-                <td class="k" data-label="프리셋"><b>searchable-library</b></td>
+                <th scope="row" class="k" data-label="프리셋"><b>searchable-library</b></th>
                 <td data-label="어디까지 만드나">노트에 더해 검색 가능한 본문 파일까지</td>
                 <td data-label="이럴 때">대부분 여기서 시작 (권장)</td>
               </tr>
               <tr>
-                <td class="k" data-label="프리셋">knowledge-network</td>
+                <th scope="row" class="k" data-label="프리셋">knowledge-network</th>
                 <td data-label="어디까지 만드나">위에 더해 따로 떼어낸 지식 노트까지</td>
                 <td data-label="이럴 때">논문 사이를 엮어 종합할 때</td>
               </tr>
@@ -1073,16 +1214,18 @@
           </table>
         </div>
         <p>
-          셋은 다른 체계가 아니라 같은 체계의 깊이 차이예요. 나중에 올려도 되니 처음부터
-          제일 깊은 걸 고를 필요는 없습니다.
+          셋은 서로 다른 체계가 아니라 같은 체계의 깊이 차이예요. 처음에는
+          <code>notes-only</code>로 읽기 기록만 남겨도 되고, 나중에 검색용 본문이나 연결된
+          지식 노트를 더할 수 있어요.
         </p>
 
         <h3 class="sub">2단계. 어디에 두면 안전한지 확인하기</h3>
         <p>
           그다음 질문은 취향이 아니라 설계를 가르는 조건이에요. Vault를 혼자 쓰는지 공유하는지,
-          어디까지 동기화되는지, PDF와 Zotero는 지금 어디에 있는지를 확인합니다. 공유하거나
+          어디까지 동기화되는지, PDF와 Zotero는 지금 어디에 있는지를 확인해요. 공유하거나
           공개되는 Vault, 노출 범위가 불확실한 Vault라면 본문 파일을 Vault 밖(<code>external</code>)에
-          두라고 권해요. 저작권 문제도 있고, 실수로 공개될 위험도 있어서예요.
+          두는 쪽으로 설계해요. 저작권과 공개 범위를 먼저 확인해야 하고, 실수로 파일이 노출될
+          위험도 줄일 수 있어서예요.
         </p>
         <ul class="dash">
           <li>새 Vault인지 기존 Vault인지, 그리고 <strong>정확한 경로</strong></li>
@@ -1092,21 +1235,22 @@
 
         <h3 class="sub">3단계. 설계안을 승인하면 그때 적용</h3>
         <p>
-          여기까지 정리되면 Blueprint가 나와요. 만들 폴더와 템플릿, 노트마다 무슨 뜻인지,
-          원문 파일의 경계선, 첫 연결 경로가 적혀 있습니다. 바꿀 항목과 안 건드릴 항목도
+          여기까지 정리되면 설계안(Blueprint)이 나와요. 만들 폴더와 템플릿, 노트마다 무슨 뜻인지,
+          원문 파일의 경계선, 첫 연결 경로가 적혀 있어요. 바꿀 항목과 안 건드릴 항목도
           따로 나와 있고요. 경로와 설계안을 승인하면 그때 파일이 만들어져요. 이미 있는 Vault를
-          통째로 옮기는 일은 없고, 승인한 범위만 적용합니다.
+          통째로 옮기는 일은 없고, 승인한 범위만 적용해요.
         </p>
       </div>
     </section>
 
     <section class="sec" id="structure">
-      <div class="sec-title"><span class="no">04</span><h2>자료를 어떻게 나눠 두는가</h2></div>
+      <div class="sec-title"><span class="no">04</span><h2>자료를 네 겹으로 나눠 두는 이유</h2></div>
       <div class="sec-body">
         <p class="lead">
           핵심은 한 논문이 네 개의 서로 다른 물건으로 존재한다는 점이에요. 이걸 섞지 않는 게
-          이 스킬의 전부라고 해도 됩니다.
+          이 스킬의 전부라고 해도 돼요.
         </p>
+        <p class="figcap">처음 설치한 뒤 기본 흐름을 확인했다면, 여기부터는 원문을 더 엄격하게 추적하고 싶은 분을 위한 상세 구조예요.</p>
 
         <div class="layers">
           <div class="layer">
@@ -1230,18 +1374,19 @@
         <h3 class="sub">읽은 내용을 적는 방식</h3>
         <p>
           논문은 한 번에 훑지 않고 순서대로 읽어요. 전체 지도, 방법과 측정과 대조군, 결과와
-          그림과 표, 그리고 결론과 한계 순입니다. 각 항목에는 페이지와 그림 번호, 단위, 조건을
+          그림과 표, 그리고 결론과 한계 순서예요. 각 항목에는 페이지와 그림 번호, 단위, 조건을
           같이 남기고, 그 값이 어떤 성격인지 라벨을 붙여요.
         </p>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>라벨</th><th>뜻</th></tr></thead>
+            <caption>읽은 내용의 성격을 구분하는 라벨</caption>
+            <thead><tr><th scope="col">라벨</th><th scope="col">뜻</th></tr></thead>
             <tbody>
-              <tr><td class="k" data-label="라벨">reported</td><td data-label="뜻">논문이 직접 보고한 값</td></tr>
-              <tr><td class="k" data-label="라벨">modelled</td><td data-label="뜻">모델에서 나온 값</td></tr>
-              <tr><td class="k" data-label="라벨">calculated</td><td data-label="뜻">계산으로 유도한 값</td></tr>
-              <tr><td class="k" data-label="라벨">author interpretation</td><td data-label="뜻">저자의 해석</td></tr>
-              <tr><td class="k" data-label="라벨">synthesis</td><td data-label="뜻">여러 근거를 묶은 정리</td></tr>
+              <tr><th scope="row" class="k" data-label="라벨">reported</th><td data-label="뜻">논문이 직접 보고한 값</td></tr>
+              <tr><th scope="row" class="k" data-label="라벨">modelled</th><td data-label="뜻">모델에서 나온 값</td></tr>
+              <tr><th scope="row" class="k" data-label="라벨">calculated</th><td data-label="뜻">계산으로 유도한 값</td></tr>
+              <tr><th scope="row" class="k" data-label="라벨">author interpretation</th><td data-label="뜻">저자의 해석</td></tr>
+              <tr><th scope="row" class="k" data-label="라벨">synthesis</th><td data-label="뜻">여러 근거를 묶은 정리</td></tr>
             </tbody>
           </table>
         </div>
@@ -1256,7 +1401,7 @@
           사용자가 명시적으로 승인한 PDF만 추출해요. 원본은 밖에 그대로 두고, 페이지 표시가
           붙은 본문 파일과 <code>Source Text Manifest</code>를 만듭니다. 이 파일에는 원본과 추출본의
           해시, 추출기와 옵션, 페이지 수가 기록돼요. 나중에 해시가 달라지면 그 노트는 재검토
-          대상으로 표시됩니다.
+          대상으로 표시돼요.
         </p>
         <ul class="dash">
           <li>텍스트 층이 멀쩡한 PDF는 <code>pdftotext</code> 경로 (macOS는 <code>brew install poppler</code>)</li>
@@ -1271,7 +1416,7 @@
       <div class="sec-body">
         <p class="lead">
           노트는 쌓는 게 목적이 아니라 다시 꺼내 쓰는 게 목적이죠. 정리를 마친 뒤에는
-          같은 스킬에게 그냥 물어보면 됩니다. 따로 설치할 게 없어요.
+          같은 스킬에게 그냥 물어보면 돼요. 따로 설치할 게 없어요.
         </p>
 
         <div class="note-mock">
@@ -1317,7 +1462,7 @@
         <p>
           이미 쓰던 Vault라면 기존 파일을 <strong>제자리에 두기</strong>,
           <strong>새 노트에서 링크만 걸기</strong>, <strong>나중에 따로 승인받고 옮기기</strong>
-          셋 중 하나로만 분류해요. 첫 연결을 승인했다고 해서 대규모 이동이 따라붙는 일은 없습니다.
+          셋 중 하나로만 분류해요. 첫 연결을 승인했다고 해서 대규모 이동이 따라붙는 일은 없어요.
         </p>
       </div>
     </section>
@@ -1327,28 +1472,31 @@
       <div class="sec-body">
         <p class="lead">
           마무리하기 전에 읽기 전용 검사를 한 번 돌려요. 링크가 다 이어지는지, 템플릿 자리표시자가
-          남아 있지 않은지, 승인한 자료 수와 맞는지를 봅니다. Vault를 고치지는 않아요.
-          직접 터미널에 칠 필요는 없고, <strong>“노트 검사 돌려줘”</strong>라고 하면 에이전트가 이 명령을 실행합니다.
+          남아 있지 않은지, 승인한 자료 수와 맞는지를 봐요. Vault를 고치지는 않아요.
+          직접 터미널에 칠 필요는 없고, <strong>“노트 검사 돌려줘”</strong>라고 하면 에이전트가 이 명령을 실행해요.
         </p>
-        <div class="cmd">
-          <pre><span class="p">$ </span>REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py &lt;vault 경로&gt; \
+        <details class="advanced-check">
+          <summary>직접 검사 명령을 실행하고 싶다면</summary>
+          <div class="cmd">
+            <pre><span class="p">$ </span>REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py &lt;vault 경로&gt; \
     --expect-sources &lt;승인한 자료 수&gt; --expect-profile</pre>
-          <button class="btn" data-copy="REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <vault 경로> --expect-sources <승인한 자료 수> --expect-profile">복사</button>
-        </div>
-        <p>본문 파일을 만들었다면 해시와 페이지 맵도 따로 확인해요.</p>
-        <div class="cmd">
-          <pre><span class="p">$ </span>python scripts/check_source_text.py &lt;manifest.md&gt; --vault-root &lt;vault 경로&gt;</pre>
-          <button class="btn" data-copy="python scripts/check_source_text.py <manifest.md> --vault-root <vault 경로>">복사</button>
-        </div>
+            <button class="btn" data-copy="REFERENCE_SCHEMA_MODE=current python scripts/check_notes.py <vault 경로> --expect-sources <승인한 자료 수> --expect-profile">복사</button>
+          </div>
+          <p>본문 파일을 만들었다면 해시와 페이지 맵도 따로 확인해요.</p>
+          <div class="cmd">
+            <pre><span class="p">$ </span>python scripts/check_source_text.py &lt;manifest.md&gt; --vault-root &lt;vault 경로&gt;</pre>
+            <button class="btn" data-copy="python scripts/check_source_text.py <manifest.md> --vault-root <vault 경로>">복사</button>
+          </div>
+        </details>
         <p>
           이 검사는 구조와 출처 추적의 구멍을 잡아줄 뿐, 원문을 대신 읽어주거나 과학적 주장이
-          맞는지 판단해 주지는 않아요. 그건 여전히 사람 몫입니다.
+          맞는지 판단해 주지는 않아요. 그건 여전히 사람 몫이에요.
         </p>
 
         <h3 class="sub">자주 막히는 지점</h3>
         <ul class="dash">
           <li>스킬을 못 찾는다면 설치 후 대화를 새로 시작했는지 확인해 주세요.</li>
-          <li>그래프에 <code>{claim_name}</code> 같은 노드가 보이면 템플릿이에요. Obsidian 그래프 필터에서 <code class="nw">-path:_templates</code>로 빼면 됩니다.</li>
+          <li>그래프에 <code>{claim_name}</code> 같은 노드가 보이면 템플릿이에요. Obsidian 그래프 필터에서 <code class="nw">-path:_templates</code>로 빼면 돼요.</li>
           <li><code>--expect-sources</code> 없이 돌린 검사는 확인용일 뿐이라 마무리 근거로는 못 써요.</li>
         </ul>
       </div>
@@ -1362,8 +1510,9 @@
             <h3>무료인가요?</h3>
             <p>
               개인 연구, 학습, 실험, 교육기관과 공공 연구기관은 무료예요.
-              상업적으로 쓰려면 Moonweave의 별도 라이선스가 필요합니다.
-              (PolyForm Noncommercial 1.0.0. 소스는 공개돼 있지만 OSI 승인 오픈소스는 아니에요.)
+              상업적으로 쓰려면 Moonweave의 별도 라이선스가 필요해요.
+              (<a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a>.
+              소스는 공개돼 있지만 OSI 승인 오픈소스는 아니에요.)
             </p>
           </div>
           <div class="qa">
@@ -1382,17 +1531,17 @@
           <div class="qa">
             <h3>PDF를 한꺼번에 여러 편 줘도 되나요?</h3>
             <p>
-              돼요. 다만 처음에는 한두 편으로 시험 적용을 해보고 결과를 본 다음 늘리는 걸 권합니다.
+              돼요. 다만 처음에는 한두 편으로 시험 적용을 해보고 결과를 본 다음 늘리는 걸 권해요.
               노트가 어떻게 생기는지 보고 규칙을 손볼 수 있거든요. 아직 안 읽은 자료는
-              <code>not reviewed</code>로 잡아두니 목록만 먼저 던져놔도 됩니다.
+              <code>not reviewed</code>로 잡아두니 목록만 먼저 던져놔도 돼요.
             </p>
           </div>
           <div class="qa">
             <h3>Codex에서도 똑같이 되나요?</h3>
             <p>
-              됩니다. 공개된 Agent Skills 사양을 따르는 패키지라 SKILL.md 형식이 그대로 통해요.
+              돼요. 공개된 Agent Skills 사양을 따르는 패키지라 SKILL.md 형식이 그대로 통해요.
               다른 건 스킬 폴더 위치(<code>~/.agents/skills/</code>)와 직접 지목할 때 쓰는
-              <code>$스킬이름</code> 표기 정도예요. 대화 내용과 안전 규칙은 동일합니다.
+              <code>$스킬이름</code> 표기 정도예요. 대화 내용과 안전 규칙은 같아요.
             </p>
           </div>
           <div class="qa">
@@ -1407,7 +1556,7 @@
             <h3>Python이나 개발 도구를 따로 깔아야 하나요?</h3>
             <p>
               노트만 쓸 거면 필요 없어요. 검사와 PDF 본문 추출에만 Python을 쓰는데, 그것도
-              에이전트에게 시키면 알아서 실행합니다.
+              에이전트에게 시키면 알아서 실행해요.
             </p>
           </div>
           <div class="qa">
@@ -1421,6 +1570,7 @@
       </div>
     </section>
 
+    </article>
   </main>
 
   <div class="star">
@@ -1436,12 +1586,22 @@
       <a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/docs/ONBOARDING.md">온보딩 문서</a>
       <a href="https://obsidian.md/download">Obsidian 다운로드</a>
       <a href="https://claude.com/download">Claude 앱 다운로드</a>
+      <a href="https://code.claude.com/docs/en/desktop">Claude Code Desktop 문서</a>
+      <a href="https://support.claude.com/en/articles/12512180-use-skills-in-claude">Claude Skills 업로드 안내</a>
       <a href="https://learn.chatgpt.com/docs/build-skills">Codex 스킬 문서</a>
+      <a href="https://agentskills.io/specification">Agent Skills 사양</a>
+      <a href="https://github.com/moonweave/obsidian-reference-wiki/blob/main/LICENSE">라이선스</a>
     </div>
     <p>
-      Obsidian Research Wiki: Reference · v0.2.0 · Moonweave.
+      가이드 제작 · <strong>moon · phd.ai.log</strong> · Obsidian Research Wiki: Reference · v0.2.0 · Moonweave.
       이 페이지의 명령과 규칙은 저장소 문서를 기준으로 정리했어요. 버전이 올라가면 저장소의
       변경 이력을 먼저 확인해 주세요.
+    </p>
+    <p class="source-note">
+      가이드 확인일 2026.08.15 · 설치와 스킬 호출 방식은
+      <a href="https://learn.chatgpt.com/docs/build-skills">Codex 공식 문서</a>,
+      <a href="https://code.claude.com/docs/en/desktop">Claude Code Desktop 문서</a>와
+      <a href="https://agentskills.io/specification">Agent Skills 사양</a>을 기준으로 확인했습니다.
     </p>
   </footer>
 </div>

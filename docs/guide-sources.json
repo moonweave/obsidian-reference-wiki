@@ -1,0 +1,48 @@
+{
+  "guideUrl": "https://moonweave.github.io/obsidian-reference-wiki/guide.html",
+  "lastReviewed": "2026-08-15",
+  "claims": [
+    {
+      "id": "codex-local-skills",
+      "claim": "Codex loads user skills from ~/.agents/skills/ and supports explicit $skill-name invocation.",
+      "sourceUrl": "https://developers.openai.com/codex/skills/",
+      "verifiedAt": "2026-08-15",
+      "volatility": "high"
+    },
+    {
+      "id": "codex-desktop-skills",
+      "claim": "Standalone skills are available in the ChatGPT desktop app, and ChatGPT/Codex can explicitly select skills from the prompt surface.",
+      "sourceUrl": "https://developers.openai.com/codex/skills/",
+      "verifiedAt": "2026-08-15",
+      "volatility": "high"
+    },
+    {
+      "id": "claude-desktop-code",
+      "claim": "Claude Desktop's Code tab supports a local environment, a selected project folder, and skill selection from the prompt UI.",
+      "sourceUrl": "https://code.claude.com/docs/en/desktop",
+      "verifiedAt": "2026-08-15",
+      "volatility": "high"
+    },
+    {
+      "id": "claude-chat-skill-upload",
+      "claim": "Claude users can upload a custom skill ZIP from Customize > Skills; this is separate from using Claude Code on a local Vault.",
+      "sourceUrl": "https://support.claude.com/en/articles/12512180-use-skills-in-claude",
+      "verifiedAt": "2026-08-15",
+      "volatility": "high"
+    },
+    {
+      "id": "agent-skills-format",
+      "claim": "An Agent Skill is a directory containing a required SKILL.md file and optional supporting resources.",
+      "sourceUrl": "https://agentskills.io/specification",
+      "verifiedAt": "2026-08-15",
+      "volatility": "medium"
+    },
+    {
+      "id": "project-license",
+      "claim": "This repository is distributed under PolyForm Noncommercial License 1.0.0.",
+      "sourceUrl": "https://github.com/moonweave/obsidian-reference-wiki/blob/main/LICENSE",
+      "verifiedAt": "2026-08-15",
+      "volatility": "medium"
+    }
+  ]
+}

@@ -347,8 +347,13 @@ def extract(args: argparse.Namespace) -> dict[str, object]:
         raise RuntimeError("vault-local output must be inside the approved Vault")
     if args.storage == "external" and output.is_relative_to(vault_root):
         raise RuntimeError("external output must be outside the approved Vault")
+    if output == source or manifest == source:
+        raise RuntimeError("output and manifest must not overwrite the canonical PDF")
     if output == manifest:
         raise RuntimeError("output and manifest paths must differ")
+    for candidate in (output, manifest):
+        if candidate.exists() and os.path.samefile(source, candidate):
+            raise RuntimeError("output and manifest must not alias the canonical PDF")
     for path in (output, manifest):
         if path.exists() and not args.overwrite:
             raise RuntimeError(f"refusing to overwrite existing file: {path}")

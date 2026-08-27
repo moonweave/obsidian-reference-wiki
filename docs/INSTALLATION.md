@@ -28,11 +28,11 @@ skills directory your agent reads. The installed directory must contain
 | Agent | Personal skills directory | Explicit invocation |
 | --- | --- | --- |
 | Claude Code | `~/.claude/skills/` | `/obsidian-research-wiki-reference` |
-| Codex | `~/.agents/skills/` | `$obsidian-research-wiki-reference` |
+| Codex | `~/.codex/skills/` | `$obsidian-research-wiki-reference` |
 
 Both agents also pick the skill up from the description alone, so naming it in
 plain language is enough. A project-scoped install goes in `.claude/skills/` or
-`.agents/skills/` inside the Vault instead. Other agents that implement the
+`.codex/skills/` inside the Vault instead. Other agents that implement the
 specification use their own paths; check their documentation.
 
 The skill writes notes into a folder on your machine, so it needs an agent with

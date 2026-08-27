@@ -64,17 +64,20 @@ def verify(manifest: Path, vault_root: Path) -> dict[str, object]:
         else:
             if storage == "external" and not supplied_location.is_absolute():
                 errors.append("external source_text_location must be absolute")
-            if storage == "vault-local" and supplied_location.is_absolute():
-                errors.append("vault-local source_text_location must be relative to the manifest")
-            location = supplied_location
-            if not location.is_absolute():
-                location = manifest.parent / location
-            location = location.resolve()
-            if storage == "vault-local" and not location.is_relative_to(vault_root):
-                errors.append("vault-local derived source text is outside the approved Vault root")
                 location = None
-            elif not location.is_file():
-                errors.append(f"derived source text does not exist: {location}")
+            elif storage == "vault-local" and supplied_location.is_absolute():
+                errors.append("vault-local source_text_location must be relative to the manifest")
+                location = None
+            else:
+                location = supplied_location
+                if not location.is_absolute():
+                    location = manifest.parent / location
+                location = location.resolve()
+                if storage == "vault-local" and not location.is_relative_to(vault_root):
+                    errors.append("vault-local derived source text is outside the approved Vault root")
+                    location = None
+                elif not location.is_file():
+                    errors.append(f"derived source text does not exist: {location}")
 
     expected_hash = metadata.get("source_text_hash", "")
     if not SHA256.fullmatch(expected_hash):

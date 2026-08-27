@@ -280,8 +280,16 @@ def main() -> None:
         canonical_dir.mkdir(parents=True)
         canonical_pdf = canonical_dir / "two page.pdf"
         shutil.copy2(ROOT / "evals/fixtures/source-text/two-page.pdf", canonical_pdf)
+        canonical_before = canonical_pdf.read_bytes()
         extraction_output = extraction_vault / "05 Source Text/Full Text/Full Text — Two Page Fixture.md"
         extraction_manifest = extraction_vault / "05 Source Text/Manifests/Source Text Manifest — Two Page Fixture.md"
+        overwrite_pdf = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/extract_source_text.py"), str(canonical_pdf), "--output", str(canonical_pdf), "--manifest", str(extraction_manifest), "--vault-root", str(extraction_vault), "--source-name", "Two Page Fixture", "--reference-type", "Paper", "--storage", "external", "--basis", "native-text", "--overwrite", "--json"],
+            check=False, capture_output=True, text=True,
+        )
+        assert overwrite_pdf.returncode == 1
+        assert "must not overwrite the canonical PDF" in overwrite_pdf.stdout + overwrite_pdf.stderr
+        assert canonical_pdf.read_bytes() == canonical_before
         extracted = subprocess.run(
             [
                 sys.executable,
@@ -526,6 +534,18 @@ def main() -> None:
         assert escaped_check.returncode == 1
         assert "outside the approved Vault root" in escaped_check.stdout
         assert json.loads(escaped_check.stdout)["byte_count"] == 0
+        external_relative_values = source_text_values | {
+            "source_text_storage": "external",
+            "source_text_location": "../Full Text/Full Text — Anchor Review.md",
+        }
+        write(vault, "05 Source Text/Manifests/Source Text Manifest — External Relative", render(templates / "source-text-manifest.md", external_relative_values))
+        external_relative_check = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/check_source_text.py"), str(vault / "05 Source Text/Manifests/Source Text Manifest — External Relative.md"), "--vault-root", str(vault), "--json"],
+            check=False, capture_output=True, text=True,
+        )
+        assert external_relative_check.returncode == 1
+        assert "external source_text_location must be absolute" in external_relative_check.stdout
+        assert json.loads(external_relative_check.stdout)["byte_count"] == 0
         linked_text = vault / "05 Source Text/Full Text/Linked outside.md"
         linked_text.symlink_to(escaped_text)
         linked_values = escaped_values | {

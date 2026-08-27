@@ -129,6 +129,7 @@ def check(
     root: Path,
     expected_sources: int | None = None,
     expect_profile: bool = False,
+    scope_prefix: str | None = None,
 ) -> dict[str, object]:
     errors: list[str] = []
     schema_mode = os.environ.get("REFERENCE_SCHEMA_MODE", "compat")
@@ -139,11 +140,12 @@ def check(
             "errors": ["REFERENCE_SCHEMA_MODE must be compat or current"],
         }
     current_schema = schema_mode == "current"
-    notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
+    all_notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
+    notes = [path for path in all_notes if scope_prefix is None or scope_prefix in path.relative_to(root).parts]
     name_paths: dict[str, list[Path]] = {}
-    for path in notes:
+    for path in all_notes:
         name_paths.setdefault(path.stem, []).append(path)
-    references = source_notes(root)
+    references = [path for path in source_notes(root) if path in notes]
     profiles = [
         path
         for path in notes

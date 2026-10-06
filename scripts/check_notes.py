@@ -20,6 +20,9 @@ VALID_SOURCE_TEXT_STATUSES = {"available", "not supplied", "not reviewed", "stal
 VALID_SOURCE_TEXT_STORAGE = {"external", "vault-local", "not supplied", "not reviewed"}
 VALID_PAGE_MAPS = {"pdf-page-comments", "section-only", "not provided"}
 VALID_REFERENCE_KINDS = {"paper", "report", "web-page", "standard", "dataset", "other"}
+VALID_REVIEW_STATUSES = {"not-reviewed", "partial", "reviewed"}
+# A library summary that covers the full text must be a reviewed dossier instead.
+VALID_SUMMARY_BASES = {"none", "abstract", "supplied-excerpt", "sections"}
 SOURCE_TEXT_HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 SOURCE_TEXT_MANIFEST_TYPE = "source-text-manifest"
 REFERENCE_PROFILE_TYPE = "reference-profile"
@@ -92,6 +95,40 @@ def source_notes(root: Path) -> list[Path]:
     )
 
 
+def library_records(root: Path, library_scope: str) -> list[Path]:
+    return sorted(
+        path
+        for path in (root / library_scope).rglob("*.md")
+        if frontmatter(path.read_text(encoding="utf-8")).get("type") == "reference-record"
+    )
+
+
+def check_library_record(path: Path, root: Path, text: str, meta: dict[str, str]) -> list[str]:
+    relative = path.relative_to(root)
+    errors: list[str] = []
+    if meta.get("reference_kind") not in VALID_REFERENCE_KINDS:
+        errors.append(f"invalid reference_kind: {relative}")
+    if not meta.get("canonical_location"):
+        errors.append(f"missing canonical_location: {relative}")
+    for key in ("reviewed_scope", "unreviewed_scope"):
+        if not substantive(meta.get(key, "")):
+            errors.append(f"missing {key}: {relative}")
+    summary_basis = meta.get("summary_basis", "")
+    if summary_basis not in VALID_SUMMARY_BASES:
+        errors.append(f"invalid summary_basis: {relative} -> {summary_basis or 'missing'}")
+    if meta.get("source_text_status") not in VALID_SOURCE_TEXT_STATUSES:
+        errors.append(f"invalid source_text_status: {relative}")
+    if meta.get("source_text_storage") not in VALID_SOURCE_TEXT_STORAGE:
+        errors.append(f"invalid source_text_storage: {relative}")
+    if not substantive(section_preamble(text, "## Extraction and review trace")):
+        errors.append(f"source review trace is not supplied: {relative}")
+    if meta.get("review_status") == "not-reviewed" and summary_basis != "none":
+        errors.append(f"not-reviewed library record must not carry a summary: {relative}")
+    if meta.get("review_status") == "partial" and summary_basis == "none":
+        errors.append(f"partial library record must name its summary_basis: {relative}")
+    return errors
+
+
 def in_domain(path: Path, domain: str) -> bool:
     return any(part == domain or part.endswith(f" {domain}") for part in path.parts)
 
@@ -130,6 +167,7 @@ def check(
     expected_sources: int | None = None,
     expect_profile: bool = False,
     scope_prefix: str | None = None,
+    library_scope: str | None = None,
 ) -> dict[str, object]:
     errors: list[str] = []
     schema_mode = os.environ.get("REFERENCE_SCHEMA_MODE", "compat")
@@ -140,12 +178,19 @@ def check(
             "errors": ["REFERENCE_SCHEMA_MODE must be compat or current"],
         }
     current_schema = schema_mode == "current"
-    all_notes = sorted(path for path in root.rglob("*.md") if "_templates" not in path.parts)
+    # Obsidian does not index dot-directories, so their Markdown is not part of the Vault.
+    all_notes = sorted(
+        path
+        for path in root.rglob("*.md")
+        if "_templates" not in path.parts
+        and not any(part.startswith(".") for part in path.relative_to(root).parts)
+    )
     notes = [path for path in all_notes if scope_prefix is None or scope_prefix in path.relative_to(root).parts]
     name_paths: dict[str, list[Path]] = {}
     for path in all_notes:
         name_paths.setdefault(path.stem, []).append(path)
-    references = [path for path in source_notes(root) if path in notes]
+    library = set(library_records(root, library_scope)) if library_scope else set()
+    references = sorted(path for path in set(source_notes(root)) | library if path in notes)
     profiles = [
         path
         for path in notes
@@ -303,12 +348,25 @@ def check(
         text = path.read_text(encoding="utf-8")
         meta = frontmatter(text)
         status = review_status(meta)
+        if path in library:
+            # Library records keep the host Vault's legacy `status` field, so read only review_status.
+            status = meta.get("review_status", "")
+            if status not in VALID_REVIEW_STATUSES:
+                errors.append(f"invalid source status: {path.relative_to(root)}")
+                continue
+            if status != "reviewed":
+                errors.extend(check_library_record(path, root, text, meta))
+                if status == "partial":
+                    partial += 1
+                else:
+                    captured += 1
+                continue
         if current_schema:
             if meta.get("type") != "reference-record":
                 errors.append(f"invalid reference record type: {path.relative_to(root)}")
             if meta.get("reference_kind") not in VALID_REFERENCE_KINDS:
                 errors.append(f"invalid reference_kind: {path.relative_to(root)}")
-            if "status" in meta:
+            if "status" in meta and path not in library:
                 errors.append(f"legacy status field is not allowed in current schema: {path.relative_to(root)}")
         if not meta.get("canonical_location"):
             errors.append(f"missing canonical_location: {path.relative_to(root)}")
@@ -513,6 +571,14 @@ def main() -> int:
         action="store_true",
         help="fail unless one valid persisted Reference Profile is present",
     )
+    parser.add_argument(
+        "--scope",
+        help="lint only notes under this top-level folder; links still resolve Vault-wide",
+    )
+    parser.add_argument(
+        "--library-scope",
+        help="folder whose type: reference-record notes are checked as library-tier records",
+    )
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
     if args.expect_sources is not None and args.expect_sources < 0:
@@ -525,6 +591,8 @@ def main() -> int:
         root,
         expected_sources=args.expect_sources,
         expect_profile=args.expect_profile,
+        scope_prefix=args.scope,
+        library_scope=args.library_scope,
     )
     if args.as_json:
         print(json.dumps(result, ensure_ascii=False, indent=2))

@@ -272,6 +272,26 @@ for the factual review. Template Markdown can otherwise appear as
 `{claim_name}`-style graph nodes; those are not research records, and the skill
 does not edit `.obsidian` automatically to hide them.
 
+## Library tier for an existing corpus
+
+A large existing paper corpus joins the schema in place rather than by
+migration. Each note keeps its basename, folder, and any legacy `status` field
+that other tools read, and gains `type: reference-record`, `review_status`,
+`summary_basis`, `reviewed_scope`, `unreviewed_scope`, `canonical_location`,
+and source-text fields, plus an `## Extraction and review trace` section.
+
+- `not-reviewed` + `summary_basis: none`: metadata and author abstract only.
+- `partial` + `summary_basis: abstract` (or `supplied-excerpt`, `sections`): any
+  generated summary is labelled `synthesis` of that excerpt, never a reading of
+  the full text.
+- `reviewed`: the full dossier contract above, with PDF page anchors and
+  evidence labels. Promote nodes only from these.
+
+Whatever regenerates a summary must update these labels in the same write.
+Check with `python scripts/check_notes.py <vault> --scope <top folder>
+--library-scope <corpus folder> --expect-sources <labelled count>
+--expect-profile`. Label a pilot first and roll out only after it passes.
+
 ## Existing Vault and handoff
 
 For a mixed Vault, the baseline ledger must use exactly `keep in place`, `link

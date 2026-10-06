@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 14`
+`contract_version: 15`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -181,3 +181,13 @@ For `reviewed` sources, required dossier sections must contain substantive
 content rather than `not supplied`. A promoted note must carry a PDF page
 anchor and may link only to a Source dossier whose status is `reviewed`;
 promotion from a partial or unread source fails.
+
+An existing corpus can join through the library tier instead of migration. A
+library record keeps its basename, folder, and legacy `status`, and carries
+`type: reference-record`, `review_status`, and `summary_basis`. `not-reviewed`
+records hold no summary; `partial` records name the excerpt their summary was
+synthesized from; only `reviewed` records follow the full dossier contract and
+may source promoted nodes. A library record that claims available source text
+must become a reviewed dossier, and a `Paper — …` or `Source — …` dossier inside
+the scope keeps the full dossier rules. The lint discovers these records with
+`--library-scope`, which also skips dot-directories that Obsidian does not index.

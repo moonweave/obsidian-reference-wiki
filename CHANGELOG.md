@@ -5,6 +5,14 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Added a library tier so an existing paper corpus can join the schema in
+  place: notes keep their basenames and legacy `status`, and carry
+  `review_status` plus `summary_basis` so an abstract-derived summary can no
+  longer pass for a reviewed reading. `check_notes.py` gains `--library-scope`
+  and `--scope`; library mode skips dot-directories that Obsidian does not
+  index, so results for existing Vaults are unchanged.
+  Contract version 15.
+
 ## [0.2.0] — 2026-08-10
 
 - Added an Answer mode: the skill now reads its own notes back, quoting the

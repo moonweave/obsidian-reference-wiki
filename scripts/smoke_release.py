@@ -615,7 +615,121 @@ def main() -> None:
         assert tampered_source_text.returncode == 1
         assert "source_text_hash mismatch" in tampered_source_text.stdout
 
+    check_library_tier()
     print("PASS: standalone Reference release first-run smoke")
+
+
+LIBRARY_PROFILE = """---
+type: reference-profile
+profile_schema_version: 1
+preset: searchable-library
+organization_mode: balanced
+source_text_policy: searchable
+source_text_availability: unavailable
+source_text_storage: not supplied
+preset_status: pending-source-text
+sharing: private
+sync_exposure: none
+---
+## Next action
+
+Label library records before writing reviewed dossiers.
+"""
+
+LIBRARY_RECORD = """---
+status: unread
+type: reference-record
+reference_kind: paper
+review_status: {review_status}
+summary_basis: {summary_basis}
+canonical_location: zotero://select/library/items/ABC123
+reviewed_scope: abstract field only
+unreviewed_scope: full text
+source_text_basis: supplied-excerpt
+source_text_status: not supplied
+source_text_storage: not supplied
+---
+## Abstract
+
+A supplied abstract.
+
+## Extraction and review trace
+
+- Summary: {summary_basis}.
+"""
+
+
+def check_library_tier() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        vault = Path(tmp)
+        write(vault, "Reference Profile", LIBRARY_PROFILE)
+        write(vault, "Reference Index", "---\ntype: reference-index\n---\n- [[Reference Profile]]\n")
+        library = vault / "papers"
+        library.mkdir()
+        for name, status, basis in (
+            ("smithA2020", "partial", "abstract"),
+            ("smithB2021", "not-reviewed", "none"),
+        ):
+            (library / f"{name}.md").write_text(
+                LIBRARY_RECORD.format(review_status=status, summary_basis=basis), encoding="utf-8"
+            )
+
+        def run() -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts/check_notes.py"),
+                    str(vault),
+                    "--library-scope",
+                    "papers",
+                    "--expect-sources",
+                    "2",
+                    "--expect-profile",
+                    "--json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        checked = run()
+        assert checked.returncode == 0, checked.stdout + checked.stderr
+        result = json.loads(checked.stdout)
+        assert (result["partial_sources"], result["capture_sources"]) == (1, 1)
+
+        capture = library / "smithB2021.md"
+        capture.write_text(
+            capture.read_text(encoding="utf-8").replace("summary_basis: none", "summary_basis: abstract"),
+            encoding="utf-8",
+        )
+        mislabelled = run()
+        assert mislabelled.returncode == 1
+        assert "not-reviewed library record must not carry a summary" in mislabelled.stdout
+        capture.write_text(
+            capture.read_text(encoding="utf-8")
+            .replace("summary_basis: abstract", "summary_basis: none")
+            .replace("source_text_status: not supplied", "source_text_status: available"),
+            encoding="utf-8",
+        )
+        claimed = run()
+        assert claimed.returncode == 1
+        assert "library record claims source text without a reviewed dossier" in claimed.stdout
+
+        (library / "Paper — Dossier.md").write_text(
+            LIBRARY_RECORD.format(review_status="partial", summary_basis="abstract"), encoding="utf-8"
+        )
+        dossier = run()
+        assert "missing ## Reference map: papers/Paper — Dossier.md" in dossier.stdout
+
+    with tempfile.TemporaryDirectory() as tmp:
+        missing_scope = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/check_notes.py"), tmp, "--library-scope", "papres"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert missing_scope.returncode == 1
+        assert "library scope is not a folder: papres" in missing_scope.stdout
 
 
 if __name__ == "__main__":

@@ -187,5 +187,7 @@ library record keeps its basename, folder, and legacy `status`, and carries
 `type: reference-record`, `review_status`, and `summary_basis`. `not-reviewed`
 records hold no summary; `partial` records name the excerpt their summary was
 synthesized from; only `reviewed` records follow the full dossier contract and
-may source promoted nodes. The lint discovers these records with
-`--library-scope` and ignores dot-directories, which Obsidian does not index.
+may source promoted nodes. A library record that claims available source text
+must become a reviewed dossier, and a `Paper — …` or `Source — …` dossier inside
+the scope keeps the full dossier rules. The lint discovers these records with
+`--library-scope`, which also skips dot-directories that Obsidian does not index.

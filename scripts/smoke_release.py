@@ -705,6 +705,31 @@ def check_library_tier() -> None:
         mislabelled = run()
         assert mislabelled.returncode == 1
         assert "not-reviewed library record must not carry a summary" in mislabelled.stdout
+        capture.write_text(
+            capture.read_text(encoding="utf-8")
+            .replace("summary_basis: abstract", "summary_basis: none")
+            .replace("source_text_status: not supplied", "source_text_status: available"),
+            encoding="utf-8",
+        )
+        claimed = run()
+        assert claimed.returncode == 1
+        assert "library record claims source text without a reviewed dossier" in claimed.stdout
+
+        (library / "Paper — Dossier.md").write_text(
+            LIBRARY_RECORD.format(review_status="partial", summary_basis="abstract"), encoding="utf-8"
+        )
+        dossier = run()
+        assert "missing ## Reference map: papers/Paper — Dossier.md" in dossier.stdout
+
+    with tempfile.TemporaryDirectory() as tmp:
+        missing_scope = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/check_notes.py"), tmp, "--library-scope", "papres"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert missing_scope.returncode == 1
+        assert "library scope is not a folder: papres" in missing_scope.stdout
 
 
 if __name__ == "__main__":

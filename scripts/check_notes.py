@@ -116,9 +116,13 @@ def check_library_record(path: Path, root: Path, text: str, meta: dict[str, str]
     summary_basis = meta.get("summary_basis", "")
     if summary_basis not in VALID_SUMMARY_BASES:
         errors.append(f"invalid summary_basis: {relative} -> {summary_basis or 'missing'}")
-    if meta.get("source_text_status") not in VALID_SOURCE_TEXT_STATUSES:
-        errors.append(f"invalid source_text_status: {relative}")
-    if meta.get("source_text_storage") not in VALID_SOURCE_TEXT_STORAGE:
+    basis = meta.get("source_text_basis", "")
+    if basis not in VALID_TEXT_BASES and not (basis == "unknown" and meta.get("review_status") == "not-reviewed"):
+        errors.append(f"invalid source_text_basis: {relative} -> {basis or 'missing'}")
+    # Available source text needs the manifest and hash checks of a reviewed dossier.
+    if meta.get("source_text_status") not in {"not supplied", "not reviewed"}:
+        errors.append(f"library record claims source text without a reviewed dossier: {relative}")
+    if meta.get("source_text_storage") not in {"not supplied", "not reviewed", "external", "vault-local"}:
         errors.append(f"invalid source_text_storage: {relative}")
     if not substantive(section_preamble(text, "## Extraction and review trace")):
         errors.append(f"source review trace is not supplied: {relative}")
@@ -178,19 +182,29 @@ def check(
             "errors": ["REFERENCE_SCHEMA_MODE must be compat or current"],
         }
     current_schema = schema_mode == "current"
-    # Obsidian does not index dot-directories, so their Markdown is not part of the Vault.
+    # Obsidian does not index dot-directories; skip them only in library mode so
+    # existing Vault results are unchanged.
     all_notes = sorted(
         path
         for path in root.rglob("*.md")
         if "_templates" not in path.parts
-        and not any(part.startswith(".") for part in path.relative_to(root).parts)
+        and not (library_scope and any(part.startswith(".") for part in path.relative_to(root).parts))
     )
     notes = [path for path in all_notes if scope_prefix is None or scope_prefix in path.relative_to(root).parts]
     name_paths: dict[str, list[Path]] = {}
     for path in all_notes:
         name_paths.setdefault(path.stem, []).append(path)
-    library = set(library_records(root, library_scope)) if library_scope else set()
-    references = sorted(path for path in set(source_notes(root)) | library if path in notes)
+    if library_scope and not (root / library_scope).is_dir():
+        errors.append(f"library scope is not a folder: {library_scope}")
+    scoped = (
+        set(library_records(root, library_scope))
+        if library_scope and (root / library_scope).is_dir()
+        else set()
+    )
+    # A Paper/Source dossier keeps the full dossier rules even inside the library scope.
+    dossiers = {path for path in scoped if path.stem.startswith(("Paper — ", "Source — "))}
+    library = scoped - dossiers
+    references = sorted(path for path in set(source_notes(root)) | scoped if path in notes)
     profiles = [
         path
         for path in notes
@@ -573,11 +587,14 @@ def main() -> int:
     )
     parser.add_argument(
         "--scope",
-        help="lint only notes under this top-level folder; links still resolve Vault-wide",
+        help="lint only notes under a folder with this name; links still resolve Vault-wide",
     )
     parser.add_argument(
         "--library-scope",
-        help="folder whose type: reference-record notes are checked as library-tier records",
+        help=(
+            "folder whose type: reference-record notes are checked as library-tier records; "
+            "also skips dot-directories, which Obsidian does not index"
+        ),
     )
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()

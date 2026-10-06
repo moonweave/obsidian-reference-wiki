@@ -9,7 +9,8 @@ versioning for public releases.
   place: notes keep their basenames and legacy `status`, and carry
   `review_status` plus `summary_basis` so an abstract-derived summary can no
   longer pass for a reviewed reading. `check_notes.py` gains `--library-scope`
-  and `--scope`, and skips dot-directories that Obsidian does not index.
+  and `--scope`; library mode skips dot-directories that Obsidian does not
+  index, so results for existing Vaults are unchanged.
   Contract version 15.
 
 ## [0.2.0] — 2026-08-10

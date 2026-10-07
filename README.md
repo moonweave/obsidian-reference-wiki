@@ -182,7 +182,7 @@ Does an AI answering from a library organised with this skill make things up? Me
   <img alt="Headline numbers (hallucination rate, refusals, answer accuracy) and a chart of how the library improved" src="docs/progress/figure-light.svg" width="100%">
 </picture>
 
-One person's library and question set, with an AI judge checked against planted errors; the numbers are not comparable to public leaderboards. The judge catches reversed meanings but can miss small additions such as an unsupported "first", so the hallucination rate may be an underestimate. Searching and answering use the maintainer's own search tools, which are not part of this skill; the skill contributes the review labels and PDF page numbers that let answers be checked.
+One person's library and question set, with an AI judge checked against planted errors; the numbers are not comparable to public leaderboards. The judge catches reversed meanings, and a separate rule flags "first", "best" or "only" wording the source does not support; subtler distortions can still slip through, so the hallucination rate may be an underestimate. Searching and answering use the maintainer's own search tools, which are not part of this skill; the skill contributes the review labels and PDF page numbers that let answers be checked.
 
 <details>
 <summary>All metrics</summary>

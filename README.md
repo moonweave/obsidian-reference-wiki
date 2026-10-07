@@ -175,14 +175,14 @@ reading the source or reviewing scientific claims.
 
 Does an AI answering from a library organised with this skill make things up? Measured on the maintainer's own library of 565 papers. Updated 2026-10-07.
 
-**7%** of AI claims had no support in the cited paper · **40/40** unanswerable questions declined · **96%** of answerable questions answered with a correct source
+**3%** of AI claims had no support in the cited paper · **40/40** unanswerable questions declined · **96%** of answerable questions answered with a correct source
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/progress/figure-dark.svg">
   <img alt="Headline numbers (hallucination rate, refusals, answer accuracy) and a chart of how the library improved" src="docs/progress/figure-light.svg" width="100%">
 </picture>
 
-One person's library and question set, with an AI judge checked against planted errors; the numbers are not comparable to public leaderboards. The judge catches reversed meanings, and a separate rule flags "first", "best" or "only" wording the source does not support; subtler distortions can still slip through, so the hallucination rate may be an underestimate. Searching and answering use the maintainer's own search tools, which are not part of this skill; the skill contributes the review labels and PDF page numbers that let answers be checked.
+One person's library and question set, with an AI judge checked against planted errors and every flagged line re-checked by a stronger model; the numbers are not comparable to public leaderboards. The judge catches reversed meanings, and a separate rule flags "first", "best" or "only" wording the source does not support; subtler distortions can still slip through, so the hallucination rate may be an underestimate. Searching and answering use the maintainer's own search tools, which are not part of this skill; the skill contributes the review labels and PDF page numbers that let answers be checked.
 
 <details>
 <summary>All metrics</summary>
@@ -192,9 +192,9 @@ One person's library and question set, with an AI judge checked against planted 
 | AI answer score (CRAG) | 0.947 | 0.947 |
 | AI answers with a correct source | 96% | 96% |
 | AI declines unanswerable questions | 100% | 100% |
-| AI claims backed by the cited paper | 93% | 93% |
-| AI citations that back a claim | 93% | 93% |
-| Cited PDF page holds the claim | 93% | 93% |
+| AI claims backed by the cited paper | 93% | 97% |
+| AI citations that back a claim | 93% | 97% |
+| Cited PDF page holds the claim | 93% | 98% |
 | Right paper ranked first: Exact wording | 0.625 | 0.833 |
 | Right paper ranked first: Paraphrased | 0.667 | 0.750 |
 | Right paper ranked first: Multi-paper | 0.929 | 0.857 |

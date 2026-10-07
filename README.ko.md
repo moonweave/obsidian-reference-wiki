@@ -170,22 +170,20 @@ python scripts/smoke_release.py
 
 관리자 본인의 논문 565편을 이 스킬의 라이브러리 단계로 정리한 뒤 잰 값입니다. 추적 가능성 그래프(검토 표시, PDF 쪽 앵커)는 이 스킬이 만드는 결과입니다. 검색과 근거 있는 답변 그래프는 이 스킬에 포함되지 않는 관리자의 별도 검색 엔진에서 나온 값으로, 이렇게 정리한 서재가 근거 있는 답변을 얼마나 뒷받침하는지 보여 줍니다. 갱신: 2026-10-07 (AI-in-the-loop).
 
-![AI answering](docs/progress/agent.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/progress/figure-dark.svg">
+  <img alt="진행 그림: a, AI가 서재로 답하기; b, 정답 논문 찾기; c, 출처 추적 가능성" src="docs/progress/figure-light.svg" width="100%">
+</picture>
 
-AI 포함 평가 모델: `claude-sonnet-5-5` (질문 170개).
-
-![Retrieval](docs/progress/retrieval.svg)
-
-![Grounding](docs/progress/grounding.svg)
-
-![Structure](docs/progress/structure.svg)
+a: Claude Sonnet 5.5, 질문 170개.
 
 | 지표 | 처음 (2026-10-06) | 지금 (2026-10-07) |
 |---|---|---|
 | AI 답변 점수 (CRAG) | 0.947 | 0.947 |
 | AI가 답할 수 없는 질문에 "모름" | 100% | 100% |
-| AI 인용 중 정답 표시 논문 비율 (하한값) | 53% | 53% |
-| AI 답변에 PDF 쪽 표시 | 72% | 72% |
+| AI 주장이 인용 논문으로 뒷받침됨 | – | – |
+| AI 인용 중 실제 근거가 된 비율 | – | – |
+| 인용한 PDF 쪽에 실제로 그 내용이 있음 | – | – |
 | 첫 결과가 정답 논문: 원문 표현 | 0.625 | 0.833 |
 | 첫 결과가 정답 논문: 바꿔 말한 질문 | 0.667 | 0.750 |
 | 첫 결과가 정답 논문: 여러 논문을 잇는 질문 | 0.929 | 0.857 |

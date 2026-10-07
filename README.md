@@ -175,22 +175,20 @@ reading the source or reviewing scientific claims.
 
 Measured on the maintainer's own library of 565 papers, organised with this skill's library tier. The traceability chart comes from this skill: review labels and PDF page anchors. The retrieval and grounded-answer charts come from the maintainer's separate search stack, which is not part of this skill; they show whether a library organised this way supports grounded answers. Updated 2026-10-07 (AI-in-the-loop).
 
-![AI answering](docs/progress/agent.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/progress/figure-dark.svg">
+  <img alt="Progress figure: a, AI answering from the library; b, finding the right paper; c, traceability" src="docs/progress/figure-light.svg" width="100%">
+</picture>
 
-AI-in-the-loop answers by `claude-sonnet-5-5` on 170 questions.
-
-![Retrieval](docs/progress/retrieval.svg)
-
-![Grounding](docs/progress/grounding.svg)
-
-![Structure](docs/progress/structure.svg)
+a: Claude Sonnet 5.5 on 170 questions.
 
 | Metric | First (2026-10-06) | Latest (2026-10-07) |
 |---|---|---|
 | AI answer score (CRAG) | 0.947 | 0.947 |
 | AI declines unanswerable questions | 100% | 100% |
-| AI citations matching labelled papers (lower bound) | 53% | 53% |
-| AI answers cite a PDF page | 72% | 72% |
+| AI claims backed by the cited paper | – | – |
+| AI citations that back a claim | – | – |
+| Cited PDF page holds the claim | – | – |
 | Right paper ranked first: Exact wording | 0.625 | 0.833 |
 | Right paper ranked first: Paraphrased | 0.667 | 0.750 |
 | Right paper ranked first: Multi-paper | 0.929 | 0.857 |

@@ -38,35 +38,40 @@
 <text x="74.0" y="404.5" font-size="12" font-weight="400" fill="#898781" text-anchor="end">100%</text>
 <text x="84.0" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">PDF 읽기 실패</text>
 <text x="84.0" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/06</text>
-<text x="285.2" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">PDF 복구</text>
-<text x="285.2" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/06</text>
-<text x="486.4" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">노트 표시</text>
-<text x="486.4" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/06</text>
-<text x="687.6" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">쪽 번호 추가</text>
-<text x="687.6" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
-<text x="888.8" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">AI 평가</text>
-<text x="888.8" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
-<text x="1090.0" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">주장 검증</text>
+<text x="251.7" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">PDF 복구</text>
+<text x="251.7" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/06</text>
+<text x="419.3" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">노트 표시</text>
+<text x="419.3" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/06</text>
+<text x="587.0" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">쪽 번호 추가</text>
+<text x="587.0" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
+<text x="754.7" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">AI 평가</text>
+<text x="754.7" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
+<text x="922.3" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">주장 검증</text>
+<text x="922.3" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
+<text x="1090.0" y="702.0" font-size="12.5" font-weight="400" fill="#c3c2b7" text-anchor="middle">더 엄격한 검사</text>
 <text x="1090.0" y="718.0" font-size="11.5" font-weight="400" fill="#898781" text-anchor="middle">10/07</text>
-<polyline points="84.0,473.2 285.2,448.5 687.6,448.5 888.8,448.5 1090.0,448.5" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="84.0,473.2 251.7,448.5 587.0,448.5 754.7,448.5 922.3,448.5 1090.0,448.5" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="84.0" cy="473.2" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="285.2" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="687.6" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="888.8" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="251.7" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="587.0" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="754.7" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="922.3" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
 <circle cx="1090.0" cy="448.5" r="4.5" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
 <text x="1102.0" y="453.0" font-size="13" font-weight="600" fill="#ffffff" text-anchor="start">83%</text>
-<polyline points="285.2,680.0 486.4,680.0 687.6,551.8 888.8,551.8 1090.0,551.8" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="285.2" cy="680.0" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="486.4" cy="680.0" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="687.6" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="888.8" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
+<polyline points="251.7,680.0 419.3,680.0 587.0,551.8 754.7,551.8 922.3,551.8 1090.0,551.8" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="251.7" cy="680.0" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="419.3" cy="680.0" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="587.0" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="754.7" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="922.3" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
 <circle cx="1090.0" cy="551.8" r="4.5" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
 <text x="1102.0" y="556.3" font-size="13" font-weight="600" fill="#ffffff" text-anchor="start">46%</text>
-<polyline points="285.2,675.0 486.4,400.0 687.6,400.0 888.8,400.0 1090.0,400.0" fill="none" stroke="#199e70" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="285.2" cy="675.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="486.4" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="687.6" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
-<circle cx="888.8" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
+<polyline points="251.7,675.0 419.3,400.0 587.0,400.0 754.7,400.0 922.3,400.0 1090.0,400.0" fill="none" stroke="#199e70" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="251.7" cy="675.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="419.3" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="587.0" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="754.7" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
+<circle cx="922.3" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
 <circle cx="1090.0" cy="400.0" r="4.5" fill="#199e70" stroke="#1a1a19" stroke-width="2"/>
 <text x="1102.0" y="404.5" font-size="13" font-weight="600" fill="#ffffff" text-anchor="start">100%</text>
 </svg>

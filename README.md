@@ -170,6 +170,36 @@ python scripts/smoke_release.py
 These checks catch structural and provenance errors. They do not replace
 reading the source or reviewing scientific claims.
 
+<!-- progress:start -->
+## Field results
+
+Measured on the maintainer's own library of 565 papers, organised with this skill's library tier. The traceability chart comes from this skill: review labels and PDF page anchors. The retrieval and grounded-answer charts come from the maintainer's separate search stack, which is not part of this skill; they show whether a library organised this way supports grounded answers. Updated 2026-10-07 (Page anchors).
+
+![Retrieval](docs/progress/retrieval.svg)
+
+![Grounding](docs/progress/grounding.svg)
+
+![Structure](docs/progress/structure.svg)
+
+| Metric | First (2026-10-06) | Latest (2026-10-07) |
+|---|---|---|
+| Right paper ranked first: Exact wording | 0.625 | 0.833 |
+| Right paper ranked first: Paraphrased | 0.667 | 0.750 |
+| Right paper ranked first: Multi-paper | 0.929 | 0.857 |
+| Right paper ranked first: Provenance | 0.733 | 0.867 |
+| Right paper ranked first: Korean questions | 0.358 | 0.358 |
+| Grounded-answer score (English) | 0.546 | 0.546 |
+| Grounded-answer score (Korean) | -0.151 | -0.151 |
+| Declines unanswerable (English) | 0% | 0% |
+| Papers labelled with review depth | 2% | 100% |
+| Summaries marked abstract-based | 1% | 100% |
+| Facts with a PDF page | 0% | 46% |
+| Gold evidence traceable to a page | 65% | 65% |
+| Fully reviewed papers (page-anchored dossiers) | 0 | 0 |
+
+Grounded-answer score follows [CRAG](https://github.com/facebookresearch/CRAG): a right answer scores +1, declining scores 0, and a wrong or unsupported answer scores −1. "First" is the earliest recorded value of each metric.
+<!-- progress:end -->
+
 ## Documentation
 
 - [Operating contract](SKILL.md)

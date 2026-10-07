@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 340" width="820" height="340" font-family="-apple-system, Segoe UI, sans-serif">
+<text x="56" y="22" font-size="15" font-weight="600" fill="#6b7280">Finding the right paper (share ranked first)</text>
+<line x1="56" x2="540" y1="276.0" y2="276.0" stroke="#9ca3af" stroke-opacity="0.35"/>
+<text x="48" y="280.0" font-size="11" fill="#6b7280" text-anchor="end">0</text>
+<line x1="56" x2="540" y1="217.0" y2="217.0" stroke="#9ca3af" stroke-opacity="0.35"/>
+<text x="48" y="221.0" font-size="11" fill="#6b7280" text-anchor="end">0.25</text>
+<line x1="56" x2="540" y1="158.0" y2="158.0" stroke="#9ca3af" stroke-opacity="0.35"/>
+<text x="48" y="162.0" font-size="11" fill="#6b7280" text-anchor="end">0.5</text>
+<line x1="56" x2="540" y1="99.0" y2="99.0" stroke="#9ca3af" stroke-opacity="0.35"/>
+<text x="48" y="103.0" font-size="11" fill="#6b7280" text-anchor="end">0.75</text>
+<line x1="56" x2="540" y1="40.0" y2="40.0" stroke="#9ca3af" stroke-opacity="0.35"/>
+<text x="48" y="44.0" font-size="11" fill="#6b7280" text-anchor="end">1</text>
+<text x="126.0" y="294" font-size="11" fill="#6b7280" text-anchor="middle">10-06 PDF cache broken</text>
+<text x="240.7" y="294" font-size="11" fill="#6b7280" text-anchor="middle">10-06 PDFs on NAS</text>
+<text x="355.3" y="294" font-size="11" fill="#6b7280" text-anchor="middle">10-06 Notes labelled</text>
+<text x="470.0" y="294" font-size="11" fill="#6b7280" text-anchor="middle">10-07 Page anchors</text>
+<text x="14" y="158.0" font-size="11" fill="#6b7280" transform="rotate(-90 14 158.0)" text-anchor="middle">recall@1</text>
+<polyline points="126.0,128.5 240.7,79.3 470.0,79.3" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+<circle cx="126.0" cy="128.5" r="4" fill="#2563eb"/>
+<circle cx="240.7" cy="79.3" r="4" fill="#2563eb"/>
+<circle cx="470.0" cy="79.3" r="4" fill="#2563eb"/>
+<rect x="558" y="37" width="12" height="12" rx="2" fill="#2563eb"/>
+<text x="576" y="47" font-size="12" fill="#6b7280">Exact wording</text>
+<polyline points="126.0,118.7 240.7,99.0 470.0,99.0" fill="none" stroke="#db2777" stroke-width="2.5" stroke-dasharray="7 5"/>
+<circle cx="126.0" cy="118.7" r="4" fill="#db2777"/>
+<circle cx="240.7" cy="99.0" r="4" fill="#db2777"/>
+<circle cx="470.0" cy="99.0" r="4" fill="#db2777"/>
+<rect x="558" y="59" width="12" height="12" rx="2" fill="#db2777"/>
+<text x="576" y="69" font-size="12" fill="#6b7280">Paraphrased</text>
+<polyline points="126.0,56.9 240.7,73.7 470.0,73.7" fill="none" stroke="#059669" stroke-width="2.5"/>
+<circle cx="126.0" cy="56.9" r="4" fill="#059669"/>
+<circle cx="240.7" cy="73.7" r="4" fill="#059669"/>
+<circle cx="470.0" cy="73.7" r="4" fill="#059669"/>
+<rect x="558" y="81" width="12" height="12" rx="2" fill="#059669"/>
+<text x="576" y="91" font-size="12" fill="#6b7280">Multi-paper</text>
+<polyline points="126.0,102.9 240.7,71.5 470.0,71.5" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="7 5"/>
+<circle cx="126.0" cy="102.9" r="4" fill="#d97706"/>
+<circle cx="240.7" cy="71.5" r="4" fill="#d97706"/>
+<circle cx="470.0" cy="71.5" r="4" fill="#d97706"/>
+<rect x="558" y="103" width="12" height="12" rx="2" fill="#d97706"/>
+<text x="576" y="113" font-size="12" fill="#6b7280">Provenance</text>
+<circle cx="470.0" cy="191.4" r="4" fill="#7c3aed"/>
+<rect x="558" y="125" width="12" height="12" rx="2" fill="#7c3aed"/>
+<text x="576" y="135" font-size="12" fill="#6b7280">Korean questions</text>
+</svg>

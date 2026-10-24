@@ -302,3 +302,12 @@ material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
 Propose `Reference Index`, `Reference Profile`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Reference Profile]]` and `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+
+### Link-validation regression
+
+The checker resolves explicit Vault-relative or note-relative paths before
+basename/alias lookup. Bare duplicate basenames and duplicate aliases remain
+ambiguous. Existing library basenames are valid Source Text manifest targets;
+no rename to `Paper — …` is required. Run
+`python scripts/test_check_notes_links.py` plus `python scripts/smoke_release.py`
+after changing this contract.

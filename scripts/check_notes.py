@@ -68,6 +68,48 @@ def frontmatter(text: str) -> dict[str, str]:
     return values
 
 
+def note_aliases(text: str) -> list[str]:
+    """Read Obsidian's scalar, flow-list and block-list alias properties."""
+    match = FRONTMATTER.match(text)
+    if not match:
+        return []
+    field = re.search(r"(?m)^alias(?:es)?:[ \t]*(.*)$", match.group(1))
+    if not field:
+        return []
+    value = field.group(1).strip()
+    if value.startswith("[") and value.endswith("]"):
+        tokens = re.findall(r'\s*("(?:[^"\\]|\\.)*"|\'(?:[^\']|\'\')*\'|[^,]+)', value[1:-1])
+    elif value:
+        tokens = [value]
+    else:
+        tokens = []
+        for line in match.group(1)[field.end():].splitlines():
+            if not line.strip():
+                continue
+            item = re.match(r"^\s*-\s+(.+)$", line)
+            if not item:
+                break
+            tokens.append(item.group(1))
+    return [token.strip().strip("\"'").replace("''", "'") for token in tokens if token.strip()]
+
+
+def link_candidates(target: str, source: Path, root: Path,
+                    name_paths: dict[str, list[Path]],
+                    alias_paths: dict[str, list[Path]]) -> list[Path]:
+    root = root.resolve()
+    if "/" in target:
+        relative = Path(target)
+        if relative.is_absolute():
+            return []
+        for base in (root, source.parent):
+            path = base / (str(relative) + ".md") if not target.endswith(".md") else base / relative
+            if path.resolve().is_relative_to(root) and path.is_file():
+                return [path]
+        return []
+    name = target[:-3] if target.endswith(".md") else target
+    return name_paths.get(name, []) or alias_paths.get(target, [])
+
+
 def not_provided(value: str) -> bool:
     return value.strip().lower() in {"", "not provided", "not supplied", "unknown"}
 
@@ -194,6 +236,10 @@ def check(
     name_paths: dict[str, list[Path]] = {}
     for path in all_notes:
         name_paths.setdefault(path.stem, []).append(path)
+    alias_paths: dict[str, list[Path]] = {}
+    for path in all_notes:
+        for alias in set(note_aliases(path.read_text(encoding="utf-8"))):
+            alias_paths.setdefault(alias, []).append(path)
     if library_scope and not (root / library_scope).is_dir():
         errors.append(f"library scope is not a folder: {library_scope}")
     scoped = (
@@ -225,7 +271,7 @@ def check(
             errors.append(f"filename-mirroring top-level heading: {path.relative_to(root)}")
         for target in LINK.findall(text):
             target = target.strip()
-            candidates = name_paths.get(target, [])
+            candidates = link_candidates(target, path, root, name_paths, alias_paths)
             if not candidates:
                 errors.append(f"unresolved wikilink: {path.relative_to(root)} -> {target.strip()}")
             elif len(candidates) > 1:
@@ -345,11 +391,12 @@ def check(
             errors.append(f"invalid source_text_page_map: {relative} -> {meta.get('source_text_page_map', '')}")
         if not SOURCE_TEXT_HASH.fullmatch(meta.get("source_text_hash", "")):
             errors.append(f"invalid source_text_hash: {relative}")
-        source_targets = [
-            target.strip()
+        source_targets = sorted({
+            candidate.stem
             for target in LINK.findall(text)
-            if target.strip().startswith(("Paper — ", "Source — "))
-        ]
+            for candidate in link_candidates(target.strip(), path, root, name_paths, alias_paths)
+            if candidate in references
+        })
         if len(source_targets) != 1:
             errors.append(f"source-text manifest must link exactly one Paper/Source: {relative}")
         else:

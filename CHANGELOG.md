@@ -5,6 +5,8 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Fixed link validation for Vault-relative and note-relative paths, Obsidian aliases, and manifests targeting existing library records. Missing and ambiguous targets remain errors.
+
 - Added a library tier so an existing paper corpus can join the schema in
   place: notes keep their basenames and legacy `status`, and carry
   `review_status` plus `summary_basis` so an abstract-derived summary can no

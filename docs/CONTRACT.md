@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 15`
+`contract_version: 16`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -191,3 +191,11 @@ may source promoted nodes. A library record that claims available source text
 must become a reviewed dossier, and a `Paper — …` or `Source — …` dossier inside
 the scope keeps the full dossier rules. The lint discovers these records with
 `--library-scope`, which also skips dot-directories that Obsidian does not index.
+
+
+In an existing library, legacy-only duplicate basenames outside Reference
+ownership are visible warnings; every ambiguous live wikilink and every
+Reference-owned collision remains an error. New Vaults retain strict basename
+uniqueness. Structural lint excludes `templates` and `_templates`, Markdown
+code examples, and dollar-delimited TeX when testing template variables.
+These exclusions never relax reviewed-dossier evidence requirements.

@@ -110,6 +110,29 @@ def link_candidates(target: str, source: Path, root: Path,
     return name_paths.get(name, []) or alias_paths.get(target, [])
 
 
+def prose(text: str) -> str:
+    """Exclude Markdown code examples from structural note checks."""
+    lines = []
+    fence = None
+    for line in text.splitlines(keepends=True):
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line.rstrip("\n"))
+        if fence:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence) and not marker[2].strip():
+                fence = None
+            lines.append("\n")
+        elif marker:
+            fence = marker[1]
+            lines.append("\n")
+        else:
+            lines.append(line)
+    return re.sub(r"(`+)(?!`)(.+?)(?<!`)\1(?!`)", "", "".join(lines), flags=re.DOTALL)
+
+
+def placeholder_text(text: str) -> str:
+    """TeX brace groups are mathematical notation, not template variables."""
+    return re.sub(r"(?<!\\)\${1,2}.*?(?<!\\)\${1,2}", "", prose(text), flags=re.DOTALL)
+
+
 def not_provided(value: str) -> bool:
     return value.strip().lower() in {"", "not provided", "not supplied", "unknown"}
 
@@ -216,6 +239,7 @@ def check(
     library_scope: str | None = None,
 ) -> dict[str, object]:
     errors: list[str] = []
+    warnings: list[str] = []
     schema_mode = os.environ.get("REFERENCE_SCHEMA_MODE", "compat")
     if schema_mode not in {"compat", "current"}:
         return {
@@ -229,7 +253,7 @@ def check(
     all_notes = sorted(
         path
         for path in root.rglob("*.md")
-        if "_templates" not in path.parts
+        if not {"_templates", "templates"}.intersection(path.relative_to(root).parts)
         and not (library_scope and any(part.startswith(".") for part in path.relative_to(root).parts))
     )
     notes = [path for path in all_notes if scope_prefix is None or scope_prefix in path.relative_to(root).parts]
@@ -261,15 +285,21 @@ def check(
     for name, paths in sorted(name_paths.items()):
         if len(paths) > 1:
             locations = ", ".join(str(path.relative_to(root)) for path in paths)
-            errors.append(f"duplicate Markdown basename: {name} ({locations})")
+            reference_owned = any(
+                frontmatter(path.read_text(encoding="utf-8")).get("type", "").startswith("reference-")
+                or frontmatter(path.read_text(encoding="utf-8")).get("type") == SOURCE_TEXT_MANIFEST_TYPE
+                or path in references for path in paths
+            )
+            diagnostics = warnings if library_scope and not reference_owned else errors
+            diagnostics.append(f"duplicate Markdown basename: {name} ({locations})")
 
     for path in notes:
         text = path.read_text(encoding="utf-8")
-        if PLACEHOLDER.search(path.stem) or PLACEHOLDER.search(text):
+        if PLACEHOLDER.search(path.stem) or PLACEHOLDER.search(placeholder_text(text)):
             errors.append(f"unresolved template placeholder: {path.relative_to(root)}")
-        if any(heading.strip() == path.stem for heading in TOP_LEVEL_HEADING.findall(text)):
+        if any(heading.strip() == path.stem for heading in TOP_LEVEL_HEADING.findall(prose(text))):
             errors.append(f"filename-mirroring top-level heading: {path.relative_to(root)}")
-        for target in LINK.findall(text):
+        for target in LINK.findall(prose(text)):
             target = target.strip()
             candidates = link_candidates(target, path, root, name_paths, alias_paths)
             if not candidates:
@@ -393,7 +423,7 @@ def check(
             errors.append(f"invalid source_text_hash: {relative}")
         source_targets = sorted({
             candidate.stem
-            for target in LINK.findall(text)
+            for target in LINK.findall(prose(text))
             for candidate in link_candidates(target.strip(), path, root, name_paths, alias_paths)
             if candidate in references
         })
@@ -463,7 +493,7 @@ def check(
         manifest_targets = list(
             dict.fromkeys(
                 target.strip()
-                for target in LINK.findall(text)
+                for target in LINK.findall(prose(text))
                 if target.strip() in manifest_names
             )
         )
@@ -581,7 +611,7 @@ def check(
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
         source_targets = [
             target.strip()
-            for target in LINK.findall(text)
+            for target in LINK.findall(prose(text))
             if target.strip().startswith(("Paper — ", "Source — "))
         ]
         for target in source_targets:
@@ -615,6 +645,7 @@ def check(
             for path in references
             if frontmatter(path.read_text(encoding="utf-8")).get("source_text_status") == "available"
         ),
+        "warnings": warnings,
         "errors": errors,
     }
 
@@ -667,6 +698,8 @@ def main() -> int:
             f"reviewed={result['reviewed_sources']}, partial={result['partial_sources']}, "
             f"capture={result['capture_sources']}, promoted={result['promoted_notes']})"
         )
+        for warning in result.get("warnings", []):
+            print(f"- warning: {warning}")
         for error in result["errors"]:
             print(f"- {error}")
     return 0 if result["status"] == "pass" else 1

@@ -5,6 +5,12 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Fixed structural false positives for declared template folders, Markdown code
+  examples, and dollar-delimited TeX. Existing-library legacy basename
+  collisions remain visible warnings; live ambiguous links and Reference-owned
+  collisions still fail. Added positive and negative structural regressions.
+  Contract version 16.
+
 - Fixed link validation for Vault-relative and note-relative paths, Obsidian aliases, and manifests targeting existing library records. Missing and ambiguous targets remain errors.
 
 - Added a library tier so an existing paper corpus can join the schema in

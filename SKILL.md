@@ -311,3 +311,20 @@ ambiguous. Existing library basenames are valid Source Text manifest targets;
 no rename to `Paper — …` is required. Run
 `python scripts/test_check_notes_links.py` plus `python scripts/smoke_release.py`
 after changing this contract.
+
+### Structural checks in an existing library
+
+The checker excludes both `templates/` and `_templates/` from factual-note
+validation. Code spans and fenced examples are not live wikilinks, headings,
+or unfinished prose; TeX dollar-delimited math is not a template placeholder.
+Unresolved variables in prose or filenames still fail.
+
+In `--library-scope` mode, duplicate basenames belonging only to legacy notes
+outside Reference ownership are reported as warnings. Reference-owned
+collisions and every ambiguous live wikilink still fail. New-Vault mode keeps
+all basename collisions as errors. Report warnings explicitly; do not call a
+legacy warning a repaired file. Renaming existing notes needs explicit user
+scope and a target-by-target incoming-link audit.
+
+Run `python scripts/test_check_notes_structure.py` as well as the link
+regressions and release smoke after changing structural checks.

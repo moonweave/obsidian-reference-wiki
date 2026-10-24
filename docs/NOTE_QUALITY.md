@@ -107,6 +107,21 @@ not completion evidence.
 - `reviewed`: the core paper map, method, theory/model, results, and limitations
   were checked, with a review trace and source anchors.
 
+## Updating an existing partial dossier
+
+Preserve the citation-key filename, links, aliases, user reading status and
+Zotero annotation blocks. Keep the earlier abstract-based summary as clearly
+labelled historical material when replacing it with a full dossier; do not let
+historical claims enter the reviewed evidence ledger by implication. Record
+agent review separately from human acceptance and raw-data reproduction.
+
+When a PDF's printed DOI differs from the current publisher or registry record,
+check title, authors, year, volume and pages against both records. Preserve the
+printed identifier separately from the verified current DOI, with the checked
+sources and date. A registry lookup failure alone does not invalidate the paper.
+Leave unresolved identity differences visible rather than silently correcting
+or merging them.
+
 ## Reading passes
 
 For a supplied paper, use this order:
@@ -223,6 +238,14 @@ retrieval availability are separate results; report both.
    Vault. For a producer repair, compare all pre-existing facts and source-file
    hashes before and after regeneration; preserve draft facts and overlays as
    well as reviewed facts. A passing checker cannot excuse dropped old data.
+
+For an authorized partial-to-reviewed promotion, the selected dossier's old
+abstract-derived facts may intentionally be superseded by its anchored reviewed
+evidence. Record the before/after counts and confirm that the removed facts
+belong only to that selected source. Preserve the earlier text in the dossier
+and compare all other facts, overlays and unrelated source-file hashes unchanged.
+This bounded replacement is distinct from accidental data loss during a
+producer repair; do not weaken the coverage auditor to accommodate it.
 
 An active build can temporarily publish upstream artifacts before downstream
 ones. Check the real producer's progress and final readiness before diagnosing

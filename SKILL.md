@@ -302,3 +302,47 @@ material, and list `.obsidian`, existing notes, source files, and plugins that
 were untouched.
 
 Propose `Reference Index`, `Reference Profile`, `Sources` or an equivalent existing `Papers` domain, `Claims`, `Evidence & Methods`, `Theories`, `Limitations`, `Themes`, `Questions`, `Reading Queue`, and `_templates`. A first route uses real links: `[[Reference Index]] -> [[Reference Profile]]` and `[[Reference Index]] -> [[Paper — …]]` for an academic article or `[[Source — …]]` for other material, then adds a Claim or promoted node only when the reference supports it. Create factual records only from supplied content or explicitly authorized reading; record canonical locations, never copies. Existing Vaults receive a read-only `keep in place` / `link from a new note` / `move later only with separate approval` ledger. Verify every wikilink resolves and report provenance, next action, and untouched material.
+
+### Link-validation regression
+
+The checker resolves explicit Vault-relative or note-relative paths before
+basename/alias lookup. Bare duplicate basenames and duplicate aliases remain
+ambiguous. Existing library basenames are valid Source Text manifest targets;
+no rename to `Paper — …` is required. Run
+`python scripts/test_check_notes_links.py` plus `python scripts/smoke_release.py`
+after changing this contract.
+
+### Structural checks in an existing library
+
+The checker excludes both `templates/` and `_templates/` from factual-note
+validation. Code spans and fenced examples are not live wikilinks, headings,
+or unfinished prose; TeX dollar-delimited math is not a template placeholder.
+Unresolved variables in prose or filenames still fail.
+
+In `--library-scope` mode, duplicate basenames belonging only to legacy notes
+outside Reference ownership are reported as warnings. Reference-owned
+collisions and every ambiguous live wikilink still fail. New-Vault mode keeps
+all basename collisions as errors. Report warnings explicitly; do not call a
+legacy warning a repaired file. Renaming existing notes needs explicit user
+scope and a target-by-target incoming-link audit.
+
+Run `python scripts/test_check_notes_structure.py` as well as the link
+regressions and release smoke after changing structural checks.
+
+
+### Keep structural repairs stable under producers
+
+After an authorized structural repair, trace the current ingest, sync, tag,
+concept, index, and template writers; historical plans are not active producer
+code. Preserve approved tag namespaces rather than reviving an old exporter.
+Preflight a new note's basename against existing factual notes before writing;
+a collision must not silently merge or rename either note.
+
+Replay the actual create and metadata-merge commands in a disposable fixture
+with a repaired note, a namespaced tag index, and a rendered template. Check
+that title levels, note paths, live link targets, user body, reading/review
+status, and provenance survive. Template directories must stay out of factual
+indexes even when their rendered YAML is valid. Test another merge after any
+initial metadata fill; it should stabilize. Prefer the producer's preserve-body
+merge mode; an explicit overwrite is a replacement operation and is not
+preservation evidence. A static checker pass alone cannot prove this behavior.

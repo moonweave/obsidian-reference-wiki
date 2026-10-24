@@ -5,6 +5,19 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Added producer-replay guidance for structural repairs: trace current writers,
+  preserve approved tag namespaces, reject new basename collisions before
+  writes, exclude rendered templates from factual indexes, and test repeat
+  metadata merges without treating overwrite as preservation evidence.
+
+- Fixed structural false positives for declared template folders, Markdown code
+  examples, and dollar-delimited TeX. Existing-library legacy basename
+  collisions remain visible warnings; live ambiguous links and Reference-owned
+  collisions still fail. Added positive and negative structural regressions.
+  Contract version 16.
+
+- Fixed link validation for Vault-relative and note-relative paths, Obsidian aliases, and manifests targeting existing library records. Missing and ambiguous targets remain errors.
+
 - Added a library tier so an existing paper corpus can join the schema in
   place: notes keep their basenames and legacy `status`, and carry
   `review_status` plus `summary_basis` so an abstract-derived summary can no

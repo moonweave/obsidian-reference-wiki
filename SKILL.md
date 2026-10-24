@@ -328,3 +328,21 @@ scope and a target-by-target incoming-link audit.
 
 Run `python scripts/test_check_notes_structure.py` as well as the link
 regressions and release smoke after changing structural checks.
+
+
+### Keep structural repairs stable under producers
+
+After an authorized structural repair, trace the current ingest, sync, tag,
+concept, index, and template writers; historical plans are not active producer
+code. Preserve approved tag namespaces rather than reviving an old exporter.
+Preflight a new note's basename against existing factual notes before writing;
+a collision must not silently merge or rename either note.
+
+Replay the actual create and metadata-merge commands in a disposable fixture
+with a repaired note, a namespaced tag index, and a rendered template. Check
+that title levels, note paths, live link targets, user body, reading/review
+status, and provenance survive. Template directories must stay out of factual
+indexes even when their rendered YAML is valid. Test another merge after any
+initial metadata fill; it should stabilize. Prefer the producer's preserve-body
+merge mode; an explicit overwrite is a replacement operation and is not
+preservation evidence. A static checker pass alone cannot prove this behavior.

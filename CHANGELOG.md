@@ -5,6 +5,11 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Added producer-replay guidance for structural repairs: trace current writers,
+  preserve approved tag namespaces, reject new basename collisions before
+  writes, exclude rendered templates from factual indexes, and test repeat
+  metadata merges without treating overwrite as preservation evidence.
+
 - Fixed structural false positives for declared template folders, Markdown code
   examples, and dollar-delimited TeX. Existing-library legacy basename
   collisions remain visible warnings; live ambiguous links and Reference-owned

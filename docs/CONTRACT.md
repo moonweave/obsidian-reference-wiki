@@ -40,6 +40,16 @@ notes it answered from. It never edits the Vault as a side effect of a
 question; a missing note or a stale `Source Text Manifest` hash is reported and
 proposed, not written.
 
+When an authorized external question/search pipeline consumes this Vault,
+indexed handoff additionally follows `docs/NOTE_QUALITY.md`: independently
+inventory every reviewed record, verify its labelled evidence through the
+active fact/vector/search layers, and check representative real questions.
+Structural lint and title lookup do not prove question coverage. Keep review
+status separate from retrieval state, preserve existing draft facts and source
+files during repairs, and reject unsupported identity mappings rather than
+silently skipping or renaming records. Notes-only use does not require an
+index. A dossier-coverage pass is not full-text search acceptance.
+
 First run uses the two-stage interview in `docs/ONBOARDING.md`. Stage 1 starts
 with one depth preset: `notes-only`, `searchable-library` (the default), or
 `knowledge-network`. It then checks the sharing boundary, synchronization

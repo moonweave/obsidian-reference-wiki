@@ -87,6 +87,19 @@ Answering never edits the Vault. When an answer reveals a missing note or a
 stale dossier, propose the change and wait; do not write it as a side effect of
 a question.
 
+### Indexed retrieval handoff
+
+When the authorized Vault also feeds a question/search index, use the
+[retrieval handoff checks](docs/NOTE_QUALITY.md#indexed-retrieval-handoff).
+`reviewed` describes source review, not index coverage. A structural lint pass,
+a title-search hit, or a nonzero total fact count cannot establish that every
+reviewed dossier's evidence is available to questions. Inventory all reviewed
+records independently, compare their labelled anchors through the active
+retrieval artifacts, and test representative questions before calling that
+integration ready. Keep an index failure visible without changing review
+status or renaming notes to fit an adapter. Ordinary notes-only Vaults do not
+need an indexing system.
+
 ## First-run workflow
 
 Ask what the user can answer now, and defer what depends on having notes. Reuse

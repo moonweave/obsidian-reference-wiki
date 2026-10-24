@@ -184,6 +184,53 @@ folder with the graph filter when the installed Obsidian version supports it;
 otherwise review factual edges through Backlinks/Outgoing links. Do not edit
 `.obsidian` automatically for this display preference.
 
+## Indexed retrieval handoff
+
+Apply this check only when the user has an authorized question/search pipeline
+connected to this Vault. It does not require an index for ordinary notes-only
+use, install an integration, or authorize a corpus rewrite. Source review and
+retrieval availability are separate results; report both.
+
+1. Inventory reviewed Paper/Source records across the approved scope before
+   reading generated indexes. Record the reviewed count and keep partial and
+   unread counts separate. Do not infer review from legacy reading status or
+   promote another source to make a test set larger.
+2. Compare every reviewed record and its eligible evidence ledger/limitation
+   units with the active question artifacts. Check identity mapping, actual
+   fact coverage, vector-manifest coverage/validity when vectors are used, and
+   current lexical search content. Preserve evidence labels, quantities,
+   conditions, and the recorded PDF/printed anchors. A source with some facts
+   can still be missing a result. Unanchored review-scope commentary is not a
+   source fact; report its exclusion separately rather than inventing an anchor.
+   Unsupported paths or filenames are explicit
+   adapter failures; preserve notes and links while repairing the producer.
+3. Use the integration's read-only coverage auditor with the independently
+   counted expected set. For a Research Wiki foundation checkout that provides
+   it, run `uv run python -m scripts.search.reference_index_audit --wiki-dir
+   <source-vault> --graph-index <active-index> --expect-reviewed <count>`.
+   Do not enable a retired GraphRAG path to obtain a green result. If the tool
+   or artifacts are absent, report the missing verification instead of claiming
+   searchable readiness. This dossier check does not prove full-text coverage.
+4. After an authorized repair, verify the real search and question entrypoints
+   with representative quantitative, method/mechanism, and limitation questions
+   from affected reviewed sources. Compare returned evidence with the dossier,
+   including its label, path, and page anchor. A relevant title alone is not a
+   passing question. Use existing manifest integrity checks before quoting a
+   derivative-backed dossier. Do not manufacture a cross-paper connection.
+5. Test the gate in a disposable fixture: remove one record or one evidence
+   unit while others remain, detach a vector entry, or stale the search body.
+   Each affected layer must fail visibly. Restore the fixture, not the live
+   Vault. For a producer repair, compare all pre-existing facts and source-file
+   hashes before and after regeneration; preserve draft facts and overlays as
+   well as reviewed facts. A passing checker cannot excuse dropped old data.
+
+An active build can temporarily publish upstream artifacts before downstream
+ones. Check the real producer's progress and final readiness before diagnosing
+a persistent stale index. Never weaken freshness checks to hide a build in
+progress. If an integration is incomplete, keep `review_status` truthful and
+report retrieval as pending or failed. Do not mark the source reviewed merely
+because an index build succeeded.
+
 ## Source-to-dossier semantic regression
 
 Run `scripts/score_dossier.py` against

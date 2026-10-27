@@ -1,10 +1,15 @@
-# Obsidian Research Wiki: Reference
+# Obsidian Reference Wiki
+
+**원문 근거를 남기는 문헌 지식 위키.** 기존 호출명
+`obsidian-research-wiki-reference`는 [독립 호환 패키지](docs/INSTALLATION.md#keep-the-old-invocation)로
+유지합니다. 기존 Vault의 파일명·유형·링크는 바꾸지 않습니다.
+[정리 명칭과 역할](docs/TERMINOLOGY.md)을 참고하세요.
 
 한국어 | [English](README.md)
 
 > 출처와의 연결을 유지하면서 논문을 추적 가능한 지식으로 정리합니다.
 
-`Obsidian Research Wiki: Reference`는 Obsidian에 근거 중심 문헌 체계를
+`Obsidian Reference Wiki`는 Obsidian에 근거 중심 문헌 체계를
 구축하는 독립형 에이전트 스킬(Agent Skill)입니다. 공개된
 [Agent Skills 사양](https://agentskills.io/specification)을 따르며, 검토한
 논문 노트, 검색 가능한 전문 파생본, 재사용 가능한 지식 노트를 서로
@@ -33,7 +38,7 @@ npx skills add moonweave/obsidian-reference-wiki
 있습니다. 설치한 뒤 새 에이전트 세션을 시작하고 다음과 같이 요청합니다.
 
 ```text
-obsidian-research-wiki-reference로 문헌 Vault를 설계해줘.
+obsidian-reference-wiki로 문헌 Vault를 설계해줘.
 ```
 
 > [!NOTE]

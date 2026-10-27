@@ -1,9 +1,14 @@
 ---
-name: obsidian-research-wiki-reference
-description: Design, onboard, or extend an Obsidian reference Vault for papers, Zotero, citations, claims, evidence, and limitations, and answer questions from it with the page anchor each value was recorded with. Not for research records or combined workspaces.
+name: obsidian-reference-wiki
+description: Design, onboard, or extend an Obsidian reference Vault for papers, Zotero, citations, claims, evidence, and limitations, and answer questions with the recorded source locator and evidence label. Not for research records or combined workspaces.
 ---
 
-# Obsidian Research Wiki: Reference
+# Obsidian Reference Wiki
+
+User-facing description: 원문 근거를 남기는 문헌 지식 위키. The legacy
+invocation `obsidian-research-wiki-reference` remains supported through the
+standalone compatibility package; see [installation](docs/INSTALLATION.md) and
+[the note terminology](docs/TERMINOLOGY.md).
 
 Onboard into a complete external-knowledge architecture, never a shallow starter. Design mode reads only user-authorized paths. Apply requires exact Vault path and Blueprint approval; it never changes `.obsidian`, installs plugins, copies PDFs/Zotero files, or moves existing notes. A full parsed/OCR text file is a derived reading input, not a replacement for the canonical source or a knowledge note.
 
@@ -67,17 +72,19 @@ the notes rather than from model memory or the web.
 1. Read the notes before answering. If no reviewed note covers the question,
    say that plainly and stop. Do not fall back to general knowledge while
    sounding like the Vault said it.
-2. Carry the anchor. Quote the recorded page anchor with the value, in the form
-   the note stores (`PDF p. 1 / printed p. 713, Fig. 1`). A value without its
-   anchor is not an answer this skill gives.
+2. Carry the anchor. Quote the recorded source locator with the value: PDF/printed
+   page for papers, a section or paragraph for web sources, a clause for standards,
+   or a version plus record/field for datasets. Never invent PDF pages for HTML.
 3. Carry the label unchanged. `reported`, `modelled`, `calculated`, `author
    interpretation`, and `synthesis` mean different things; never promote one to
    another, and never present a modelled number as a measurement.
 4. Material marked `not reviewed` or `not supplied` is not evidence. Name it as
    an unread lead instead of answering from it.
-5. Route cross-paper questions through the promoted Claim, Theory, or Theme
-   notes, then back to each Source dossier. Do not synthesize across papers
-   that the Vault never connected.
+5. Prefer existing Claim, Theory, or Theme routes for cross-paper questions. If
+   no route exists, read the relevant reviewed dossiers directly and label the
+   comparison as a one-off `synthesis`, citing each source and preserving its
+   limits. Do not imply that this synthesis is saved or approved; Answer never
+   creates a graph connection.
 6. Name the notes you answered from so the user can open them. The route is
    part of the answer.
 7. If a `Source Text Manifest` hash no longer matches its derivative, say the
@@ -153,7 +160,9 @@ reports, web pages, standards, datasets, or other external material. Preserve
 existing `Source — …` paper basenames and links; do not rename them as part of
 onboarding. Set `reference_type` to the actual prefix when rendering links.
 Start with the short title; on a basename collision append `— {year}`, then
-append `— {first author}` only if the title and year still collide.
+append `— {first author}` only if the title and year still collide. If that
+collides too, use a supplied stable citation key, Zotero item key, or DOI suffix;
+otherwise stop and ask for an identifier. Never silently merge or overwrite.
 
 ## Source-text layer
 
@@ -235,16 +244,24 @@ scientific fact beyond what the supplied source supports.
 
 ## Reference-record capture and selective promotion
 
-Create one Source note per paper as the reading record. Keep the paper-specific
+Create one literature record per source: a Paper note for an article or a
+Source note for other external material. Use “논문 노트 / 자료 노트” in Korean
+explanations; `reference-record` is their shared internal type. Keep the paper-specific
 abstract or scope, method as used by that paper, background theory, reported
-evidence or results, and supplied limitations together in that Source note.
+evidence or results, and supplied limitations together in that literature record.
 
 Promote a Claim, Method, Theory, Evidence, or Limitation to its own note only
 when it is reused across sources, answers an active literature question, needs
 independent links or revision, or has a distinct provenance boundary. A
 promoted note is a concise reusable index with a link back to the Source; it is
 not a second copy of the paper's full discussion. If none of those conditions
-hold, keep the detail in the Source note.
+hold, keep the detail in the literature record.
+
+Open Question notes may precede reading and link unread candidates; they are
+not promoted evidence. `question_status` defaults to `open` for existing notes.
+An `answered` question, an Answer/Evidence section, or labelled factual results
+requires reviewed supporting records and type-appropriate anchors. Questions
+without candidates may remain open; never manufacture a source link.
 
 ## Reading and note-quality workflow
 
@@ -271,7 +288,7 @@ scripts/check_notes.py <approved-vault> --expect-sources <approved-count>
 It checks Paper/Source count, source-text status and manifest metadata,
 text-basis enum, substantive required dossier sections, per-result
 evidence-ledger anchors and labels, promoted-note provenance and reviewed-source
-status, unresolved placeholders, duplicate
+status (open Question reading candidates are exempt), unresolved placeholders, duplicate
 basenames, filename-mirroring headings, and resolving wikilinks; it never
 edits the Vault. Run `check_source_text.py` separately with the approved
 `--vault-root` when the approved derived artifact itself must be hash-verified.
@@ -297,7 +314,7 @@ and source-text fields, plus an `## Extraction and review trace` section.
 - `partial` + `summary_basis: abstract` (or `supplied-excerpt`, `sections`): any
   generated summary is labelled `synthesis` of that excerpt, never a reading of
   the full text.
-- `reviewed`: the full dossier contract above, with PDF page anchors and
+- `reviewed`: the full dossier contract above, with type-appropriate source anchors and
   evidence labels. Promote nodes only from these.
 
 Whatever regenerates a summary must update these labels in the same write.
@@ -340,7 +357,9 @@ legacy warning a repaired file. Renaming existing notes needs explicit user
 scope and a target-by-target incoming-link audit.
 
 Run `python scripts/test_check_notes_structure.py` as well as the link
-regressions and release smoke after changing structural checks.
+regressions and release smoke after changing structural checks. Also run `python scripts/test_reference_contract.py`
+and `python scripts/test_skill_packages.py` for source locators, Question semantics,
+resolved-file provenance, and both installed skill names.
 
 
 ### Keep structural repairs stable under producers

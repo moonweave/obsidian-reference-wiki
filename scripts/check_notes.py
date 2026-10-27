@@ -55,6 +55,19 @@ CURRENT_PROMOTED_TYPES = {
 GROUNDED_PREFIXES = {"Claim — ", "Evidence — ", "Method — ", "Theory — ", "Limitation — "}
 
 
+def has_source_anchor(text: str, kind: str) -> bool:
+    """Recognize locators appropriate to the canonical source, not its filename."""
+    if PAGE_ANCHOR.search(text):
+        return True
+    if kind == "paper":
+        return False
+    section = r"(?:§\s*[\w.-]+|\b(?:section|heading|paragraph|clause|table)\s*[:#]?\s+[\w.-]+)"
+    if kind == "dataset":
+        return bool(re.search(r"\b(?:version|release)\s*[:#]?\s+[\w.-]+", text, re.I)
+                    and re.search(r"\b(?:record|row|column|field|table)\s*[:#]?\s+[\w.-]+", text, re.I))
+    return bool(re.search(section, text, re.I))
+
+
 def frontmatter(text: str) -> dict[str, str]:
     match = FRONTMATTER.match(text)
     if not match:
@@ -104,7 +117,7 @@ def link_candidates(target: str, source: Path, root: Path,
         for base in (root, source.parent):
             path = base / (str(relative) + ".md") if not target.endswith(".md") else base / relative
             if path.resolve().is_relative_to(root) and path.is_file():
-                return [path]
+                return [path.resolve()]
         return []
     name = target[:-3] if target.endswith(".md") else target
     return name_paths.get(name, []) or alias_paths.get(target, [])
@@ -238,6 +251,7 @@ def check(
     scope_prefix: str | None = None,
     library_scope: str | None = None,
 ) -> dict[str, object]:
+    root = root.resolve()
     errors: list[str] = []
     warnings: list[str] = []
     schema_mode = os.environ.get("REFERENCE_SCHEMA_MODE", "compat")
@@ -476,7 +490,13 @@ def check(
             reviewed += 1
         else:
             errors.append(f"invalid source status: {path.relative_to(root)}")
-        for headings in REQUIRED_SOURCE_HEADING_GROUPS:
+        required_headings = REQUIRED_SOURCE_HEADING_GROUPS
+        if meta.get("reference_kind", "paper") != "paper":
+            required_headings = tuple(group for group in required_headings if group[0] not in {
+                "## Method described or used by this source", "### Measurement and analysis",
+                "## Background theory and model",
+            })
+        for headings in required_headings:
             if current_schema and headings[0] not in text:
                 errors.append(f"missing {headings[0]}: {path.relative_to(root)}")
             elif not current_schema and not first_heading(text, headings):
@@ -553,6 +573,11 @@ def check(
                 ("## Limitations as supplied", "source limitations"),
                 ("## Extraction and review trace", "source review trace"),
             ):
+                if meta.get("reference_kind", "paper") != "paper" and label in {
+                    "source method", "source measurement and analysis", "source controls or baseline",
+                    "source theory or model",
+                }:
+                    continue
                 if isinstance(headings, str):
                     heading = headings
                 else:
@@ -560,8 +585,8 @@ def check(
                 if not substantive(section_preamble(text, heading)):
                     verb = "are" if label == "source limitations" else "is"
                     errors.append(f"{label} {verb} not supplied: {path.relative_to(root)}")
-            if not PAGE_ANCHOR.search(text):
-                errors.append(f"missing page anchor: {path.relative_to(root)}")
+            if not has_source_anchor(text, meta.get("reference_kind", "paper")):
+                errors.append(f"missing source anchor: {path.relative_to(root)}")
             if not EVIDENCE_LABEL.search(text):
                 errors.append(f"missing evidence type label: {path.relative_to(root)}")
         ledger_match = re.search(
@@ -582,15 +607,15 @@ def check(
                         f"evidence ledger item {index} missing evidence type label: "
                         f"{path.relative_to(root)}"
                     )
-                if not PAGE_ANCHOR.search(bullet):
+                if not has_source_anchor(bullet, meta.get("reference_kind", "paper")):
                     errors.append(
-                        f"evidence ledger item {index} missing page anchor: "
+                        f"evidence ledger item {index} missing source anchor: "
                         f"{path.relative_to(root)}"
                     )
 
     promoted = 0
-    source_statuses = {
-        path.stem: review_status(frontmatter(path.read_text(encoding="utf-8")))
+    source_metadata = {
+        path: frontmatter(path.read_text(encoding="utf-8"))
         for path in references
     }
     for path in notes:
@@ -607,21 +632,35 @@ def check(
                 errors.append(f"invalid promoted grounding_status: {path.relative_to(root)}")
             if "status" in meta:
                 errors.append(f"legacy status field is not allowed in current schema: {path.relative_to(root)}")
-        if "Source anchor" not in text and not re.search(r"(?:Paper|Source|Reference): \[\[", text):
+        source_targets = set()
+        for target in LINK.findall(prose(text)):
+            candidates = link_candidates(target.strip(), path, root, name_paths, alias_paths)
+            if len(candidates) == 1:
+                candidate = candidates[0]
+                candidate_meta = frontmatter(candidate.read_text(encoding="utf-8"))
+                if candidate in source_metadata or candidate_meta.get("type") == "reference-record":
+                    source_targets.add(candidate)
+        is_question = prefix == "Question — " or meta.get("type") == "reference-question"
+        if is_question and meta.get("question_status", "open") not in {"open", "answered"}:
+            errors.append(f"invalid question_status: {path.relative_to(root)}")
+        # Open questions may name unread reading candidates, but answers and factual
+        # evidence remain subject to the same provenance checks as promoted claims.
+        open_question = is_question and meta.get("question_status", "open") == "open" \
+            and not re.search(r"^## (?:Answer|Evidence)\s*$", text, re.M) \
+            and not EVIDENCE_LABEL.search(prose(text))
+        if open_question:
+            continue
+        if not source_targets:
             errors.append(f"promoted note lacks source provenance: {path.relative_to(root)}")
-        source_targets = [
-            target.strip()
-            for target in LINK.findall(prose(text))
-            if target.strip().startswith(("Paper — ", "Source — "))
-        ]
         for target in source_targets:
-            if source_statuses.get(target) != "reviewed":
+            target_meta = source_metadata.get(target, {})
+            if review_status(target_meta) != "reviewed":
                 errors.append(
                     f"promoted note references a non-reviewed source: "
-                    f"{path.relative_to(root)} -> {target}"
+                    f"{path.relative_to(root)} -> {target.relative_to(root)}"
                 )
-        if source_targets and not PAGE_ANCHOR.search(text):
-            errors.append(f"promoted note lacks a PDF page anchor: {path.relative_to(root)}")
+            if not has_source_anchor(text, target_meta.get("reference_kind", "paper")):
+                errors.append(f"promoted note lacks a source anchor: {path.relative_to(root)} -> {target.relative_to(root)}")
 
     if expected_sources is not None and len(references) != expected_sources:
         errors.append(

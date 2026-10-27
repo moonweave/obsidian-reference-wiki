@@ -7,7 +7,7 @@ canonical_location: {canonical_location}
 
 {theory_summary}
 
-## Assumptions or model boundary
+## Assumptions
 
 {theory_assumptions}
 
@@ -15,7 +15,7 @@ canonical_location: {canonical_location}
 
 {theory_role}
 
-## Assumptions and boundary
+## Applicability and limits
 
 {theory_limits}
 

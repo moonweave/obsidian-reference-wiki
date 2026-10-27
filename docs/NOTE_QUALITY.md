@@ -88,7 +88,9 @@ other external material. The prefix is part of the stable Markdown basename,
 not a prose heading. Preserve an existing basename even when it predates this
 default; link it through `reference_type` instead of renaming it silently.
 Use the short title first. If that basename already exists, append `— {year}`;
-if it still collides, append `— {first author}`.
+if it still collides, append `— {first author}`. If that also collides, use a
+supplied stable citation key, Zotero item key, or DOI suffix, or request one.
+Never merge or overwrite on a collision.
 
 ## Handoff count gate
 
@@ -146,7 +148,7 @@ hash, page map, and compact review trace.
 
 ## Provenance rule
 
-Each non-trivial result or promoted Claim must have an anchor such as `PDF p.
+Each non-trivial result or promoted Claim must have a type-appropriate anchor, for a paper such as `PDF p.
 9 / printed p. 3147, §5, Fig. 11` and one of these labels: `reported`,
 `modelled`, `calculated`, `author interpretation`, or `synthesis`. A numeric
 value is incomplete without its unit, condition, comparison, and boundary.
@@ -263,3 +265,20 @@ anchors, quantitative value/unit/condition retention, and explicitly forbidden
 contradictions. The good candidate must pass and the unsupported candidate
 must fail. This small deterministic corpus catches known semantic regressions;
 it does not replace human reading or a broader multi-paper benchmark.
+
+
+## Non-paper evidence and open questions
+
+Use the v17 source-kind rules in `CONTRACT.md`: web sections/paragraphs,
+standard clauses, or dataset version plus record/field replace PDF anchors when
+there is no PDF. Do not fabricate methods, controls or theories for sources
+that do not contain them. Record their applicability and the actual review scope.
+Keep every non-trivial ledger item labelled and located.
+
+Open Questions may link unread reading candidates or have no candidates yet.
+An unknown question anchor is `not provided`; it is not a missing factual
+citation. Once recording an answer or labelled evidence, require reviewed
+sources and their locators. Existing filenames and status fields remain valid.
+
+Run `python scripts/test_reference_contract.py` for explicit-path, relative-path,
+alias, no-source, source-kind locator and Question regression controls.

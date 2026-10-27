@@ -23,12 +23,13 @@ npx skills add moonweave/obsidian-reference-wiki --list
 For a manual installation, clone or unzip the repository into the personal
 skills directory your agent reads. The installed directory must contain
 `SKILL.md` at its root and should retain the basename
-`obsidian-research-wiki-reference`.
+`obsidian-reference-wiki`. Existing legacy installs must be inspected before
+updating; do not rename or remove their directory implicitly.
 
 | Agent | Personal skills directory | Explicit invocation |
 | --- | --- | --- |
-| Claude Code | `~/.claude/skills/` | `/obsidian-research-wiki-reference` |
-| Codex | `~/.codex/skills/` | `$obsidian-research-wiki-reference` |
+| Claude Code | `~/.claude/skills/` | `/obsidian-reference-wiki` |
+| Codex | `~/.codex/skills/` | `$obsidian-reference-wiki` |
 
 Both agents also pick the skill up from the description alone, so naming it in
 plain language is enough. A project-scoped install goes in `.claude/skills/` or
@@ -42,7 +43,7 @@ conversation but cannot create the Vault files.
 Start a new agent session after installation, then ask:
 
 ```text
-Use obsidian-research-wiki-reference to design a literature Vault.
+Use obsidian-reference-wiki to design a literature Vault.
 ```
 
 The first response should offer `notes-only`, `searchable-library`, and
@@ -50,18 +51,43 @@ The first response should offer `notes-only`, `searchable-library`, and
 occupies the target directory, inspect it before replacing it; do not merge two
 skill installations.
 
+## Keep the old invocation
+
+The canonical display name is **Obsidian Reference Wiki**. The previous
+`obsidian-research-wiki-reference` invocation remains available as a fully
+self-contained compatibility package, with the same checker, templates and
+contract. Build both names into a fresh directory outside the checkout:
+
+```bash
+python scripts/build_skill_packages.py --output /tmp/reference-skill-packages
+```
+
+The output contains `obsidian-reference-wiki/` and
+`obsidian-research-wiki-reference/`, each with its own correctly named
+`SKILL.md` and all local resources. Manually install the directory matching
+the name you already use, or install both if both explicit names are needed.
+Do not overwrite a customized installation without comparing and preserving
+its changes. The builder refuses existing package destinations and never
+changes an agent installation or Vault. No cross-skill forwarding or symlinks
+are needed for either package.
+
+Skills CLI discovery of the repository uses the new canonical name. To keep
+the old name, use the compatibility package rather than assuming the CLI will
+automatically add an alias. The documented update/remove commands above refer
+to the canonical CLI installation; retain the old name for a legacy install.
+
 ## Update or remove
 
 Update a Skills CLI installation:
 
 ```bash
-npx skills update obsidian-research-wiki-reference
+npx skills update obsidian-reference-wiki
 ```
 
 Remove it from the selected agent and scope:
 
 ```bash
-npx skills remove obsidian-research-wiki-reference
+npx skills remove obsidian-reference-wiki
 ```
 
 For a manual Git installation, run `git pull --ff-only` inside the installed

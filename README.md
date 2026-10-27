@@ -1,10 +1,15 @@
-# Obsidian Research Wiki: Reference
+# Obsidian Reference Wiki
+
+Source-grounded literature knowledge for Obsidian. The legacy skill name
+`obsidian-research-wiki-reference` remains available through the
+[standalone compatibility package](docs/INSTALLATION.md#keep-the-old-invocation).
+Existing Vault note names and links are preserved. See [note meanings](docs/TERMINOLOGY.md).
 
 [한국어](README.ko.md) | English
 
 > Turn papers into traceable knowledge—without losing the source.
 
-`Obsidian Research Wiki: Reference` is a standalone Agent Skill for building a
+`Obsidian Reference Wiki` is a standalone Agent Skill for building a
 provenance-first literature system in Obsidian. It follows the open
 [Agent Skills specification](https://agentskills.io/specification) and keeps
 reviewed paper notes, searchable source text, and reusable knowledge notes
@@ -32,7 +37,7 @@ The installer detects compatible agents and lets you choose the target and
 installation scope. Start a new agent session, then ask:
 
 ```text
-Use obsidian-research-wiki-reference to design a literature Vault.
+Use obsidian-reference-wiki to design a literature Vault.
 ```
 
 > [!NOTE]

@@ -96,6 +96,7 @@ VALUES = {
     "theme_anchor": "PDF p. 1, §1.",
     "question_anchor": "PDF p. 1, §1.",
     "question_text": "What remains unresolved?",
+    "reading_candidates": "- Reference to review: [[Paper — Anchor Review]]",
     "theme_link": "not provided",
     "source_links": "- Paper: [[Paper — Anchor Review]]",
     "capture_reason": "User supplied this source for later review.",
@@ -128,7 +129,7 @@ def assert_links_resolve(vault: Path) -> None:
 def main() -> None:
     os.environ["REFERENCE_SCHEMA_MODE"] = "current"
     skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
-    assert re.search(r"^name: obsidian-research-wiki-reference$", skill_text, re.M)
+    assert re.search(r"^name: (?:obsidian-reference-wiki|obsidian-research-wiki-reference)$", skill_text, re.M)
     legacy_names = ("Reference-First " + "Starter", "Research Workspace " + "Advanced")
     assert not any(name in skill_text for name in legacy_names)
     assert "## Target preflight" in skill_text
@@ -156,7 +157,7 @@ def main() -> None:
     assert re.search(r"Never hide or\s+defer `knowledge-network`", skill_text)
     assert "persisted `Reference Profile`" in skill_text
     payload = json.loads((ROOT / "evals/evals.json").read_text(encoding="utf-8"))
-    assert payload["skill_name"] == "obsidian-research-wiki-reference"
+    assert payload["skill_name"] == "obsidian-reference-wiki"
 
     corpus = ROOT / "evals/corpus/reference-quality/corpus.json"
     scorer = ROOT / "scripts/score_dossier.py"
@@ -616,6 +617,10 @@ def main() -> None:
         assert "source_text_hash mismatch" in tampered_source_text.stdout
 
     check_library_tier()
+    for regression in ("test_check_notes_links.py", "test_check_notes_structure.py",
+                       "test_reference_contract.py", "test_skill_packages.py"):
+        subprocess.run([sys.executable, str(ROOT / "scripts" / regression)], check=True,
+                       capture_output=True, text=True)
     print("PASS: standalone Reference release first-run smoke")
 
 

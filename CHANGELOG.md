@@ -5,6 +5,15 @@ versioning for public releases.
 
 ## [Unreleased]
 
+- Contract v17: validate factual provenance through resolved files (including
+  paths, aliases and legacy library basenames), require source-kind locators,
+  and distinguish open reading questions from grounded answers. Non-paper
+  records no longer require invented PDF pages or scientific-method sections.
+- Rename the display and canonical skill to Obsidian Reference Wiki /
+  `obsidian-reference-wiki`; provide a standalone legacy-name package builder,
+  preserving existing Vault filenames, stored types and links. Clarify Korean
+  note terminology, collision fallback and read-only cross-source synthesis.
+
 - Added producer-replay guidance for structural repairs: trace current writers,
   preserve approved tag namespaces, reject new basename collisions before
   writes, exclude rendered templates from factual indexes, and test repeat

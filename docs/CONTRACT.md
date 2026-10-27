@@ -1,6 +1,6 @@
 # Reference contract
 
-`contract_version: 16`
+`contract_version: 17`
 
 Reference owns external knowledge: source provenance, claims, evidence,
 literature methods, background theories, limitations, themes, questions, and
@@ -31,11 +31,12 @@ re-asking; its absence triggers the first-run interview before any file is
 created. A question is not a mutation and skips the interview entirely.
 
 Answer mode inherits the provenance rules rather than relaxing them. It
-responds only from reviewed notes, quotes the recorded page anchor with every
+responds only from reviewed notes, quotes the recorded source locator with every
 value, repeats the evidence label as written without promoting `modelled` or
 `synthesis` into a reported measurement, refuses `not reviewed` and `not
-supplied` material as evidence, routes cross-paper questions through promoted
-Claim, Theory, or Theme notes rather than inventing a connection, and names the
+supplied` material as evidence, prefers existing promoted
+Claim, Theory, or Theme routes and permits explicitly labelled, read-only
+one-off synthesis from reviewed dossiers when no saved route exists, and names the
 notes it answered from. It never edits the Vault as a side effect of a
 question; a missing note or a stale `Source Text Manifest` hash is reported and
 proposed, not written.
@@ -99,7 +100,7 @@ models, or conceptual frameworks and must retain their source link plus a
 claim link when a claim was supplied. Optional claim/theme relations are
 written explicitly as `not provided`; a graph edge is never invented.
 
-The Source note is the paper-first reading record. It may contain the paper's
+The literature record (Paper or Source) is the primary reading record. It may contain the paper's
 abstract or scope, method, theory, evidence, and limitations together. Standalone
 Claim, Method, Theory, Evidence, or Limitation notes are promoted only when
 they are reusable, question-relevant, independently revised, or provenance-
@@ -183,13 +184,13 @@ Paper/Source count in the approved Blueprint and `--expect-profile` for a new
 or upgraded preset-aware Apply. It also rejects unresolved
 template placeholders, invalid text-basis values, duplicate/ambiguous note
 basenames, filename-mirroring headings, and reviewed evidence-ledger items
-without a type label and page anchor. For an available derivative it requires
+without a type label and source-type-appropriate anchor. For an available derivative it requires
 a linked Source Text manifest with a valid hash and page-map declaration. A
 mismatch fails the command. A bare run without that option is exploratory only
 and cannot prove that the correct Vault or expected reference set was reviewed.
 For `reviewed` sources, required dossier sections must contain substantive
-content rather than `not supplied`. A promoted note must carry a PDF page
-anchor and may link only to a Source dossier whose status is `reviewed`;
+content rather than `not supplied`. A factual promoted note must carry a source-type-appropriate
+anchor and may use only a dossier whose status is `reviewed`;
 promotion from a partial or unread source fails.
 
 An existing corpus can join through the library tier instead of migration. A
@@ -209,3 +210,33 @@ Reference-owned collision remains an error. New Vaults retain strict basename
 uniqueness. Structural lint excludes `templates` and `_templates`, Markdown
 code examples, and dollar-delimited TeX when testing template variables.
 These exclusions never relax reviewed-dossier evidence requirements.
+
+
+## Names, source types, and questions (v17)
+
+The product is Obsidian Reference Wiki (원문 근거를 남기는 문헌 지식 위키).
+The canonical skill name is `obsidian-reference-wiki`; the old
+`obsidian-research-wiki-reference` name has a standalone compatibility package.
+This does not rename Vaults, notes, stored types, folders, or wikilinks.
+Use the terminology in `docs/TERMINOLOGY.md` when explaining the system.
+
+Resolve every provenance link to the actual validated record using the same
+path/basename/alias resolver as ordinary wikilinks. A heading, an alias, a
+citation-key filename, or an explicit path cannot bypass source review or
+locator checks. Missing, ambiguous, or outside-scope records do not establish
+reviewed provenance.
+
+Paper dossiers retain PDF page and method/measurement/controls/model checks.
+For other source kinds, a reviewed record needs the map, scope, evidence ledger,
+limitations and review trace; scientific method/model sections are conditional.
+Use PDF pages when applicable, otherwise a web section/heading/paragraph, a
+standard clause/section/table, or a dataset version/release plus record/row/field.
+These locators remain attached to labelled ledger items and promoted evidence.
+A locator check is structural, not proof that the source says the claim.
+
+An open Question is a reading question rather than a promoted factual claim.
+It may have no candidate or may link an unread candidate without inventing an
+anchor. Existing Questions without `question_status` default to open. An
+answered Question (`question_status: answered`), Answer/Evidence section, or
+labelled factual result requires reviewed sources and valid locators. The
+reading-candidate exemption does not apply to Claims, Evidence or other facts.

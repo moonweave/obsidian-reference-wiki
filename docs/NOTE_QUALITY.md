@@ -282,3 +282,51 @@ sources and their locators. Existing filenames and status fields remain valid.
 
 Run `python scripts/test_reference_contract.py` for explicit-path, relative-path,
 alias, no-source, source-kind locator and Question regression controls.
+
+
+## Source statements and AI interpretation
+
+Record three distinct origins: what the supplied source reports, the authors'
+interpretation of those results, and the agent's own synthesis or research idea.
+Use the existing evidence labels (`reported`, `modelled`, `calculated`,
+`author interpretation`, `synthesis`); the agent's idea is `synthesis`, never
+`author interpretation`. Preserve source modality and whether a result was
+measured, modelled or merely proposed.
+
+For abstract-only library records, keep `review_status: partial` and
+`summary_basis: abstract`. A generated paraphrase is `[synthesis]` with its
+scope explicitly stated and a short, exact supporting abstract excerpt. The
+excerpt must support the whole claim, not just share its topic. Use `Abstract`
+as the locator; do not invent PDF pages. Missing methods or limitations stay
+`not supplied in abstract`; do not fill required-looking headings from domain
+knowledge. Missing information is not an author-stated scientific limitation.
+
+Separate possible research connections under the existing relation section,
+label them `AI interpretation (unverified)`, and keep them out of the source
+results and promoted evidence. An integrated device's separate capabilities do
+not establish simultaneous operation; closed-loop control does not identify a
+sensor or feedback mechanism unless the supplied source does.
+
+Before saving a generated note, compare each factual paraphrase with its exact
+source excerpt and the surrounding source. Review entities, causality, numbers,
+units, conditions, modality and timing. A matching quote is a structural check,
+not semantic entailment. Reject or revise unsupported drafts before writing;
+a separate source-bound LLM review is useful automation but does not constitute
+full-text reading or human acceptance. Keep user edits, reading status and
+annotations when a draft is rejected or the source changes during generation.
+
+For authorized corrections, retain the old generated text in a clearly marked
+historical section, separate from current evidence. Preserve its wording, links
+and reading history; archive headings so producers cannot mistake the old text
+for the current generated sections. Verify the actual extractor/overwrite path
+on a disposable fixture. When indexes consume the note, refresh only the
+approved source's derived records, preserving unrelated records and overlays.
+Structural lint does not prove either semantic support or downstream freshness.
+
+When answering, inspect review scope and the supporting source passage before
+using a generated summary or an indexed snippet. Historical text and unverified
+AI ideas are not source evidence, even when a search result includes a citation.
+A partial record is an explicitly scoped discovery/drafting aid, not promoted
+factual evidence. It cannot establish unread methods, full-text results or
+quantitative comparisons. Factual answers and answered Questions/promoted facts
+still follow the existing reviewed-source gate.

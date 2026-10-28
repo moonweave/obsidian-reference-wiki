@@ -13,6 +13,9 @@ source_text_manifest: {source_text_manifest}
 reviewed_scope: {reviewed_scope}
 unreviewed_scope: {unreviewed_scope}
 ---
+<!-- Draft within the supplied scope. Keep supporting source excerpts, author interpretation
+and unverified AI synthesis distinct; see docs/NOTE_QUALITY.md. -->
+
 ## Canonical source
 
 - [Open canonical source]({canonical_location})

@@ -378,3 +378,9 @@ indexes even when their rendered YAML is valid. Test another merge after any
 initial metadata fill; it should stabilize. Prefer the producer's preserve-body
 merge mode; an explicit overwrite is a replacement operation and is not
 preservation evidence. A static checker pass alone cannot prove this behavior.
+
+
+For abstract-only drafting or correcting generated summaries, apply
+[the source/interpretation boundary](docs/NOTE_QUALITY.md#source-statements-and-ai-interpretation).
+Keep supporting excerpts, author interpretation and unverified AI ideas distinct;
+headings or genuine quotes alone do not establish scientific support.
